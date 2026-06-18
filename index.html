@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- VERS: 4.0.2 | 19/06/2026 11:15 | GPS fix: requestAnimationFrame per tutti i dispositivi -->
+<!-- VERS: 4.0.3 | 19/06/2026 11:45 | GPS fix definitivo: style.display + container protetto -->
 <html lang="it">
 <head>
     <meta charset="UTF-8">
@@ -166,9 +166,6 @@
         #gps-ui-container {
             display: none;
         }
-        #gps-ui-container.visible {
-            display: block;
-        }
         .map-gps-container {
             background: #FFF8E7;
             border: 2px solid var(--gold);
@@ -269,7 +266,7 @@
                 <button class="lang-btn" onclick="setLang('de')" id="btn-de" role="radio" aria-checked="false" aria-label="Deutsch">DE</button>
                 <button class="lang-btn" onclick="setLang('pl')" id="btn-pl" role="radio" aria-checked="false" aria-label="Polski">PL</button>
             </div>
-            <div class="version-info">📅 19/06/2026 · 11:15 · v4.0.2</div>
+            <div class="version-info">📅 19/06/2026 · 11:45 · v4.0.3</div>
         </div>
     </header>
     <div class="hero" id="hero">
@@ -737,11 +734,13 @@
             var container = document.getElementById('gps-ui-container');
             if (!container) return;
 
+            // Nascondi sempre nei dettagli
             if (currentPlaceDetail >= 0) {
-                container.classList.remove('visible');
+                container.style.display = 'none';
                 return;
             }
 
+            // Aggiorna testo e bottone
             var textEl = document.getElementById('gps-text');
             if (textEl) {
                 textEl.innerHTML = tr(
@@ -760,6 +759,7 @@
                 btn.classList.toggle('active', isGpsTracking);
             }
 
+            // Mostra solo se siamo in una sezione con mappa
             var visible = false;
             var mapSections = ['mustsee', 'restaurants', 'barpub', 'supermarkets', 'parking', 'around', 'marche'];
             if (currentSection !== -1) {
@@ -769,7 +769,7 @@
                     if (currentSubItinerary) visible = true;
                 }
             }
-            container.classList.toggle('visible', visible);
+            container.style.display = visible ? 'block' : 'none';
         }
 
         function toggleGpsTracking() {
@@ -855,7 +855,7 @@
             if (currentSection === -1) {
                 nav.style.display = 'none';
                 cont.innerHTML = renderHome();
-                // Forza aggiornamento GPS anche sulla home
+                // Forza GPS sulla home (sempre nascosto)
                 updateGpsUI();
                 requestAnimationFrame(function() {
                     updateGpsUI();
@@ -874,12 +874,11 @@
 
             if (currentPlaceDetail < 0) {
                 setTimeout(initSectionMap, 0);
-                // Forza update GPS subito e dopo il frame
+                // Forza update GPS subito, dopo il frame e dopo 200ms
                 updateGpsUI();
                 requestAnimationFrame(function() {
                     updateGpsUI();
                 });
-                // Richiama ancora dopo 200ms per sicurezza su tutti i dispositivi
                 setTimeout(updateGpsUI, 200);
             } else {
                 updateGpsUI();

@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- VERS: 4.0.2 | 19/06/2026 11:15 | GPS fix: requestAnimationFrame per tutti i dispositivi -->
 <html lang="it">
 <head>
     <meta charset="UTF-8">
@@ -45,13 +46,15 @@
         a { color: inherit; text-decoration: none }
         button { font-family: 'Outfit', sans-serif; cursor: pointer }
         .header { background: var(--navy); color: var(--white); position: sticky; top: 0; z-index: 200; box-shadow: 0 2px 20px rgba(0,0,0,.30) }
-        .header-inner { display: flex; align-items: center; justify-content: space-between; padding: 13px max(28px, calc(env(safe-area-inset-left, 0px) + 18px)); padding-left: max(28px, calc(env(safe-area-inset-left, 0px) + 18px)); padding-right: max(28px, calc(env(safe-area-inset-right, 0px) + 18px)); border-bottom: 1px solid rgba(200,164,90,.18) }
+        .header-inner { display: flex; align-items: center; justify-content: space-between; padding: 13px max(28px, calc(env(safe-area-inset-left, 0px) + 18px)); padding-left: max(28px, calc(env(safe-area-inset-left, 0px) + 18px)); padding-right: max(28px, calc(env(safe-area-inset-right, 0px) + 18px)); border-bottom: 1px solid rgba(200,164,90,.18); flex-wrap: wrap; gap: 4px 0; }
+        .header-brand { flex: 1; min-width: 140px; }
         .header-title { font-family: 'Cormorant Garamond', serif; font-size: 1.25rem; font-weight: 600; line-height: 1.15; color: var(--white) }
         .header-sub { font-size: .65rem; font-weight: 300; opacity: .6; letter-spacing: .1em; text-transform: uppercase; margin-top: 1px }
         .header-cin { font-size: .6rem; font-weight: 300; opacity: .5; letter-spacing: .05em; margin-top: 2px; color: var(--gold-3); }
-        .lang-toggle { display: flex; background: rgba(255,255,255,.08); border-radius: 22px; overflow: hidden; border: 1px solid rgba(200,164,90,.30) }
+        .lang-toggle { display: flex; background: rgba(255,255,255,.08); border-radius: 22px; overflow: hidden; border: 1px solid rgba(200,164,90,.30); flex-shrink: 0; }
         .lang-btn { padding: 5px 11px; font-size: .68rem; font-weight: 500; border: none; background: transparent; color: rgba(255,255,255,.55); transition: all .2s }
         .lang-btn.active { background: var(--gold); color: var(--navy); font-weight: 600 }
+        .version-info { font-size: .55rem; color: rgba(255,255,255,.35); text-align: right; width: 100%; letter-spacing: .04em; margin-top: 2px; }
         .hero { width: 100%; height: 320px; overflow: hidden; position: relative; background: linear-gradient(160deg, var(--navy) 0%, var(--navy-2) 50%, var(--navy-3) 100%); transition: height .3s ease }
         .hero.section-mode { height: 68px }
         @media (max-height: 700px) { .hero.section-mode { height: 48px } }
@@ -160,7 +163,6 @@
         .link-desc { font-size: .7rem; color: var(--muted); margin-top: 1px }
         .link-action { font-size: .68rem; color: var(--navy-3); background: var(--bg); padding: 4px 9px; border-radius: 14px; border: 1px solid var(--border); white-space: nowrap }
 
-        /* GPS UI */
         #gps-ui-container {
             display: none;
         }
@@ -267,6 +269,7 @@
                 <button class="lang-btn" onclick="setLang('de')" id="btn-de" role="radio" aria-checked="false" aria-label="Deutsch">DE</button>
                 <button class="lang-btn" onclick="setLang('pl')" id="btn-pl" role="radio" aria-checked="false" aria-label="Polski">PL</button>
             </div>
+            <div class="version-info">📅 19/06/2026 · 11:15 · v4.0.2</div>
         </div>
     </header>
     <div class="hero" id="hero">
@@ -278,7 +281,6 @@
     <nav class="nav-scroll" id="nav" style="display:none;" role="navigation" aria-label="Sezioni"></nav>
     <main class="content" id="content" role="main"></main>
 
-    <!-- GPS UI - Ora rimane fisso qui, non viene più spostato -->
     <div id="gps-ui-container">
         <div class="map-gps-container">
             <div class="map-gps-row">
@@ -295,15 +297,7 @@
     <div class="copyright-footer">© 2026 Affittacamere Ancona Centro · Guida V4.0 · All rights reserved</div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
     <script>
-        // ============================================================
-        // V4.0 · COMPILAZIONE: 18/06/2026 14:45
-        // TUTTO IL CODICE (data + app) UNIFICATO PER IPAD
-        // ============================================================
-
-        // ---- DATA.JS (contenuti) ----
-
         var appData = {
             rules: [
                 { icon: '🚭', it: 'Vietato fumare in tutto l\'appartamento', en: 'No smoking anywhere in the apartment', de: 'Rauchen in der gesamten Wohnung verboten', pl: 'Zakaz palenia w całym mieszkaniu' },
@@ -595,8 +589,6 @@
             'contact': 10
         };
 
-        // ---- APP.JS (logica) ----
-
         var currentLang = 'it';
         var currentSection = -1;
         var currentPlaceDetail = -1;
@@ -863,7 +855,11 @@
             if (currentSection === -1) {
                 nav.style.display = 'none';
                 cont.innerHTML = renderHome();
+                // Forza aggiornamento GPS anche sulla home
                 updateGpsUI();
+                requestAnimationFrame(function() {
+                    updateGpsUI();
+                });
                 return;
             }
 
@@ -876,11 +872,14 @@
             var body = renderSection(s.id);
             cont.innerHTML = '<section class="section active"><div class="section-header"><div class="section-header-inner"><div class="section-icon" aria-hidden="true">' + s.icon + '</div><div><div class="section-title">' + tr(s.it, s.en, s.de, s.pl) + '</div></div></div></div><div class="cards">' + body + '<div class="goto-home"><button class="home-btn" onclick="goTo(-1)" aria-label="Torna alla Home">🏠 Home</button></div></div></section>';
 
-            // Il container GPS non viene più spostato dentro .cards
-            // La visibilità è gestita da updateGpsUI() tramite la classe .visible
-
             if (currentPlaceDetail < 0) {
                 setTimeout(initSectionMap, 0);
+                // Forza update GPS subito e dopo il frame
+                updateGpsUI();
+                requestAnimationFrame(function() {
+                    updateGpsUI();
+                });
+                // Richiama ancora dopo 200ms per sicurezza su tutti i dispositivi
                 setTimeout(updateGpsUI, 200);
             } else {
                 updateGpsUI();
@@ -1106,7 +1105,6 @@
             }
         }
 
-        // PWA – Service Worker
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', function() {
                 navigator.serviceWorker.register('./sw.js').then(function(reg) {
@@ -1117,7 +1115,6 @@
             });
         }
 
-        // Supporto hash per shortcut PWA
         window.addEventListener('load', function() {
             var hash = window.location.hash.replace('#', '');
             if (hash && sectionHashMap[hash] !== undefined) {
@@ -1125,10 +1122,8 @@
             }
         });
 
-        // Avvio
         renderAll();
         setTimeout(updateGpsUI, 300);
     </script>
 </body>
-</htlm>
-    
+</html>

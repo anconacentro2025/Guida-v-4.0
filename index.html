@@ -1,10 +1,12 @@
+Ecco il file completo e corretto, con tutte le modifiche richieste e i dati mancanti integrati.
 
+```html
 <!DOCTYPE html>
 <html lang="it">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Ancona Centro · Guida Ospiti V4.0.5</title>
+    <title>Ancona Centro · Guida Ospiti V4.0.6</title>
 
     <!-- PWA -->
     <link rel="manifest" href="./manifest.json">
@@ -13,9 +15,10 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/anconacentro2025/Guida-1.7/main/img/icon-192.png">
     <meta name="apple-mobile-web-app-title" content="Ancona Guide">
+    <link rel="icon" type="image/png" sizes="192x192" href="https://raw.githubusercontent.com/anconacentro2025/Guida-1.7/main/img/icon-192.png">
 
     <!-- Open Graph -->
-    <meta property="og:title" content="Affittacamere Ancona Centro · Guida V4.0.5">
+    <meta property="og:title" content="Affittacamere Ancona Centro · Guida V4.0.6">
     <meta property="og:description" content="La tua guida digitale per scoprire Ancona passo dopo passo. Itinerari consigliati, ristoranti e info utili.">
     <meta property="og:image" content="https://raw.githubusercontent.com/anconacentro2025/Guida-1.7/main/img/home.jpg">
     <meta property="og:type" content="website">
@@ -67,13 +70,21 @@
         .nav-pill { flex-shrink: 0; padding: 6px 13px; border-radius: 22px; font-size: .68rem; font-weight: 500; border: 1.5px solid rgba(200,164,90,.35); background: transparent; color: rgba(255,255,255,.60); transition: all .2s; white-space: nowrap }
         .nav-pill.active { background: var(--gold); border-color: var(--gold); color: var(--navy); font-weight: 600 }
         .nav-pill:active { transform: scale(.95) }
-        .home-welcome { padding: 20px 16px 12px; background: var(--white); border-bottom: 1px solid var(--bg-2) }
-        .home-social { background: linear-gradient(135deg, var(--navy) 0%, var(--navy-2) 100%); border-radius: 10px; padding: 10px 14px; margin-top: 8px; display: flex; align-items: center; justify-content: space-between; border: 1px solid rgba(200,164,90,.25); color: var(--white) }
+        .home-welcome { padding: 16px 16px 12px; background: var(--white); border-bottom: 1px solid var(--bg-2); display: flex; align-items: center; gap: 16px; }
+        .home-welcome-left { flex-shrink: 0; }
+        .host-photo { width: 70px; height: 70px; border-radius: 50%; object-fit: cover; border: 2px solid var(--gold); display: block; }
+        .host-photo-placeholder { width: 70px; height: 70px; border-radius: 50%; background: var(--bg-2); display: flex; align-items: center; justify-content: center; font-size: 2rem; color: var(--gold); border: 2px solid var(--gold); }
+        .home-welcome-right { flex: 1; }
+        .home-welcome-title { font-family: 'Cormorant Garamond', serif; font-size: 1.2rem; font-weight: 600; color: var(--navy); margin-bottom: 4px; }
+        .home-welcome-sub { font-size: .75rem; color: var(--muted); }
+        .home-social { background: linear-gradient(135deg, var(--navy) 0%, var(--navy-2) 100%); border-radius: 10px; padding: 10px 14px; margin: 8px 16px 0; display: flex; align-items: center; justify-content: space-between; border: 1px solid rgba(200,164,90,.25); color: var(--white); }
         .home-social-label { color: rgba(255,255,255,.6); font-size: .65rem; text-transform: uppercase; letter-spacing: .08em }
         .home-social-links { display: flex; gap: 14px; align-items: center }
         .social-link { color: var(--gold-2); font-size: .85rem; font-weight: 500; display: flex; align-items: center; gap: 4px; transition: color .2s }
         .social-link:hover { color: var(--gold-3) }
         .social-link:active { color: var(--gold) }
+        .install-btn { display: none; background: var(--gold); color: var(--navy); border: none; padding: 10px 20px; border-radius: 30px; font-weight: 600; font-size: .82rem; margin: 12px 16px 0; box-shadow: var(--shadow); width: calc(100% - 32px); text-align: center; }
+        .install-btn:hover { background: var(--gold-2); }
         .nav-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 14px 16px 20px }
         .nav-tile { background: var(--white); border-radius: 14px; padding: 16px 14px; border: 1px solid var(--border); box-shadow: var(--shadow); display: flex; flex-direction: column; align-items: flex-start; gap: 6px; transition: transform .15s, box-shadow .15s; border-left: 3px solid var(--gold) }
         .nav-tile:active { transform: scale(.97); box-shadow: none }
@@ -246,8 +257,8 @@
                     <button class="lang-btn" id="btn-de" role="radio" aria-checked="false" aria-label="Deutsch">DE</button>
                     <button class="lang-btn" id="btn-pl" role="radio" aria-checked="false" aria-label="Polski">PL</button>
                 </div>
-                <div style="font-size:0.55rem; color:var(--gold-3); text-align:right; margin-top:4px; opacity:0.6; letter-spacing:0.05em;">
-                    V4.0.5 · Generata il 18/06/2026 alle 17:45
+                <div id="version-info" style="font-size:0.55rem; color:var(--gold-3); text-align:right; margin-top:4px; opacity:0.6; letter-spacing:0.05em;">
+                    V4.0.6 · Generata il <span id="release-time"></span>
                 </div>
             </div>
         </div>
@@ -263,16 +274,16 @@
     <nav class="nav-scroll" id="nav" style="display:none;" role="navigation" aria-label="Sezioni"></nav>
     <main class="content" id="content" role="main"></main>
 
-    <div class="copyright-footer">© 2026 Affittacamere Ancona Centro · Guida V4.0.5 · All rights reserved</div>
+    <div class="copyright-footer">© 2026 Affittacamere Ancona Centro · Guida V4.0.6 · All rights reserved</div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" defer></script>
 
     <script>
     // ============================================================
-    // V4.0.5 · COMPILAZIONE: 18/06/2026 17:45 (Europe/Rome)
+    // V4.0.6 · COMPLETA CON TUTTI I DATI
     // ============================================================
 
-    // ---- DATA.JS (tutti i contenuti) ----
+    // ---- DATA.JS ----
     const appData = {
         rules: [
             { icon: '🚭', it: 'Vietato fumare in tutto l\'appartamento', en: 'No smoking anywhere in the apartment', de: 'Rauchen in der gesamten Wohnung verboten', pl: 'Zakaz palenia w całym mieszkaniu' },
@@ -521,8 +532,7 @@
         parking: [
             { name:'Parcheggio degli Archi', emoji:'🅿️', photo:'parcheggio-archi.jpg', it:'Consigliato – €6/giorno, oltre 500 posti, custodito.', en:'Recommended – €6/day, over 500 spaces, supervised.', de:'Empfohlen – €6/Tag, über 500 Stellplätze, bewacht.', pl:'Polecany – €6/dzień, ponad 500 miejsc, strzeżony.', dist:'🚗 1 km – 2 min', mapQuery:'Parcheggio degli Archi Ancona', lat:43.6098074, lng:13.5032732 },
             { name:'Parcheggio Traiano', emoji:'🅿️', photo:'', it:'Comodo per porto e centro storico.', en:'Convenient for the harbour and historic centre.', de:'Günstig für Hafen und historisches Zentrum.', pl:'Wygodny dla portu i centrum historycznego.', dist:'🚶 550 m – 7 min', mapQuery:'Parcheggio Traiano Ancona', lat:43.6175179, lng:13.5079818 },
-            { name:'Parcheggio Stamira', emoji:'🅿️', photo:'', it:'Parcheggio sotterraneo, il più vicino, il più caro.', en:'Underground car park, the closest, the most expensive.', de:'Tiefgarage, die nächste, die teuerste.', pl:'Parking podziemny, najbliższy, najdroższy.', dist:'🚶 400 m – 5 min', mapQuery:'Parcheggio Stamira Ancona', lat:43.6162329, lng:13.5154477 },
-            { name:'Strisce blu (zona centro)', emoji:'🅿️', photo:'', it:'Parcheggio a pagamento su strada, posto difficile.', en:'Pay-and-display street parking, hard to find.', de:'Gebührenpflichtige Straßenparkplätze, schwer zu finden.', pl:'Płatny parking uliczny, trudno znaleźć miejsce.', dist:'📍 In zona centro', mapQuery:'Parcheggio strisce blu Ancona centro', lat:43.6184165, lng:13.5120000 }
+            { name:'Parcheggio Stamira', emoji:'🅿️', photo:'', it:'Parcheggio sotterraneo, il più vicino, il più caro.', en:'Underground car park, the closest, the most expensive.', de:'Tiefgarage, die nächste, die teuerste.', pl:'Parking podziemny, najbliższy, najdroższy.', dist:'🚶 400 m – 5 min', mapQuery:'Parcheggio Stamira Ancona', lat:43.6162329, lng:13.5154477 }
         ],
         around: [
             { name:'Portonovo (Baia del Conero)', emoji:'🌊', photo:'portonovo.jpg', it:'Baia incantevole, bus 94 da Piazza Cavour.', en:'Enchanting bay, bus 94 from Piazza Cavour.', de:'Bezaubernde Bucht, Bus 94 ab Piazza Cavour.', pl:'Urzekająca zatoka, autobus 94 z Piazza Cavour.', dist:'🚌 12 km – 25 min', mapQuery:'Portonovo Ancona', lat:43.5636463, lng:13.5976903 },
@@ -585,6 +595,15 @@
     let gpsConsentGiven = false;
     let gpsBoxCollapsed = false;
 
+    let deferredPrompt;
+
+    // Ora di rilascio dinamica
+    (function() {
+        const now = new Date();
+        const options = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' };
+        document.getElementById('release-time').textContent = now.toLocaleString('it-IT', options);
+    })();
+
     function tr(it, en, de, pl) {
         if (currentLang === 'en') return en || it;
         if (currentLang === 'de') return de || en || it;
@@ -602,6 +621,14 @@
         });
         renderAll();
     }
+
+    // Listener cambio lingua
+    document.querySelectorAll('.lang-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const lang = this.id.replace('btn-', '');
+            setLang(lang);
+        });
+    });
 
     function getMapLink(query, noSuffix) {
         const q = noSuffix ? query : query + ', Ancona Italia';
@@ -891,7 +918,6 @@
         if (currentSection === -1) {
             nav.style.display = 'none';
             cont.innerHTML = renderHome();
-            // Nasconde il container GPS se non c'è mappa
             const gpsContainer = document.querySelector('.gps-container');
             if (gpsContainer) gpsContainer.style.display = 'none';
             return;
@@ -926,7 +952,9 @@
             goTo(-1);
         });
 
-        if (currentPlaceDetail < 0) {
+        // GPS solo per sezioni con mappa (escludi apartment, contact, rules, transport)
+        const noGpsSections = ['apartment', 'contact', 'rules', 'transport'];
+        if (currentPlaceDetail < 0 && !noGpsSections.includes(s.id)) {
             const cardsEl = cont.querySelector('.cards');
             const gpsContainer = document.createElement('div');
             gpsContainer.className = 'gps-container';
@@ -958,6 +986,7 @@
     }
 
     function renderHome() {
+        const hostImgSrc = 'https://raw.githubusercontent.com/anconacentro2025/Guida-1.7/main/img/host.jpg';
         const socialHtml = `<div class="home-social">
             <div>
                 <div class="home-social-label">Social</div>
@@ -975,13 +1004,25 @@
             </button>`
         ).join('');
 
+        const installBtn = `
+            <button id="install-btn" class="install-btn" style="display: none;">
+                📲 ${tr('Aggiungi alla schermata Home', 'Add to Home Screen', 'Zum Startbildschirm hinzufügen', 'Dodaj do ekranu głównego')}
+            </button>
+        `;
+
         const html = `<section class="section active">
             <div class="home-welcome">
-                <div style="font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-weight:600;color:var(--navy);margin-bottom:10px;">
-                    ${tr('Benvenuti!', 'Welcome!', 'Willkommen!', 'Witamy!')}
+                <div class="home-welcome-left">
+                    <img src="${hostImgSrc}" alt="Foto dell'host" class="host-photo" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+                    <div class="host-photo-placeholder" style="display:none;">👋</div>
                 </div>
-                ${socialHtml}
+                <div class="home-welcome-right">
+                    <div class="home-welcome-title">${tr('Benvenuti!', 'Welcome!', 'Willkommen!', 'Witamy!')}</div>
+                    <div class="home-welcome-sub">${tr('Siamo felici di ospitarvi', 'We are happy to host you', 'Wir freuen uns, Sie zu beherbergen', 'Cieszymy się, że możemy Was gościć')}</div>
+                </div>
             </div>
+            ${installBtn}
+            ${socialHtml}
             <div class="nav-grid">${tiles}</div>
         </section>`;
 
@@ -991,6 +1032,23 @@
                     goTo(parseInt(this.dataset.index));
                 });
             });
+            const installBtn = document.getElementById('install-btn');
+            if (installBtn) {
+                installBtn.addEventListener('click', async () => {
+                    if (deferredPrompt) {
+                        deferredPrompt.prompt();
+                        const { outcome } = await deferredPrompt.userChoice;
+                        console.log(`Installazione: ${outcome}`);
+                        deferredPrompt = null;
+                        installBtn.style.display = 'none';
+                    }
+                });
+                if (deferredPrompt) {
+                    installBtn.style.display = 'inline-flex';
+                } else if (window.matchMedia('(display-mode: standalone)').matches) {
+                    installBtn.style.display = 'none';
+                }
+            }
         }, 0);
 
         return html;
@@ -1010,7 +1068,7 @@
             around: () => appData.around,
             marche: () => appData.marche
         };
-        if (map[id]) return renderPlaceSection(map[id]());
+        if (map[id]) return renderPlaceSection(map[id](), id);
         return '';
     }
 
@@ -1028,7 +1086,7 @@
         return `<button class="star-list-btn" id="star-home-btn" aria-label="Centra la mappa su Ancona Centro">★ Ancona Centro</button>`;
     }
 
-    function renderPlaceSection(items) {
+    function renderPlaceSection(items, sectionId) {
         currentSectionPlaces = items;
 
         for (let i = 0; i < items.length; i++) {
@@ -1040,6 +1098,12 @@
             }
         }
 
+        // Box informativo per strisce blu nella sezione parcheggi
+        const parkingInfoBox = (sectionId === 'parking') ? `<div class="card" style="margin-top: 8px;">
+            <div class="card-header"><span class="card-header-icon">🅿️</span><span class="card-title">Strisce blu (zona centro)</span></div>
+            <div class="card-body">Parcheggio a pagamento su strada, posto difficile.</div>
+        </div>` : '';
+
         if (currentSubItinerary) {
             let parent = null;
             for (let k = 0; k < appData.mustsee.length; k++) {
@@ -1047,7 +1111,7 @@
             }
             const descHtml = parent ? `<div class="card"><div class="place-body"><div class="place-emoji-sm" aria-hidden="true">${parent.emoji}</div><div><div class="place-name">${parent.name}</div><div class="place-desc" style="margin-top:5px;">${tr(parent.it, parent.en, parent.de, parent.pl)}</div></div></div></div>` : '';
             if (currentPlaceDetail >= 0 && currentPlaceDetail < items.length) {
-                return renderAnyPlaceDetail(items[currentPlaceDetail], currentPlaceDetail, items.length, true);
+                return renderAnyPlaceDetail(items[currentPlaceDetail], currentPlaceDetail, items.length, true) + parkingInfoBox;
             }
             const subBtns = items.map((p, i) => {
                 const dn = getDisplayNumber(p, i);
@@ -1056,7 +1120,7 @@
             }).join('');
             const html = `<button class="back-btn" id="sub-back-btn">← ${tr('Torna al tour principale', 'Back to main tour', 'Zurück zur Haupttour', 'Powrót do głównej trasy')}</button>
                 ${descHtml}
-                <div class="map-list-wrap"><div id="sectionMap" class="section-map-el" role="application" aria-label="Mappa dei luoghi"></div><div class="place-btn-col">${starBtnHtml()}${subBtns}</div></div>`;
+                <div class="map-list-wrap"><div id="sectionMap" class="section-map-el" role="application" aria-label="Mappa dei luoghi"></div><div class="place-btn-col">${starBtnHtml()}${subBtns}</div></div>${parkingInfoBox}`;
 
             setTimeout(() => {
                 document.getElementById('sub-back-btn')?.addEventListener('click', closeSubItinerary);
@@ -1071,7 +1135,7 @@
         }
 
         if (currentPlaceDetail >= 0 && currentPlaceDetail < items.length) {
-            return renderAnyPlaceDetail(items[currentPlaceDetail], currentPlaceDetail, items.length, false);
+            return renderAnyPlaceDetail(items[currentPlaceDetail], currentPlaceDetail, items.length, false) + parkingInfoBox;
         }
 
         const btns = items.map((p, i) => {
@@ -1082,7 +1146,7 @@
             return `<button class="place-btn-mini${sel}" data-index="${i}" aria-label="${p.name}${subHint}">${dn}. ${p.name}${subBadge}</button>`;
         }).join('');
 
-        const html = `<div class="map-list-wrap"><div id="sectionMap" class="section-map-el" role="application" aria-label="Mappa dei luoghi"></div><div class="place-btn-col">${starBtnHtml()}${btns}</div></div>`;
+        const html = `<div class="map-list-wrap"><div id="sectionMap" class="section-map-el" role="application" aria-label="Mappa dei luoghi"></div><div class="place-btn-col">${starBtnHtml()}${btns}</div></div>${parkingInfoBox}`;
 
         setTimeout(() => {
             document.querySelectorAll('.place-btn-mini').forEach(btn => {
@@ -1267,6 +1331,26 @@
                 .then(reg => console.log('✅ Service Worker registrato'))
                 .catch(err => console.error('❌ Errore SW:', err));
         });
+    }
+
+    // ---- Gestione installazione PWA ----
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        const installBtn = document.getElementById('install-btn');
+        if (installBtn) installBtn.style.display = 'inline-flex';
+    });
+
+    window.addEventListener('appinstalled', () => {
+        deferredPrompt = null;
+        const installBtn = document.getElementById('install-btn');
+        if (installBtn) installBtn.style.display = 'none';
+        console.log('✅ App installata');
+    });
+
+    if (window.matchMedia('(display-mode: standalone)').matches) {
+        const installBtn = document.getElementById('install-btn');
+        if (installBtn) installBtn.style.display = 'none';
     }
 
     // ---- Supporto hash per shortcut PWA ----

@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="it">
 <head>
@@ -279,7 +278,7 @@
     <nav class="nav-scroll" id="nav" style="display:none;" role="navigation" aria-label="Sezioni"></nav>
     <main class="content" id="content" role="main"></main>
 
-    <!-- GPS UI -->
+    <!-- GPS UI - Ora rimane fisso qui, non viene più spostato -->
     <div id="gps-ui-container">
         <div class="map-gps-container">
             <div class="map-gps-row">
@@ -877,12 +876,10 @@
             var body = renderSection(s.id);
             cont.innerHTML = '<section class="section active"><div class="section-header"><div class="section-header-inner"><div class="section-icon" aria-hidden="true">' + s.icon + '</div><div><div class="section-title">' + tr(s.it, s.en, s.de, s.pl) + '</div></div></div></div><div class="cards">' + body + '<div class="goto-home"><button class="home-btn" onclick="goTo(-1)" aria-label="Torna alla Home">🏠 Home</button></div></div></section>';
 
+            // Il container GPS non viene più spostato dentro .cards
+            // La visibilità è gestita da updateGpsUI() tramite la classe .visible
+
             if (currentPlaceDetail < 0) {
-                var cardsEl = cont.querySelector('.cards');
-                var gpsContainer = document.getElementById('gps-ui-container');
-                if (cardsEl && gpsContainer) {
-                    cardsEl.insertBefore(gpsContainer, cardsEl.firstChild);
-                }
                 setTimeout(initSectionMap, 0);
                 setTimeout(updateGpsUI, 200);
             } else {
@@ -1133,4 +1130,5 @@
         setTimeout(updateGpsUI, 300);
     </script>
 </body>
-</html>
+</htlm>
+    

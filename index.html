@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- Affittacamere Ancona Centro - Guida Ospiti V4.0.6 | Compilata: 19 giugno 2026 · 11:26 -->
 <html lang="it">
 <head>
     <meta charset="UTF-8">
@@ -596,7 +597,7 @@
 
     // Ora di rilascio — Aggiornato automaticamente ogni volta che il file viene modificato
     (function() {
-        const RELEASE_TIME = '19 giugno 2026 · 08:38';
+        const RELEASE_TIME = '19 giugno 2026 · 11:26';
         document.getElementById('release-time').textContent = RELEASE_TIME;
     })();
 
@@ -674,15 +675,13 @@
     }
 
     function goTo(i) {
-        if (gpsWatchId !== null) {
-            navigator.geolocation.clearWatch(gpsWatchId);
-            gpsWatchId = null;
-            if (gpsMarker && leafletMap) leafletMap.removeLayer(gpsMarker);
-            if (gpsCircle && leafletMap) leafletMap.removeLayer(gpsCircle);
-            gpsMarker = null;
-            gpsCircle = null;
-            updateGpsUI();
-        }
+        // Rimuovi i marker dalle mappe, ma NON fermare il GPS tracking
+        // Il GPS continua a tracciare in background per tutte le sezioni
+        if (gpsMarker && leafletMap) leafletMap.removeLayer(gpsMarker);
+        if (gpsCircle && leafletMap) leafletMap.removeLayer(gpsCircle);
+        gpsMarker = null;
+        gpsCircle = null;
+        
         currentSection = i;
         currentPlaceDetail = -1;
         currentSubItinerary = null;

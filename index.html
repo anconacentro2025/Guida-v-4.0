@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- Affittacamere Ancona Centro - Guida Ospiti V4.0.6 | 19 giugno 2026 · 15:50 -->
+<!-- Affittacamere Ancona Centro - Guida Ospiti V4.1 | 19/0626 · 18:30 -->
 <html lang="it">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Ancona Centro · Guida Ospiti V4.0.6</title>
+    <title>Ancona Centro · Guida Ospiti V4.1</title>
 
     <!-- PWA -->
     <link rel="manifest" href="./manifest.json">
@@ -16,7 +16,7 @@
     <link rel="icon" type="image/png" sizes="192x192" href="https://raw.githubusercontent.com/anconacentro2025/Guida-v-4.0/main/img/icon-192.png">
 
     <!-- Open Graph -->
-    <meta property="og:title" content="Affittacamere Ancona Centro · Guida V4.0.6">
+    <meta property="og:title" content="Affittacamere Ancona Centro · Guida V4.1">
     <meta property="og:description" content="La tua guida digitale per scoprire Ancona passo dopo passo. Itinerari consigliati, ristoranti e info utili.">
     <meta property="og:image" content="https://raw.githubusercontent.com/anconacentro2025/Guida-v-4.0/main/img/home.jpg">
     <meta property="og:type" content="website">
@@ -239,6 +239,30 @@
         .gps-blue-dot { width: 14px; height: 14px; background: #007AFF; border: 2px solid var(--white); border-radius: 50%; position: absolute; top: 3px; left: 3px; box-shadow: 0 0 6px rgba(0,0,0,.3); z-index: 2; }
         .gps-blue-dot-pulse { width: 20px; height: 20px; background: rgba(0,122,255,0.4); border-radius: 50%; position: absolute; top: 0; left: 0; animation: gpsPulse 2s infinite ease-out; z-index: 1; }
         @keyframes gpsPulse { 0% { transform: scale(0.5); opacity: 1; } 100% { transform: scale(1.9); opacity: 0; } }
+
+        /* Stili per il sottomenù "Come raggiungerci" */
+        .reach-sub-btn {
+            flex: 1;
+            border: 1px solid var(--border);
+            padding: 8px 4px;
+            border-radius: 8px;
+            font-size: 0.72rem;
+            font-weight: 500;
+            transition: all 0.2s;
+            outline: none;
+            background: var(--bg);
+            color: var(--text);
+        }
+        .reach-sub-btn.active {
+            background: var(--navy);
+            color: var(--white);
+            font-weight: 600;
+        }
+        .reach-content {
+            font-size: 0.82rem;
+            line-height: 1.6;
+            color: var(--text);
+        }
     </style>
 </head>
 <body>
@@ -1225,6 +1249,73 @@
 
     function renderApartment() {
         const a = appData.apartment;
+        
+        // Configurazione del Sottomenù "Come raggiungerci" nelle 4 lingue
+        const reachData = {
+            title: tr('📍 Come raggiungerci', '📍 How to reach us', '📍 Anreise', '📍 Jak do nas dotrzeć'),
+            autoLabel: tr('🚗 In auto', '🚗 By car', '🚗 Mit dem Auto', '🚗 Samochodem'),
+            trenoLabel: tr('🚆 In treno', '🚆 By train', '🚆 Mit dem Zug', '🚆 Pociągiem'),
+            aereoLabel: tr('✈️ In aereo', '✈️ By air', '✈️ Mit dem Flugzeug', '✈️ Samolotem'),
+            autoBody: tr(
+                `L'alloggio è in zona pedonale, è possibile parcheggiare su strada nei dintorni sulle strisce blu (a pagamento dalle 8 alle 20 a 1,20€/h dei giorni feriali) o nei diversi parcheggi coperti. Se si intende girare in centro non si ha bisogno dell'auto e io consiglio di lasciarla nel più economico <a href="https://anconaservizi.it/parcheggi-coperti/parcheggio-scambiatore-degli-archi/" target="_blank" rel="noopener">parcheggio multipiano degli archi</a>, ad 1,5 km di distanza, con l'alloggio facilmente raggiungibile o a piedi con una passeggiata tutta pianeggiante.<br><br>Se preferisci l'autobus prendi il bus 1/4 direzione centro e scendi in piazza Roma, ci mette 5 minuti. Attraversa la piazza, il n. 3 è a sinistra della fontana dei cavalli.<br>Al portone suona al campanello Frisoli, poi prendi l'ascensore fino al quarto piano.`,
+                `The accommodation is located in a pedestrian zone. You can park on the street nearby within the blue lines (paid from 8:00 to 20:00 at €1.20/h on weekdays) or in various covered parking garages. If you plan to visit the city center, you won't need a car, so I recommend leaving it in the cheaper multi-story <a href="https://anconaservizi.it/parcheggi-coperti/parcheggio-scambiatore-degli-archi/" target="_blank" rel="noopener">parking lot "Degli Archi"</a>, 1.5 km away, from where the accommodation is easily reachable on foot with a completely flat walk.<br><br>If you prefer the bus, take line 1/4 towards the center and get off at Piazza Roma (it takes 5 minutes). Cross the square; number 3 is to the left of the horse fountain.<br>At the main door, ring the bell for Frisoli, then take the elevator to the fourth floor.`,
+                `Die Unterkunft befindet sich in einer Fußgängerzone. Sie können in der Umgebung am Straßenrand auf den blauen Linien parken (werktags von 8:00 bis 20:00 Uhr kostenpflichtig für 1,20 €/Std.) oder in den verschiedenen Parkhäusern. Wenn Sie das Stadtzentrum besichtigen möchten, benötigen Sie kein Auto. Ich empfehle daher, es auf dem günstigeren <a href="https://anconaservizi.it/parcheggi-coperti/parcheggio-scambiatore-degli-archi/" target="_blank" rel="noopener">Parkdeck „Degli Archi"</a> in 1,5 km Entfernung abzustellen, von wo aus die Unterkunft bequem zu Fuß über einen völlig ebenen Weg zu erreichen ist.<br><br>Wenn Sie den Bus bevorzugen, nehmen Sie die Linie 1/4 Richtung Zentrum und steigen Sie an der Piazza Roma aus (Fahrzeit ca. 5 Minuten). Überqueren Sie den Platz; Hausnummer 3 befindet sich links vom Pferdebrunnen. Läuten Sie an der Haustür bei „Frisoli" und fahren Sie mit dem Aufzug in den vierten Stock.`,
+                `Obiekt znajduje się w strefie pieszej. Można zaparkować na ulicy w okolicy na niebieskich liniach (płatne w dni powszednie od 8:00 do 20:00 w cenie 1,20 €/godz.) lub na jednym z kilku parkingów zadaszonych. Jeśli planujesz poruszać się po centrum, samochód nie będzie Ci potrzebny – polecam zostawić go na tańszym <a href="https://anconaservizi.it/parcheggi-coperti/parcheggio-scambiatore-degli-archi/" target="_blank" rel="noopener">parkingu wielopoziomowym „Degli Archi"</a>, oddalonym o 1,5 km, skąd do obiektu można łatwo dojść całkowicie płaską trasą.<br><br>Jeśli wolisz autobus, wsiądź w linię 1/4 w kierunku centrum i wysiądź na Piazza Roma (podróż trwa 5 minut). Przejdź przez plac; numer 3 znajduje się po lewej stronie fontanny z końmi. Przy drzwiach wejściowych zadzwoń na dzwonek „Frisoli", a następnie wjedź windą na czwarte piętro.`
+            ),
+            trenoBody: tr(
+                `Dalla stazione sono 1,5 km tutti pianeggianti, è una passeggiata di mezz'ora.<br><br>Se preferisci l'autobus prendi il bus 1/4 direzione centro e scendi in piazza Roma, ci mette 5 minuti. Attraversa la piazza, il n. 3 è a sinistra della fontana dei cavalli.<br>Al portone suona al campanello Frisoli, poi prendi l'ascensore fino al quarto piano.`,
+                `From the station, it is 1.5 km, completely flat, about a half-hour walk.<br><br>If you prefer the bus, take line 1/4 towards the center and get off at Piazza Roma (it takes 5 minutes). Cross the square; number 3 is to the left of the horse fountain.<br>At the main door, ring the bell for Frisoli, then take the elevator to the fourth floor.`,
+                `Vom Bahnhof aus sind es 1,5 km, komplett eben, ein etwa halbstündiger Spaziergang.<br><br>Wenn Sie den Bus bevorzugen, nehmen Sie die Linie 1/4 Richtung Zentrum und steigen Sie an der Piazza Roma aus (Fahrzeit ca. 5 Minuten). Überqueren Sie den Platz; Hausnummer 3 befindet sich links vom Pferdebrunnen. Läuten Sie an der Haustür bei „Frisoli" und fahren Sie mit dem Aufzug in den vierten Stock.`,
+                `Ze stacji jest 1,5 km całkowicie płaskiej drogi, co zajmuje około pół godziny spaceru.<br><br>Jeśli wolisz autobus, wsiądź w linię 1/4 w kierunku centrum i wysiądź na Piazza Roma (podróż trwa 5 minut). Przejdź przez plac; numer 3 znajduje się po lewej stronie fontanny z końmi. Przy drzwiach wejściowych zadzwoń na dzwonek „Frisoli", a następnie wjedź windą na czwarte piętro.`
+            ),
+            aereoBody: tr(
+                `Dall'aeroporto si può prendere un taxi, scelta più comoda ma molto più costosa, prendere il bus raffaello, comodo ma presente solo per alcuni voli, oppure il treno che è la soluzione che consiglio per raggiungere la stazione di ancona e poi proseguire con l'itinerario indicato per chi arriva in treno. Ne passano di frequente e la stazione è proprio di fronte al terminal. Allego il link agli orari, comunque ne passano di frequente.<br><br>🔗 <a href="https://www.trenitalia.com/it.html" target="_blank" rel="noopener">Orari in tempo reale su Trenitalia</a>`,
+                `From the airport, you can take a taxi—the most convenient but much more expensive option—or take the "Raffaello" bus, which is convenient but only available for certain flights. Alternatively, you can take the train, which is the solution I recommend to reach Ancona station, and then follow the itinerary for those arriving by train. Trains run frequently, and the station is right in front of the terminal. I am attaching the link to the schedules, but they run often.<br><br>🔗 <a href="https://www.trenitalia.com/it.html" target="_blank" rel="noopener">Real-time schedules on Trenitalia</a>`,
+                `Vom Flughafen aus können Sie ein Taxi nehmen (die bequemste, aber weitaus teurere Option), den „Raffaello"-Bus nutzen (praktisch, aber nur auf bestimmte Flüge abgestimmt) oder den Zug nehmen. Letzteres ist meine Empfehlung, um den Bahnhof von Ancona zu erreichen; von dort aus folgen Sie dann der Beschreibung für die Anreise mit dem Zug. Züge fahren regelmäßig und der Bahnhof befindet sich direkt gegenüber dem Terminal. Ich füge den Link zu den Fahrplänen bei, die Verbindungen sind jedoch sehr häufig.<br><br>🔗 <a href="https://www.trenitalia.com/it.html" target="_blank" rel="noopener">Echtzeit-Fahrpläne auf Trenitalia</a>`,
+                `Z lotniska można wziąć taksówkę – najwygodniejsza, ale znacznie droższa opcja – pojechać autobusem „Raffaello" (wygodny, ale kursuje tylko przy niektórych lotach) lub wybrać pociąg, co jest przeze mnie najbardziej polecanym rozwiązaniem, aby dotrzeć do stacji Ancona, a następnie kontynuować podróż trasą opisaną dla przyjeżdżających pociągiem. Pociągi kursują często, a stacja znajduje się naprzeciwko terminala. Załączam link do rozkładu jazdy, pociągi jeżdżą bardzo regularnie.<br><br>🔗 <a href="https://www.trenitalia.com/it.html" target="_blank" rel="noopener">Rozkład jazdy na żywo w Trenitalia</a>`
+            )
+        };
+
+        // Rendiamo accessibili globalmente i testi e la logica per il click dei tab
+        window._reachTexts = { auto: reachData.autoBody, treno: reachData.trenoBody, aereo: reachData.aereoBody };
+        window._toggleReach = function(type, btn) {
+            const contentEl = document.getElementById('reach-content');
+            if (contentEl) {
+                contentEl.innerHTML = window._reachTexts[type];
+            }
+            document.querySelectorAll('.reach-sub-btn').forEach(b => {
+                b.style.background = 'var(--bg)';
+                b.style.color = 'var(--text)';
+                b.style.fontWeight = '500';
+            });
+            if (btn) {
+                btn.style.background = 'var(--navy)';
+                btn.style.color = 'var(--white)';
+                btn.style.fontWeight = '600';
+            }
+        };
+
+        // Generazione del blocco HTML interattivo del Sottomenù
+        const reachCardHtml = `
+        <div class="card" style="border-left: 3px solid var(--gold); margin-bottom: 12px;">
+            <div class="card-header">
+                <span class="card-header-icon">📍</span>
+                <span class="card-title">${reachData.title}</span>
+            </div>
+            <div class="card-body">
+                <div style="display: flex; gap: 6px; margin-bottom: 14px;">
+                    <button class="reach-sub-btn" onclick="window._toggleReach('auto', this)" style="flex: 1; background: var(--navy); color: var(--white); border: 1px solid var(--border); padding: 8px 4px; border-radius: 8px; font-size: 0.72rem; font-weight: 600; transition: all 0.2s; outline: none;">${reachData.autoLabel}</button>
+                    <button class="reach-sub-btn" onclick="window._toggleReach('treno', this)" style="flex: 1; background: var(--bg); color: var(--text); border: 1px solid var(--border); padding: 8px 4px; border-radius: 8px; font-size: 0.72rem; font-weight: 500; transition: all 0.2s; outline: none;">${reachData.trenoLabel}</button>
+                    <button class="reach-sub-btn" onclick="window._toggleReach('aereo', this)" style="flex: 1; background: var(--bg); color: var(--text); border: 1px solid var(--border); padding: 8px 4px; border-radius: 8px; font-size: 0.72rem; font-weight: 500; transition: all 0.2s; outline: none;">${reachData.aereoLabel}</button>
+                </div>
+                <div id="reach-content" style="font-size: 0.82rem; line-height: 1.6; color: var(--text);">
+                    ${reachData.autoBody}
+                </div>
+            </div>
+        </div>
+        `;
+
+        // Le schede dell'appartamento originali (Wi-Fi, citofono, chiavi, ecc.)
         const cards = [
             { icon: '📶', title: tr('Wi‑Fi', 'Wi‑Fi', 'WLAN', 'Wi‑Fi'), body: tr(a.wifi.it, a.wifi.en, a.wifi.de, a.wifi.pl) },
             { icon: '🚪', title: tr('Citofono', 'Intercom', 'Gegensprechanlage', 'Domofon'), body: tr(a.access.it, a.access.en, a.access.de, a.access.pl) },
@@ -1234,7 +1325,9 @@
             { icon: '🔕', title: tr('Silenzio notturno', 'Quiet hours', 'Nachtruhe', 'Godziny ciszy'), body: tr(a.quietHours.it, a.quietHours.en, a.quietHours.de, a.quietHours.pl) },
             { icon: '🧳', title: tr('Check‑out flessibile', 'Flexible check‑out', 'Flexibler Check‑out', 'Elastyczne wymeldowanie'), body: tr(a.checkout.it, a.checkout.en, a.checkout.de, a.checkout.pl) }
         ];
-        let html = '';
+
+        // Unisce la nuova scheda in alto con le schede esistenti
+        let html = reachCardHtml;
         for (let i = 0; i < cards.length; i++) {
             html += `<div class="card"><div class="card-header"><span class="card-header-icon" aria-hidden="true">${cards[i].icon}</span><span class="card-title">${cards[i].title}</span></div><div class="card-body">${cards[i].body}</div></div>`;
         }
@@ -1365,4 +1458,3 @@
     </script>
 </body>
 </html>
-```

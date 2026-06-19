@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- Affittacamere Ancona Centro - Guida Ospiti V4.1 | 19/0626 · 18:30 -->
+<!-- Affittacamere Ancona Centro - Guida Ospiti V4.1 | 19/06/26 20:21 -->
 <html lang="it">
 <head>
     <meta charset="UTF-8">
@@ -51,9 +51,11 @@
         .header-title { font-family: 'Cormorant Garamond', serif; font-size: 1.25rem; font-weight: 600; line-height: 1.15; color: var(--white) }
         .header-sub { font-size: .65rem; font-weight: 300; opacity: .6; letter-spacing: .1em; text-transform: uppercase; margin-top: 1px }
         .header-cin { font-size: .6rem; font-weight: 300; opacity: .5; letter-spacing: .05em; margin-top: 2px; color: var(--gold-3); }
-        .lang-toggle { display: flex; background: rgba(255,255,255,.08); border-radius: 22px; overflow: hidden; border: 1px solid rgba(200,164,90,.30) }
+        .header-right { text-align: center; }
+        .lang-toggle { display: flex; background: rgba(255,255,255,.08); border-radius: 22px; overflow: hidden; border: 1px solid rgba(200,164,90,.30); justify-content: center; }
         .lang-btn { padding: 5px 11px; font-size: .68rem; font-weight: 500; border: none; background: transparent; color: rgba(255,255,255,.55); transition: all .2s }
         .lang-btn.active { background: var(--gold); color: var(--navy); font-weight: 600 }
+        .version-info { font-size:0.55rem; color:var(--gold-3); text-align:center; margin-top:4px; opacity:0.6; letter-spacing:0.05em; }
         .hero { width: 100%; height: 320px; overflow: hidden; position: relative; background: linear-gradient(160deg, var(--navy) 0%, var(--navy-2) 50%, var(--navy-3) 100%); transition: height .3s ease }
         .hero.section-mode { height: 68px }
         @media (max-height: 700px) { .hero.section-mode { height: 48px } }
@@ -273,14 +275,14 @@
                 <div class="header-sub" id="header-sub">Guida Ospiti · Piazza Roma 3</div>
                 <div class="header-cin">CIN: IT042002C2QZRH9TPJ</div>
             </div>
-            <div>
+            <div class="header-right">
                 <div class="lang-toggle" role="radiogroup" aria-label="Selezione lingua">
                     <button class="lang-btn active" id="btn-it" role="radio" aria-checked="true" aria-label="Italiano">IT</button>
                     <button class="lang-btn" id="btn-en" role="radio" aria-checked="false" aria-label="English">EN</button>
                     <button class="lang-btn" id="btn-de" role="radio" aria-checked="false" aria-label="Deutsch">DE</button>
                     <button class="lang-btn" id="btn-pl" role="radio" aria-checked="false" aria-label="Polski">PL</button>
                 </div>
-                <div id="version-info" style="font-size:0.55rem; color:var(--gold-3); text-align:right; margin-top:4px; opacity:0.6; letter-spacing:0.05em;">
+                <div class="version-info">
                     V4.1 · <span id="release-time"></span>
                 </div>
             </div>
@@ -303,21 +305,11 @@
 
     <script>
     // ============================================================
-    // V4.1 · COMPLETA CON TUTTI I DATI
+    // V4.1 · COMPLETA CON TUTTI I DATI - SEZIONI UNIFICATE
     // ============================================================
 
     // ---- DATA.JS ----
     const appData = {
-        rules: [
-            { icon: '🚭', it: 'Vietato fumare in tutto l\'appartamento', en: 'No smoking anywhere in the apartment', de: 'Rauchen in der gesamten Wohnung verboten', pl: 'Zakaz palenia w całym mieszkaniu' },
-            { icon: '🐾', it: 'Vietati gli animali domestici', en: 'No pets allowed', de: 'Haustiere nicht erlaubt', pl: 'Zakaz wprowadzania zwierząt domowych' },
-            { icon: '🔕', it: 'Orario di silenzio: 22:00 – 08:00', en: 'Quiet hours: 22:00 – 08:00', de: 'Ruhezeiten: 22:00 – 08:00 Uhr', pl: 'Godziny ciszy: 22:00 – 08:00' },
-            { icon: '♻️', it: 'Raccolta differenziata: consultare il calendario in cucina', en: 'Recycling: check the calendar in the kitchen', de: 'Mülltrennung: siehe Kalender in der Küche', pl: 'Segregacja odpadów: sprawdź kalendarz w kuchni' },
-            { icon: '❄️', it: 'Condizionatore: spegnere quando si esce', en: 'Air conditioning: turn off when leaving', de: 'Klimaanlage: beim Verlassen ausschalten', pl: 'Klimatyzacja: wyłącz przy wyjściu' },
-            { icon: '🪟', it: 'Assicurarsi che le persiane siano sempre bloccate, altrimenti in caso di vento può essere pericoloso.', en: 'Make sure the shutters are always secured; otherwise, in case of wind, it can be dangerous.', de: 'Stellen Sie sicher, dass die Fensterläden immer gesichert sind; sonst kann es bei Wind gefährlich werden.', pl: 'Upewnij się, że okiennice są zawsze zablokowane; w przeciwnym razie przy wietrze może to być niebezpieczne.' },
-            { icon: '🏨', it: 'Check‑in flessibile: di norma dalle 15:00, ma è possibile concordare un orario diverso. Se arrivate prima e l\'alloggio non fosse pronto, potete lasciare i bagagli nell\'ingresso.', en: 'Flexible check‑in: normally from 15:00, but a different time can be arranged. If you arrive earlier and the accommodation is not ready, you can leave your luggage in the entrance.', de: 'Flexibler Check‑in: normalerweise ab 15:00 Uhr, aber eine andere Zeit kann vereinbart werden. Wenn Sie früher anreisen und die Unterkunft noch nicht bereit ist, können Sie Ihr Gepäck im Eingangsbereich abstellen.', pl: 'Elastyczne zameldowanie: zwykle od 15:00, ale można uzgodnić inną godzinę. Jeśli przyjedziesz wcześniej, a mieszkanie nie jest gotowe, możesz zostawić bagaż w wejściu.' },
-            { icon: '🧳', it: 'Check‑out flessibile: di norma entro le 11:00. Se avete bisogno di trattenervi, ove non fosse possibile potete sempre lasciare i bagagli nell\'ingresso e tornare a prenderli più tardi. Lasciate le chiavi sull\'attaccapanni all\'ingresso.', en: 'Flexible check‑out: normally by 11:00. If you need to stay longer and it is not possible, you can always leave your luggage in the entrance and pick it up later. Leave the keys on the coat hook at the entrance.', de: 'Flexibler Check‑out: normalerweise bis 11:00 Uhr. Wenn Sie länger bleiben müssen und es nicht möglich ist, können Sie Ihr Gepäck jederzeit im Eingangsbereich abstellen und später abholen. Lassen Sie die Schlüssel am Garderobenhaken im Eingangsbereich.', pl: 'Elastyczne wymeldowanie: zwykle do 11:00. Jeśli potrzebujesz zostać dłużej, a nie jest to możliwe, zawsze możesz zostawić bagaż w wejściu i odebrać go później. Zostaw klucze na wieszaku przy wejściu.' }
-        ],
         apartment: {
             wifi: { it: 'Rete: anconacentro | Password: la troverete nell\'appartamento', en: 'Network: anconacentro | Password: you will find it in the apartment', de: 'Netzwerk: anconacentro | Passwort: finden Sie in der Wohnung', pl: 'Sieć: anconacentro | Hasło: znajdziecie je w mieszkaniu' },
             access: { it: 'Il citofono si trova a sinistra del portone. All\'arrivo suonare al campanello Frisoli.', en: 'The intercom is on the left of the main door. On arrival, ring the bell: Frisoli.', de: 'Die Gegensprechanlage befindet sich links vom Eingangstor. Bei der Ankunft klingeln bei Frisoli.', pl: 'Domofon znajduje się po lewej stronie bramy. Po przyjeździe zadzwonić na dzwonek Frisoli.' },
@@ -327,6 +319,12 @@
             checkin: { it: 'Check‑in flessibile: di norma dalle 15:00, ma è possibile concordare un orario diverso. Se arrivate prima e l\'alloggio non fosse pronto, potete lasciare i bagagli nell\'ingresso.', en: 'Flexible check‑in: normally from 15:00, but a different time can be arranged. If you arrive earlier and the accommodation is not ready, you can leave your luggage in the entrance.', de: 'Flexibler Check‑in: normalerweise ab 15:00 Uhr, aber eine andere Zeit kann vereinbart werden. Wenn Sie früher anreisen und die Unterkunft noch nicht bereit ist, können Sie Ihr Gepäck im Eingangsbereich abstellen.', pl: 'Elastyczne zameldowanie: zwykle od 15:00, ale można uzgodnić inną godzinę. Jeśli przyjedziesz wcześniej, a mieszkanie nie jest gotowe, możesz zostawić bagaż w wejściu.' },
             checkout: { it: 'Check‑out flessibile: di norma entro le 11:00. Se avete bisogno di trattenervi, ove non fosse possibile potete sempre lasciare i bagagli nell\'ingresso e tornare a prenderli più tardi. Lasciate le chiavi sull\'attaccapanni all\'ingresso.', en: 'Flexible check‑out: normally by 11:00. If you need to stay longer and it is not possible, you can always leave your luggage in the entrance and pick it up later. Leave the keys on the coat hook at the entrance.', de: 'Flexibler Check‑out: normalerweise bis 11:00 Uhr. Wenn Sie länger bleiben müssen und es nicht möglich ist, können Sie Ihr Gepäck jederzeit im Eingangsbereich abstellen und später abholen. Lassen Sie die Schlüssel am Garderobenhaken im Eingangsbereich.', pl: 'Elastyczne wymeldowanie: zwykle do 11:00. Jeśli potrzebujesz zostać dłużej, a nie jest to możliwe, zawsze możesz zostawić bagaż w wejściu i odebrać go później. Zostaw klucze na wieszaku przy wejściu.' }
         },
+        rules: [
+            { icon: '🚭', it: 'Vietato fumare in tutto l\'appartamento', en: 'No smoking anywhere in the apartment', de: 'Rauchen in der gesamten Wohnung verboten', pl: 'Zakaz palenia w całym mieszkaniu' },
+            { icon: '🐾', it: 'Vietati gli animali domestici', en: 'No pets allowed', de: 'Haustiere nicht erlaubt', pl: 'Zakaz wprowadzania zwierząt domowych' },
+            { icon: '❄️', it: 'Condizionatore: spegnere quando si esce', en: 'Air conditioning: turn off when leaving', de: 'Klimaanlage: beim Verlassen ausschalten', pl: 'Klimatyzacja: wyłącz przy wyjściu' },
+            { icon: '🪟', it: 'Assicurarsi che le persiane siano sempre bloccate, altrimenti in caso di vento può essere pericoloso.', en: 'Make sure the shutters are always secured; otherwise, in case of wind, it can be dangerous.', de: 'Stellen Sie sicher, dass die Fensterläden immer gesichert sind; sonst kann es bei Wind gefährlich werden.', pl: 'Upewnij się, że okiennice są zawsze zablokowane; w przeciwnym razie przy wietrze może to być niebezpieczne.' }
+        ],
         social: { instagram: 'https://www.instagram.com/anconacentro', facebook: 'https://www.facebook.com/profile.php?id=61575688633462' },
         mustsee: [
             { order:1, name:'Fontana del Calamo (13 Cannelle)', emoji:'⛲', photo:'fontana-calamo.jpg',
@@ -579,7 +577,7 @@
     };
 
     const sections = [
-        { id:'apartment', icon:'🏠', it:'Appartamento', en:'Apartment', de:'Wohnung', pl:'Mieszkanie' },
+        { id:'apartment', icon:'🏠', it:'Appartamento e Regole', en:'Apartment & House Rules', de:'Wohnung & Hausregeln', pl:'Mieszkanie i Zasady' },
         { id:'mustsee', icon:'🚶', it:'Tour a piedi - Itinerari consigliati', en:'Walking Tour - Recommended Itineraries', de:'Rundgang - Empfohlene Routen', pl:'Wycieczka piesza - Polecane trasy' },
         { id:'around', icon:'🌊', it:'Dintorni', en:'Around Ancona', de:'Umgebung', pl:'Okolice' },
         { id:'marche', icon:'🏛️', it:'Nelle Marche', en:'Marche Region', de:'Marken Region', pl:'Region Marche' },
@@ -588,13 +586,12 @@
         { id:'supermarkets', icon:'🛒', it:'Supermercati', en:'Supermarkets', de:'Supermärkte', pl:'Supermarkety' },
         { id:'parking', icon:'🅿️', it:'Parcheggi', en:'Parking', de:'Parkplätze', pl:'Parkingi' },
         { id:'transport', icon:'🚌', it:'Trasporti', en:'Transport', de:'Verkehrsmittel', pl:'Transport' },
-        { id:'rules', icon:'📋', it:'Regole', en:'House Rules', de:'Hausregeln', pl:'Zasady domu' },
         { id:'contact', icon:'📞', it:'Contatti & Emergenze', en:'Contacts & Emergency', de:'Kontakt & Notfälle', pl:'Kontakt i alarmy' }
     ];
 
     const sectionHashMap = {
         'mustsee': 1,
-        'contact': 10
+        'contact': 9
     };
 
     // ---- APP.JS (logica) ----
@@ -622,7 +619,7 @@
 
     // Ora di rilascio
     (function() {
-        const RELEASE_TIME = '19/06/26 · 18:30';
+        const RELEASE_TIME = '19/06/26 20:21';
         document.getElementById('release-time').textContent = RELEASE_TIME;
     })();
 
@@ -967,7 +964,7 @@
             goTo(-1);
         });
 
-        const noGpsSections = ['apartment', 'contact', 'rules', 'transport'];
+        const noGpsSections = ['apartment', 'contact', 'transport'];
         if (currentPlaceDetail < 0 && !noGpsSections.includes(s.id)) {
             const cardsEl = cont.querySelector('.cards');
             const gpsContainer = document.createElement('div');
@@ -1019,7 +1016,6 @@
             </button>`
         ).join('');
 
-        // ✅ Variabile rinominata per evitare conflitto
         const installBtnHtml = `
             <button id="install-btn" class="install-btn" style="display: none;">
                 📲 ${tr('Aggiungi alla schermata Home', 'Add to Home Screen', 'Zum Startbildschirm hinzufügen', 'Dodaj do ekranu głównego')}
@@ -1072,7 +1068,6 @@
 
     function renderSection(id) {
         if (id === 'contact') return renderContact();
-        if (id === 'rules') return renderRules();
         if (id === 'transport') return renderTransport();
         if (id === 'apartment') return renderApartment();
         const map = {
@@ -1240,13 +1235,6 @@
         return cardsHtml;
     }
 
-    function renderRules() {
-        const rulesHtml = appData.rules.map(r =>
-            `<div class="rule-row"><span class="rule-icon" aria-hidden="true">${r.icon}</span><span class="rule-text">${tr(r.it, r.en, r.de, r.pl)}</span></div>`
-        ).join('');
-        return `<div class="card"><div class="card-header"><span class="card-header-icon" aria-hidden="true">📋</span><span class="card-title">${tr('Regole della casa', 'House rules', 'Hausregeln', 'Zasady domu')}</span></div><div class="card-body">${rulesHtml}</div></div>`;
-    }
-
     function renderApartment() {
         const a = appData.apartment;
         
@@ -1276,7 +1264,6 @@
             )
         };
 
-        // Rendiamo accessibili globalmente i testi e la logica per il click dei tab
         window._reachTexts = { auto: reachData.autoBody, treno: reachData.trenoBody, aereo: reachData.aereoBody };
         window._toggleReach = function(type, btn) {
             const contentEl = document.getElementById('reach-content');
@@ -1295,7 +1282,6 @@
             }
         };
 
-        // Generazione del blocco HTML interattivo del Sottomenù
         const reachCardHtml = `
         <div class="card" style="border-left: 3px solid var(--gold); margin-bottom: 12px;">
             <div class="card-header">
@@ -1315,22 +1301,31 @@
         </div>
         `;
 
-        // Le schede dell'appartamento originali (Wi-Fi, citofono, chiavi, ecc.)
+        // Schede informazioni appartamento
         const cards = [
             { icon: '📶', title: tr('Wi‑Fi', 'Wi‑Fi', 'WLAN', 'Wi‑Fi'), body: tr(a.wifi.it, a.wifi.en, a.wifi.de, a.wifi.pl) },
             { icon: '🚪', title: tr('Citofono', 'Intercom', 'Gegensprechanlage', 'Domofon'), body: tr(a.access.it, a.access.en, a.access.de, a.access.pl) },
             { icon: '🔑', title: tr('Chiavi', 'Keys', 'Schlüssel', 'Klucze'), body: tr(a.keys.it, a.keys.en, a.keys.de, a.keys.pl) },
             { icon: '🏨', title: tr('Check‑in flessibile', 'Flexible check‑in', 'Flexibler Check‑in', 'Elastyczne zameldowanie'), body: tr(a.checkin.it, a.checkin.en, a.checkin.de, a.checkin.pl) },
-            { icon: '♻️', title: tr('Raccolta differenziata', 'Recycling', 'Mülltrennung', 'Segregacja'), body: tr(a.recycling.it, a.recycling.en, a.recycling.de, a.recycling.pl) },
-            { icon: '🔕', title: tr('Silenzio notturno', 'Quiet hours', 'Nachtruhe', 'Godziny ciszy'), body: tr(a.quietHours.it, a.quietHours.en, a.quietHours.de, a.quietHours.pl) },
-            { icon: '🧳', title: tr('Check‑out flessibile', 'Flexible check‑out', 'Flexibler Check‑out', 'Elastyczne wymeldowanie'), body: tr(a.checkout.it, a.checkout.en, a.checkout.de, a.checkout.pl) }
+            { icon: '🧳', title: tr('Check‑out flessibile', 'Flexible check‑out', 'Flexibler Check‑out', 'Elastyczne wymeldowanie'), body: tr(a.checkout.it, a.checkout.en, a.checkout.de, a.checkout.pl) },
+            { icon: '♻️', title: tr('Raccolta differenziata', 'Recycling', 'Mülltrennung', 'Segregacja'), body: tr(a.recycling.it, a.recycling.en, a.recycling.de, a.recycling.pl) }
         ];
 
-        // Unisce la nuova scheda in alto con le schede esistenti
         let html = reachCardHtml;
         for (let i = 0; i < cards.length; i++) {
             html += `<div class="card"><div class="card-header"><span class="card-header-icon" aria-hidden="true">${cards[i].icon}</span><span class="card-title">${cards[i].title}</span></div><div class="card-body">${cards[i].body}</div></div>`;
         }
+
+        // Aggiunge la sezione regole della casa
+        const rulesTitle = tr('📋 Regole della casa', '📋 House rules', '📋 Hausregeln', '📋 Zasady domu');
+        let rulesHtml = `<div class="card"><div class="card-header"><span class="card-header-icon" aria-hidden="true">📋</span><span class="card-title">${rulesTitle}</span></div><div class="card-body">`;
+        for (let i = 0; i < appData.rules.length; i++) {
+            const r = appData.rules[i];
+            rulesHtml += `<div class="rule-row"><span class="rule-icon" aria-hidden="true">${r.icon}</span><span class="rule-text">${tr(r.it, r.en, r.de, r.pl)}</span></div>`;
+        }
+        rulesHtml += `</div></div>`;
+        html += rulesHtml;
+
         return html;
     }
 

@@ -1,4 +1,4 @@
-// Service Worker per Affittacamere Ancona Centro - Guida Ospiti V4.0.6
+// Service Worker per Affittacamere Ancona Centro - Guida Ospiti V4.1
 const CACHE_NAME = 'ancona-guida-v4.1';
 const ASSETS_TO_CACHE = [
     './',

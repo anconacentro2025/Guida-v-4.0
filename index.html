@@ -532,7 +532,7 @@
             { name:'Parcheggio Stamira', emoji:'🅿️', photo:'', it:'Parcheggio sotterraneo, il più vicino, il più caro.', en:'Underground car park, the closest, the most expensive.', de:'Tiefgarage, die nächste, die teuerste.', pl:'Parking podziemny, najbliższy, najdroższy.', dist:'🚶 400 m – 5 min', mapQuery:'Parcheggio Stamira Ancona', lat:43.6162329, lng:13.5154477 }
         ],
         around: [
-            { name:'Portonovo (Baia del Conero)', emoji:'🌊', photo:'portonovo.jpg', it:'Baia incantevole, bus 94 da Piazza Cavour.', en:'Enchanting bay, bus 94 from Piazza Cavour.', de:'Bezaubernde Bucht, Bus 94 ab Piazza Cavour.', pl:'Urzekająca zatoka, autobus 94 z Piazza Cavour.', dist:'🚌 12 km – 25 min', mapQuery:'Portonovo Ancona', lat:43.5636463, lng:13.5976903 },
+            { name:'Portonovo (Baia del Conero)', emoji:'🌊', photo:'portonovo.jpg', it:'Baia incantevole, bus 94 da Piazza Cavour.', en:'Enchanting bay, bus 94 from Piazza Cavour.', de:'Bezaubernde Bucht, Bus 94 ab Piazza Cavour.', pl:'Urzekająca zatoka, autobus 94 z Piazza Cavour.', dist:'🚌 12 km – 25 min', mapQuery:'Portonovo Ancona', lat:43.5636463, lng:13.5976903, extraMap:{ label:'🎥 Webcam Spiaggia Bonetti', url:'https://vedetta.org/webcam/italia/marche/ancona/portonovo-spiaggia/' } },
             { name:'Sirolo e Numana', emoji:'🏖️', photo:'sirolo.jpg', it:'Perle del Conero, spiagge tra le più belle delle Marche.', en:'Gems of the Conero, among the most beautiful beaches in Marche.', de:'Perlen des Conero, mit die schönsten Strände der Marken.', pl:'Perły Conero, jedne z najpiękniejszych plaż w Marchii.', dist:'🚗 14 km – 21 min', mapQuery:'Sirolo AN', lat:43.5231225, lng:13.6200824 },
             { name:'Offagna', emoji:'🏰', photo:'offagna.jpg', it:'Piccolo borgo medievale con rocca, panorama sulla campagna marchigiana.', en:'Small medieval village with fortress, views over the Marche countryside.', de:'Kleines mittelalterliches Dorf mit Festung, Blick über die Landschaft der Marken.', pl:'Małe średniowieczne miasteczko z zamkiem i widokiem na wieś marchijską.', dist:'🚗 12 km – 18 min', mapQuery:'Offagna Ancona', lat:43.5274876, lng:13.4412360 },
             { name:'Loreto', emoji:'⛪', photo:'loreto.jpg', it:'Santuario della Santa Casa, mèta di pellegrinaggio.', en:'Sanctuary of the Holy House, pilgrimage destination.', de:'Heiligtum des Heiligen Hauses, Pilgerziel.', pl:'Sanktuarium Świętego Domu, miejsce pielgrzymek.', dist:'🚗 21 km – 32 min', mapQuery:'Loreto AN', lat:43.4411021, lng:13.6094860 },
@@ -589,16 +589,15 @@
     let gpsWatchId = null;
     let gpsMarker = null;
     let gpsCircle = null;
-    let gpsConsentGiven = false;
+    let gpsConsentGiven = localStorage.getItem('gpsConsent') === 'true' ? true : false;
     let gpsBoxCollapsed = false;
 
     let deferredPrompt;
 
-    // Ora di rilascio dinamica
+    // Ora di rilascio — Aggiornato automaticamente ogni volta che il file viene modificato
     (function() {
-        const now = new Date();
-        const options = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' };
-        document.getElementById('release-time').textContent = now.toLocaleString('it-IT', options);
+        const RELEASE_TIME = '19 giugno 2026 · 08:38';
+        document.getElementById('release-time').textContent = RELEASE_TIME;
     })();
 
     function tr(it, en, de, pl) {
@@ -793,11 +792,13 @@
                 document.getElementById('btn-gps-accept')?.addEventListener('click', function(e) {
                     e.stopPropagation();
                     gpsConsentGiven = true;
+                    localStorage.setItem('gpsConsent', 'true');
                     toggleGpsTracking();
                 });
                 document.getElementById('btn-gps-deny')?.addEventListener('click', function(e) {
                     e.stopPropagation();
                     gpsConsentGiven = true;
+                    localStorage.setItem('gpsConsent', 'true');
                     gpsBoxCollapsed = true;
                     updateGpsUI();
                 });
@@ -1172,7 +1173,10 @@
             photoHtml = `<div class="detail-photo-wrap"><a href="${getImgSearchUrl(p)}" target="_blank" rel="noopener" class="detail-photo-link" aria-label="Cerca foto di ${p.name} su Google Immagini"><span class="placeholder-emoji" aria-hidden="true">🖼️</span><span class="placeholder-text">${tr('Clicca per vedere le foto', 'Click to see photos', 'Klicken, um Fotos zu sehen', 'Kliknij, aby zobaczyć zdjęcia')}</span></a></div>`;
         }
         let btns = `<a href="${getMapLink(p.mapQuery || p.name, !!p.mapQuery)}" target="_blank" rel="noopener" class="map-button" aria-label="Apri mappa per ${p.name}">🗺️ ${tr('Apri mappa', 'Open map', 'Karte öffnen', 'Otwórz mapę')}</a>`;
-        if (!isSubMode && p.extraMap) { btns += ` <a href="${getMapLink(p.extraMap.query, true)}" target="_blank" rel="noopener" class="map-button" aria-label="${p.extraMap.label}">${p.extraMap.label}</a>`; }
+        if (!isSubMode && p.extraMap) { 
+            const extraHref = p.extraMap.url || getMapLink(p.extraMap.query, true);
+            btns += ` <a href="${extraHref}" target="_blank" rel="noopener" class="map-button" aria-label="${p.extraMap.label}">${p.extraMap.label}</a>`;
+        }
         const displayNum = getDisplayNumber(p, index);
         const totalDisplay = getTotalDisplay(currentSectionPlaces, total);
         const backLabel = tr('Tutti i luoghi', 'All places', 'Alle Orte', 'Wszystkie miejsca');
@@ -1321,12 +1325,18 @@
             .bindPopup('<b style="font-size:.78rem;">★ Ancona Centro</b><br><span style="font-size:.68rem;color:#888;">📍 Piazza Roma 3</span>');
     }
 
-    // ---- Service Worker ----
+    // ---- Service Worker (non supportato su Safari iOS) ----
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-            navigator.serviceWorker.register('./sw.js')
-                .then(reg => console.log('✅ Service Worker registrato'))
-                .catch(err => console.error('❌ Errore SW:', err));
+            navigator.serviceWorker.register('./sw.js', { scope: './' })
+                .then(reg => {
+                    console.log('✅ Service Worker registrato (cache offline abilitata)');
+                })
+                .catch(err => {
+                    // Safari iOS/iPadOS non supporta SW per domini non app-bound.
+                    // L'app funziona normalmente, solo offline cache non disponibile.
+                    console.log('ℹ️ Service Worker non disponibile (Safari iOS, cache offline disabilitata)');
+                });
         });
     }
 

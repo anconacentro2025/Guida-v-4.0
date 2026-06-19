@@ -589,7 +589,7 @@
     let gpsWatchId = null;
     let gpsMarker = null;
     let gpsCircle = null;
-    let gpsConsentGiven = localStorage.getItem('gpsConsent') === 'true' ? true : false;
+    let gpsConsentGiven = sessionStorage.getItem('gpsConsent') === 'true' ? true : false;
     let gpsBoxCollapsed = false;
 
     let deferredPrompt;
@@ -792,13 +792,13 @@
                 document.getElementById('btn-gps-accept')?.addEventListener('click', function(e) {
                     e.stopPropagation();
                     gpsConsentGiven = true;
-                    localStorage.setItem('gpsConsent', 'true');
+                    sessionStorage.setItem('gpsConsent', 'true');
                     toggleGpsTracking();
                 });
                 document.getElementById('btn-gps-deny')?.addEventListener('click', function(e) {
                     e.stopPropagation();
                     gpsConsentGiven = true;
-                    localStorage.setItem('gpsConsent', 'true');
+                    sessionStorage.setItem('gpsConsent', 'true');
                     gpsBoxCollapsed = true;
                     updateGpsUI();
                 });

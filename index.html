@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- Affittacamere Ancona Centro - Guida Ospiti V4.0.6 | Compilata: 19 giugno 2026 · 15:20 -->
+<!-- Affittacamere Ancona Centro - Guida Ospiti V4.0.6 | Compilata: 19 giugno 2026 · 15:50 -->
 <html lang="it">
 <head>
     <meta charset="UTF-8">
@@ -75,7 +75,7 @@
         .home-welcome-right { flex: 1; }
         .home-welcome-title { font-family: 'Cormorant Garamond', serif; font-size: 1.2rem; font-weight: 600; color: var(--navy); margin-bottom: 4px; }
         .home-welcome-sub { font-size: .75rem; color: var(--muted); }
-        .home-social { background: linear-gradient(135deg, var(--navy) 0%, var(--navy-2) 100%); border-radius: 10px; padding: 10px 14px; margin: 8px 16px 0; border: 1px solid rgba(200,164,90,.25); color: var(--white); }
+        .home-social { background: linear-gradient(135deg, var(--navy) 0%, var(--navy-2) 100%); border-radius: 10px; padding: 10px 14px; margin: 8px 16px 0; display: flex; align-items: center; justify-content: space-between; border: 1px solid rgba(200,164,90,.25); color: var(--white); }
         .home-social-label { color: rgba(255,255,255,.6); font-size: .65rem; text-transform: uppercase; letter-spacing: .08em }
         .home-social-links { display: flex; gap: 14px; align-items: center; margin-top: 4px; }
         .social-link { color: var(--gold-2); font-size: .85rem; font-weight: 500; display: flex; align-items: center; gap: 4px; transition: color .2s }
@@ -257,7 +257,7 @@
                     <button class="lang-btn" id="btn-pl" role="radio" aria-checked="false" aria-label="Polski">PL</button>
                 </div>
                 <div id="version-info" style="font-size:0.55rem; color:var(--gold-3); text-align:right; margin-top:4px; opacity:0.6; letter-spacing:0.05em;">
-                    V4.0.6 · Generata il <span id="release-time"></span>
+                    V4.0.6 · Compilata: <span id="release-time"></span>
                 </div>
             </div>
         </div>
@@ -596,7 +596,7 @@
 
     let deferredPrompt;
 
-    // Ora di rilascio — Aggiornato automaticamente ogni volta che il file viene modificato
+    // Ora di rilascio
     (function() {
         const RELEASE_TIME = '19 giugno 2026 · 15:20';
         document.getElementById('release-time').textContent = RELEASE_TIME;
@@ -620,7 +620,6 @@
         renderAll();
     }
 
-    // Listener cambio lingua
     document.querySelectorAll('.lang-btn').forEach(btn => {
         btn.addEventListener('click', function() {
             const lang = this.id.replace('btn-', '');
@@ -676,8 +675,6 @@
     }
 
     function goTo(i) {
-        // Rimuovi i marker dalle mappe, ma NON fermare il GPS tracking
-        // Il GPS continua a tracciare in background per tutte le sezioni
         if (gpsMarker && leafletMap) leafletMap.removeLayer(gpsMarker);
         if (gpsCircle && leafletMap) leafletMap.removeLayer(gpsCircle);
         gpsMarker = null;
@@ -813,11 +810,7 @@
     }
 
     function toggleGpsBox() {
-        if (gpsBoxCollapsed) {
-            gpsBoxCollapsed = false;
-        } else {
-            gpsBoxCollapsed = true;
-        }
+        gpsBoxCollapsed = !gpsBoxCollapsed;
         updateGpsUI();
     }
 
@@ -950,7 +943,6 @@
             goTo(-1);
         });
 
-        // GPS solo per sezioni con mappa (escludi apartment, contact, rules, transport)
         const noGpsSections = ['apartment', 'contact', 'rules', 'transport'];
         if (currentPlaceDetail < 0 && !noGpsSections.includes(s.id)) {
             const cardsEl = cont.querySelector('.cards');
@@ -1003,7 +995,8 @@
             </button>`
         ).join('');
 
-        const installBtn = `
+        // ✅ Variabile rinominata per evitare conflitto
+        const installBtnHtml = `
             <button id="install-btn" class="install-btn" style="display: none;">
                 📲 ${tr('Aggiungi alla schermata Home', 'Add to Home Screen', 'Zum Startbildschirm hinzufügen', 'Dodaj do ekranu głównego')}
             </button>
@@ -1020,7 +1013,7 @@
                     <div class="home-welcome-sub">${tr('Siamo felici di ospitarvi', 'We are happy to host you', 'Wir freuen uns, Sie zu beherbergen', 'Cieszymy się, że możemy Was gościć')}</div>
                 </div>
             </div>
-            ${installBtn}
+            ${installBtnHtml}
             ${socialHtml}
             <div class="nav-grid">${tiles}</div>
         </section>`;
@@ -1097,7 +1090,6 @@
             }
         }
 
-        // Box informativo per strisce blu nella sezione parcheggi
         const parkingInfoBox = (sectionId === 'parking') ? `<div class="card" style="margin-top: 8px;">
             <div class="card-header"><span class="card-header-icon">🅿️</span><span class="card-title">Strisce blu (zona centro)</span></div>
             <div class="card-body">Parcheggio a pagamento su strada, posto difficile.</div>
@@ -1326,7 +1318,7 @@
             .bindPopup('<b style="font-size:.78rem;">★ Ancona Centro</b><br><span style="font-size:.68rem;color:#888;">📍 Piazza Roma 3</span>');
     }
 
-    // ---- Service Worker (non supportato su Safari iOS) ----
+    // ---- Service Worker ----
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
             navigator.serviceWorker.register('./sw.js', { scope: './' })
@@ -1334,8 +1326,6 @@
                     console.log('✅ Service Worker registrato (cache offline abilitata)');
                 })
                 .catch(err => {
-                    // Safari iOS/iPadOS non supporta SW per domini non app-bound.
-                    // L'app funziona normalmente, solo offline cache non disponibile.
                     console.log('ℹ️ Service Worker non disponibile (Safari iOS, cache offline disabilitata)');
                 });
         });

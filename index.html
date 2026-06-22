@@ -1,6 +1,6 @@
 
 <!DOCTYPE html>
-<!-- Affittacamere Ancona Centro - Guida Ospiti V4.1.6 | 22/06/26 15:30 -->
+<!-- Affittacamere Ancona Centro - Guida Ospiti V4.1.6 | 22/06/26 20:40 -->
 <html lang="it">
 <head>
     <meta charset="UTF-8">
@@ -196,12 +196,12 @@
                     <button class="lang-btn" id="btn-de" role="radio" aria-checked="false" aria-label="Deutsch">DE</button>
                     <button class="lang-btn" id="btn-pl" role="radio" aria-checked="false" aria-label="Polski">PL</button>
                 </div>
-                <div class="version-info">V4.1.6 · <span id="release-time">22/06/26 15:30</span></div>
+                <div class="version-info">V4.1.6 · <span id="release-time">22/06/26 20:40</span></div>
             </div>
         </div>
     </header>
     <div class="hero" id="hero">
-        <img class="hero-img" id="heroImg" src="https://raw.githubusercontent.com/anconacentro2025/Guida-v-4.0/main/img/home.jpg" alt="Ancona Centro" onerror="this.style.display='none'">
+        <img class="hero-img" id="heroImg" src="https://raw.githubusercontent.com/anconacentro2025/Guida-v-4.0/main/img/home.jpg" alt="Ancona Centro" fetchpriority="high" onerror="this.style.display='none'">
         <div class="hero-overlay" aria-hidden="true"></div>
         <div class="hero-caption"><div class="hero-caption-title">Affittacamere<br>Ancona Centro</div></div>
     </div>
@@ -346,7 +346,7 @@
         { id:'contact', icon:'📞', it:'Contatti & Emergenze', en:'Contacts & Emergency', de:'Kontakt & Notfälle', pl:'Kontakt i alarmy' }
     ];
 
-    const sectionHashMap = { 'mustsee': 1, 'contact': 10 };
+    const sectionHashMap = { 'apartment':0, 'mustsee':1, 'around':2, 'beaches':3, 'marche':4, 'restaurants':5, 'barpub':6, 'supermarkets':7, 'parking':8, 'transport':9, 'contact':10 };
 
     let currentLang = 'it', currentSection = -1, currentPlaceDetail = -1, currentSectionPlaces = [], leafletMap = null, currentSubItinerary = null;
     let placeDataMap = {}, _mapRetryCount = 0;
@@ -357,7 +357,7 @@
         const val = (currentLang === 'en') ? (en || it) : (currentLang === 'de') ? (de || en || it) : (currentLang === 'pl') ? (pl || en || it) : it;
         return val || '';
     }
-    function setLang(lang) { currentLang = lang; document.documentElement.lang = lang; document.querySelectorAll('.lang-btn').forEach(btn => { const isActive = btn.id === 'btn-'+lang; btn.classList.toggle('active', isActive); btn.setAttribute('aria-checked', isActive ? 'true' : 'false'); }); renderAll(); }
+    function setLang(lang) { currentLang=lang; document.documentElement.lang=lang; document.querySelectorAll('.lang-btn').forEach(btn=>{ const isActive=btn.id==='btn-'+lang; btn.classList.toggle('active',isActive); btn.setAttribute('aria-checked',isActive?'true':'false'); }); if(leafletMap){leafletMap.remove();leafletMap=null;} renderAll(); }
     document.querySelectorAll('.lang-btn').forEach(btn => { btn.addEventListener('click', function() { setLang(this.id.replace('btn-', '')); }); });
 
     function getMapLink(query, noSuffix) { const q = noSuffix ? query : query + ', Ancona Italia'; return 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(q); }
@@ -374,6 +374,7 @@
         if(gpsMarker&&leafletMap)leafletMap.removeLayer(gpsMarker);
         if(gpsCircle&&leafletMap)leafletMap.removeLayer(gpsCircle);
         gpsMarker=null;gpsCircle=null;
+        if(currentSection>=0&&sections[currentSection]&&sections[currentSection].id==='apartment'&&targetId!=='apartment'){window._activeReachTab='auto';}
         currentSection=i;currentPlaceDetail=-1;currentSubItinerary=null;placeDataMap={};
         if(leafletMap){leafletMap.remove();leafletMap=null;}
         renderAll();window.scrollTo({top:0,behavior:'smooth'});
@@ -410,11 +411,15 @@
     function sortMustSee(a,b){function toNum(val){if(typeof val==='string'&&val.indexOf('bis')>-1)return parseFloat(val.split('-')[0])+.5;return Number(val);}return toNum(a.order)-toNum(b.order);}
 
     window._reachTexts={};
-    window._toggleReach=function(type,btn){
+    window._activeReachTab='auto';
+    window._toggleReach=function(type){
+        window._activeReachTab=type;
         const contentEl=document.getElementById('reach-content');
         if(contentEl)contentEl.innerHTML=window._reachTexts[type]||'';
-        document.querySelectorAll('.reach-sub-btn').forEach(b=>b.classList.remove('active'));
-        if(btn)btn.classList.add('active');
+        document.querySelectorAll('.reach-sub-btn').forEach(b=>{
+            const isActive=b.dataset.reach===type;
+            b.classList.toggle('active',isActive);
+        });
     };
 
     function updateGpsUI(){
@@ -463,7 +468,7 @@
         cont.innerHTML='<section class="section active"><div class="section-header"><div class="section-header-inner"><div class="section-icon" aria-hidden="true">'+s.icon+'</div><div><div class="section-title">'+tr(s.it,s.en,s.de,s.pl)+'</div></div></div></div><div class="cards">'+body+'<div class="goto-home"><button class="home-btn" id="home-btn">🏠 Home</button></div></div></section>';
         document.getElementById('home-btn')?.addEventListener('click',function(){goTo(-1);});
         document.getElementById('sub-back-btn')?.addEventListener('click',closeSubItinerary);
-        attachDetailListeners();attachPlaceSectionListeners();
+        attachDetailListeners();attachPlaceSectionListeners();attachReachListeners();
         if(currentPlaceDetail<0&&!NO_GPS_SECTIONS.includes(s.id)){
             const cardsEl=cont.querySelector('.cards'),gpsContainer=document.createElement('div');gpsContainer.className='gps-container';
             gpsContainer.innerHTML='<div class="gps-box"><div class="gps-row"><div class="gps-icon">🧭</div><div class="gps-text"></div><div class="gps-buttons"></div></div></div><div class="gps-icon-overlay" id="gps-overlay-icon">📍</div>';
@@ -535,6 +540,13 @@
 
     function attachDetailListeners(){document.getElementById('detail-back-btn')?.addEventListener('click',backToMap);document.querySelectorAll('.nav-detail-btn[data-prev]').forEach(btn=>btn.addEventListener('click',function(){selectPlaceDetail(parseInt(this.dataset.prev));}));document.querySelectorAll('.nav-detail-btn[data-next]').forEach(btn=>btn.addEventListener('click',function(){selectPlaceDetail(parseInt(this.dataset.next));}));}
 
+    function attachReachListeners(){
+        document.querySelectorAll('.reach-sub-btn').forEach(btn=>{
+            btn.addEventListener('click',function(){window._toggleReach(this.dataset.reach);});
+        });
+        if(window._toggleReach)window._toggleReach(window._activeReachTab||'auto');
+    }
+
     function renderTransport(){
         const td=appData.transport;
         const items=[{icon:'🚌',label:tr('Bus','Bus','Bus','Autobus'),text:tr(td.bus.it,td.bus.en,td.bus.de,td.bus.pl)},{icon:'🚂',label:tr('Treno','Train','Zug','Pociąg'),text:tr(td.train.it,td.train.en,td.train.de,td.train.pl)},{icon:'🚕',label:tr('Taxi','Taxi','Taxi','Taxi'),text:tr(td.taxi.it,td.taxi.en,td.taxi.de,td.taxi.pl)},{icon:'⛴️',label:tr('Traghetti','Ferries','Fähren','Promy'),text:tr(td.ferry.it,td.ferry.en,td.ferry.de,td.ferry.pl)},{icon:'✈️',label:tr('Aeroporto','Airport','Flughafen','Lotnisko'),text:tr(td.airport.it,td.airport.en,td.airport.de,td.airport.pl)}];
@@ -547,7 +559,7 @@
         const a=appData.apartment;
         const reachData={title:tr('📍 Come raggiungerci','📍 How to reach us','📍 Anreise','📍 Jak do nas dotrzeć'),autoLabel:tr('🚗 In auto','🚗 By car','🚗 Mit dem Auto','🚗 Samochodem'),trenoLabel:tr('🚆 In treno','🚆 By train','🚆 Mit dem Zug','🚆 Pociągiem'),aereoLabel:tr('✈️ In aereo','✈️ By air','✈️ Mit dem Flugzeug','✈️ Samolotem'),autoBody:tr('L\'alloggio è nella piazza centrale di Ancona, in zona pedonale. Se si intende girare in centro non si ha bisogno dell\'auto. È possibile parcheggiare su strada nei dintorni sulle strisce blu (a pagamento dalle 8 alle 20 a 1,20€/h dei giorni feriali) ma è difficile trovare posto. Ci sono diversi parcheggi coperti, io consiglio di lasciare l\'auto nel più economico <a href="https://anconaservizi.it/parcheggi-coperti/parcheggio-scambiatore-degli-archi/" target="_blank" rel="noopener">parcheggio multipiano degli archi</a>, ad 1,5 km di distanza, con l\'alloggio facilmente raggiungibile a piedi con una passeggiata tutta pianeggiante.<br><br>Se preferisci l\'autobus prendi il bus 1/4 direzione centro e scendi in piazza Roma, ci mette 5 minuti. Attraversa la piazza, il n. 3 è a sinistra della fontana dei cavalli.<br>Al portone suona al campanello Frisoli, poi prendi l\'ascensore fino al quarto piano.','The accommodation is located in the main square of Ancona, in a pedestrian area. If you plan to explore the centre, you won\'t need a car. Street parking is available nearby in the blue bays (€1.20/h on weekdays, 8am‑8pm) but it\'s difficult to find a space. There are several covered car parks; I recommend the cheaper <a href="https://anconaservizi.it/parcheggi-coperti/parcheggio-scambiatore-degli-archi/" target="_blank" rel="noopener">multi‑storey car park "degli Archi"</a>, 1.5 km away, from where the accommodation can be easily reached on foot with an entirely flat walk.<br><br>If you prefer the bus, take line 1/4 towards the centre and get off at Piazza Roma (5 minutes). Cross the square, number 3 is on the left of the horse fountain.<br>At the main door, ring the bell for Frisoli, then take the lift to the fourth floor.','Die Unterkunft befindet sich am zentralen Platz von Ancona, in einer Fußgängerzone. Wenn Sie das Zentrum besichtigen möchten, brauchen Sie kein Auto. Auf den umliegenden Straßen können Sie auf den blauen Parkbuchten parken (werktags 8–20 Uhr, 1,20 €/Std.), aber es ist schwer, einen Platz zu finden. Es gibt mehrere Parkhäuser; ich empfehle das günstigere <a href="https://anconaservizi.it/parcheggi-coperti/parcheggio-scambiatore-degli-archi/" target="_blank" rel="noopener">Parkhaus „degli Archi"</a> in 1,5 km Entfernung, von wo aus die Unterkunft bequem zu Fuß auf einem völlig flachen Weg erreichbar ist.<br><br>Wenn Sie den Bus bevorzugen, nehmen Sie die Linie 1/4 Richtung Zentrum und steigen Sie am Piazza Roma aus (5 Minuten). Überqueren Sie den Platz, Hausnummer 3 befindet sich links vom Pferdebrunnen.<br>Läuten Sie an der Haustür bei „Frisoli" und nehmen Sie dann den Aufzug in den vierten Stock.','Obiekt znajduje się na głównym placu Ankony, w strefie pieszej. Jeśli zamierzasz poruszać się po centrum, nie potrzebujesz samochodu. Można parkować na okolicznych ulicach na niebieskich pasach (w dni powszednie w godz. 8‑20, 1,20 €/godz.), ale trudno znaleźć miejsce. Jest kilka parkingów zadaszonych; polecam zostawić samochód na tańszym <a href="https://anconaservizi.it/parcheggi-coperti/parcheggio-scambiatore-degli-archi/" target="_blank" rel="noopener">wielopoziomowym parkingu „degli Archi"</a>, oddalonym o 1,5 km, skąd można łatwo dojść pieszo całkowicie płaską trasą.<br><br>Jeśli wolisz autobus, wsiądź w linię 1/4 w kierunku centrum i wysiądź na Piazza Roma (5 minut). Przejdź przez plac, numer 3 znajduje się na lewo od fontanny z końmi.<br>Przy głównej bramie zadzwoń na dzwonek „Frisoli", a następnie wjedź windą na czwarte piętro.'),trenoBody:tr('Dalla stazione prendi il bus 1/4 direzione centro e scendi in piazza Roma, ci mette 5 minuti. Attraversa la piazza, il n. 3 è a sinistra della fontana dei cavalli.<br>Al portone suona al campanello Frisoli, poi prendi l\'ascensore fino al quarto piano.','From the station, take bus 1/4 towards the centre and get off at Piazza Roma (5 minutes). Cross the square, number 3 is on the left of the horse fountain.<br>At the main door, ring the bell for Frisoli, then take the lift to the fourth floor.','Vom Bahnhof nehmen Sie den Bus 1/4 Richtung Zentrum und steigen am Piazza Roma aus (5 Minuten). Überqueren Sie den Platz, Hausnummer 3 ist links vom Pferdebrunnen.<br>Läuten Sie an der Haustür bei „Frisoli" und nehmen Sie dann den Aufzug in den vierten Stock.','Ze stacji wsiądź w autobus 1/4 w kierunku centrum i wysiądź na Piazza Roma (5 minut). Przejdź przez plac, numer 3 znajduje się na lewo od fontanny z końmi.<br>Przy głównej bramie zadzwoń na dzwonek „Frisoli", a następnie wjedź windą na czwarte piętro.'),aereoBody:tr('Dall\'aeroporto si può prendere un taxi, scelta più comoda ma molto più costosa, prendere il bus raffaello, comodo ma presente solo per alcuni voli, oppure il treno che è la soluzione che consiglio per raggiungere la stazione di Ancona e poi proseguire con l\'itinerario indicato per chi arriva in treno. Ne passano di frequente e la stazione è proprio di fronte al terminal.<br><br>🔗 <a href="https://www.trenitalia.com/it.html" target="_blank" rel="noopener">Orari in tempo reale su Trenitalia</a>','From the airport you can take a taxi (most convenient but far more expensive), the Raffaello bus (convenient but only available for certain flights), or the train – the option I recommend to reach Ancona station, then follow the directions for those arriving by train. Trains run frequently, and the station is right opposite the terminal.<br><br>🔗 <a href="https://www.trenitalia.com/it.html" target="_blank" rel="noopener">Real‑time timetables on Trenitalia</a>','Vom Flughafen aus können Sie ein Taxi nehmen (am bequemsten, aber deutlich teurer), den Raffaello‑Bus (praktisch, aber nur für bestimmte Flüge) oder den Zug – die von mir empfohlene Lösung, um den Bahnhof von Ancona zu erreichen, und dann der Beschreibung für Zugreisende folgen. Züge verkehren regelmäßig, und der Bahnhof befindet sich direkt gegenüber dem Terminal.<br><br>🔗 <a href="https://www.trenitalia.com/it.html" target="_blank" rel="noopener">Echtzeit‑Fahrpläne auf Trenitalia</a>','Z lotniska można wziąć taksówkę (najwygodniejsza, ale znacznie droższa opcja), autobus Raffaello (wygodny, ale dostępny tylko dla niektórych lotów) lub pociąg – rozwiązanie, które polecam, aby dotrzeć na stację Ancona, a następnie postępować według wskazówek dla przyjeżdżających pociągiem. Pociągi kursują często, a stacja znajduje się dokładnie naprzeciwko terminalu.<br><br>🔗 <a href="https://www.trenitalia.com/it.html" target="_blank" rel="noopener">Rozkłady jazdy na żywo w Trenitalia</a>')};
         window._reachTexts={auto:reachData.autoBody,treno:reachData.trenoBody,aereo:reachData.aereoBody};
-        const reachCardHtml='<div class="card" style="border-left:3px solid var(--gold);margin-bottom:12px"><div class="card-header"><span class="card-header-icon">📍</span><span class="card-title">'+reachData.title+'</span></div><div class="card-body"><div style="display:flex;gap:6px;margin-bottom:14px"><button class="reach-sub-btn active" onclick="window._toggleReach(\'auto\',this)" style="flex:1">'+reachData.autoLabel+'</button><button class="reach-sub-btn" onclick="window._toggleReach(\'treno\',this)" style="flex:1">'+reachData.trenoLabel+'</button><button class="reach-sub-btn" onclick="window._toggleReach(\'aereo\',this)" style="flex:1">'+reachData.aereoLabel+'</button></div><div id="reach-content" class="reach-content">'+reachData.autoBody+'</div></div></div>';
+        const reachCardHtml='<div class="card" style="border-left:3px solid var(--gold);margin-bottom:12px"><div class="card-header"><span class="card-header-icon">📍</span><span class="card-title">'+reachData.title+'</span></div><div class="card-body"><div style="display:flex;gap:6px;margin-bottom:14px"><button class="reach-sub-btn" data-reach="auto" style="flex:1">'+reachData.autoLabel+'</button><button class="reach-sub-btn" data-reach="treno" style="flex:1">'+reachData.trenoLabel+'</button><button class="reach-sub-btn" data-reach="aereo" style="flex:1">'+reachData.aereoLabel+'</button></div><div id="reach-content" class="reach-content">'+reachData.autoBody+'</div></div></div>';
         const cards=[{icon:'📶',title:tr('Wi‑Fi','Wi‑Fi','WLAN','Wi‑Fi'),body:tr(a.wifi.it,a.wifi.en,a.wifi.de,a.wifi.pl)},{icon:'🚪',title:tr('Citofono','Intercom','Gegensprechanlage','Domofon'),body:tr(a.access.it,a.access.en,a.access.de,a.access.pl)},{icon:'🔑',title:tr('Chiavi','Keys','Schlüssel','Klucze'),body:tr(a.keys.it,a.keys.en,a.keys.de,a.keys.pl)},{icon:'🏨',title:tr('Check‑in flessibile','Flexible check‑in','Flexibler Check‑in','Elastyczne zameldowanie'),body:tr(a.checkin.it,a.checkin.en,a.checkin.de,a.checkin.pl)},{icon:'🧳',title:tr('Check‑out flessibile','Flexible check‑out','Flexibler Check‑out','Elastyczne wymeldowanie'),body:tr(a.checkout.it,a.checkout.en,a.checkout.de,a.checkout.pl)},{icon:'♻️',title:tr('Raccolta differenziata','Recycling','Mülltrennung','Segregacja'),body:tr(a.recycling.it,a.recycling.en,a.recycling.de,a.recycling.pl)}];
         let html=reachCardHtml;
         for(let i=0;i<cards.length;i++)html+='<div class="card"><div class="card-header"><span class="card-header-icon" aria-hidden="true">'+cards[i].icon+'</span><span class="card-title">'+cards[i].title+'</span></div><div class="card-body">'+cards[i].body+'</div></div>';

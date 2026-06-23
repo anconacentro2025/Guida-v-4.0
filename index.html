@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- Affittacamere Ancona Centro - Guida Ospiti V4.2.0 | 23/06/26 12:30 -->
+<!-- Affittacamere Ancona Centro - Guida Ospiti V4.2.0 | 23/06/26 13:35 -->
 <html lang="it">
 <head>
     <meta charset="UTF-8">
@@ -202,7 +202,6 @@
         .countdown-icon{font-size:1.4rem}
         .countdown-text{font-size:.75rem;color:#92400E;line-height:1.4}
         .countdown-value{font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-weight:600;color:#78350F}
-        .swipe-hint{text-align:center;font-size:.58rem;color:var(--muted);padding:4px 0 0;opacity:.5;letter-spacing:.05em}
 
         /* === MAPPA FULL-SCREEN OVERLAY === */
         .map-fullscreen-overlay{position:fixed;top:0;left:0;width:100vw;height:100vh;background:var(--navy);z-index:9999;display:none;flex-direction:column;opacity:0;transition:opacity .3s ease}
@@ -230,7 +229,7 @@
                     <button class="lang-btn" id="btn-de" role="radio" aria-checked="false" aria-label="Deutsch">DE</button>
                     <button class="lang-btn" id="btn-pl" role="radio" aria-checked="false" aria-label="Polski">PL</button>
                 </div>
-                <div class="version-info">V4.2.0 · <span id="release-time">23/06/26 12:30</span></div>
+                <div class="version-info">V4.2.0 · <span id="release-time">23/06/26 13:35</span></div>
             </div>
         </div>
     </header>
@@ -265,7 +264,6 @@
     const ANCONA_LAT = 43.6181895, ANCONA_LNG = 13.5129489;
     let distSortActive = false;
     let homeStaticMap = null;
-    let swipeStartX = 0;
 
     // === FULLSCREEN MAP VARIABLES ===
     let fullscreenMapInstance = null;
@@ -833,9 +831,8 @@
         const tiles=sections.map((s,i)=>'<button class="nav-tile" data-index="'+i+'" aria-label="'+tr(s.it,s.en,s.de,s.pl)+'"><div class="nav-tile-icon" aria-hidden="true">'+s.icon+'</div><div class="nav-tile-label">'+tr(s.it,s.en,s.de,s.pl)+'</div></button>').join('');
         const installBtnHtml='<button id="install-btn" class="install-btn" style="display:none">📲 '+tr('Aggiungi alla schermata Home','Add to Home Screen','Zum Startbildschirm hinzufügen','Dodaj do ekranu głównego')+'</button>';
         const countdownHtml=getCountdownHtml();
-        const swipeHint='<div class="swipe-hint">← '+tr('scorri per navigare','swipe to navigate','wischen zum Navigieren','przesuń aby nawigować')+' →</div>';
         const staticMapHtml='<div class="home-map-wrap" id="home-static-map"></div>';
-        const html='<section class="section active"><div class="home-welcome"><div class="home-welcome-left"><img src="'+hostImgSrc+'" alt="Foto dell\'host" class="host-photo" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\';"><div class="host-photo-placeholder" style="display:none">👋</div></div><div class="home-welcome-right"><div class="home-welcome-title">'+tr('Benvenuti!','Welcome!','Willkommen!','Witamy!')+'</div><div class="home-welcome-sub">'+tr('Siamo felici di ospitarvi','We are happy to host you','Wir freuen uns, Sie zu beherbergen','Cieszymy się, że możemy Was gościć')+'</div></div></div>'+installBtnHtml+countdownHtml+socialHtml+staticMapHtml+'<div class="nav-grid">'+tiles+'</div>'+swipeHint+'</section>';
+        const html='<section class="section active"><div class="home-welcome"><div class="home-welcome-left"><img src="'+hostImgSrc+'" alt="Foto dell\'host" class="host-photo" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\';"><div class="host-photo-placeholder" style="display:none">👋</div></div><div class="home-welcome-right"><div class="home-welcome-title">'+tr('Benvenuti!','Welcome!','Willkommen!','Witamy!')+'</div><div class="home-welcome-sub">'+tr('Siamo felici di ospitarvi','We are happy to host you','Wir freuen uns, Sie zu beherbergen','Cieszymy się, że możemy Was gościć')+'</div></div></div>'+installBtnHtml+countdownHtml+socialHtml+staticMapHtml+'<div class="nav-grid">'+tiles+'</div></section>';
         cont.innerHTML=html;
         document.querySelectorAll('.nav-tile').forEach(btn=>btn.addEventListener('click',function(){goTo(parseInt(this.dataset.index));}));
         const installBtn=document.getElementById('install-btn');
@@ -1009,43 +1006,6 @@
     if(window.matchMedia('(display-mode:standalone)').matches){const installBtn=document.getElementById('install-btn');if(installBtn)installBtn.style.display='none';}
     window.addEventListener('load',()=>{const hash=window.location.hash.replace('#','');if(hash&&sectionHashMap[hash]!==undefined)goTo(sectionHashMap[hash]);});
     window.addEventListener('popstate',()=>{const hash=window.location.hash.replace('#','');if(!hash){if(currentSection!==-1)goTo(-1);}else if(sectionHashMap[hash]!==undefined&&sectionHashMap[hash]!==currentSection)goTo(sectionHashMap[hash]);});
-    document.addEventListener('touchstart',(e)=>{swipeStartX=e.touches[0].clientX;},{passive:true});
-    document.addEventListener('touchend',(e)=>{
-        // Ignora se il tocco è su una mappa Leaflet
-        if(e.target.closest('.leaflet-container'))return;
-
-        const dx=e.changedTouches[0].clientX-swipeStartX;
-        if(Math.abs(dx)<60)return;
-
-        // 1. Se siamo dentro un dettaglio (luogo singolo)
-        if(currentPlaceDetail>=0){
-            let items=currentSectionPlaces;
-            let total=items.length;
-            if(currentSubItinerary){
-                items=appData.subItineraries[currentSubItinerary]||[];
-                total=items.length;
-            }
-            if(total>0){
-                let newIndex=currentPlaceDetail;
-                if(dx<0) newIndex=Math.min(currentPlaceDetail+1,total-1);
-                else newIndex=Math.max(currentPlaceDetail-1,0);
-                if(newIndex!==currentPlaceDetail) selectPlaceDetail(newIndex);
-            }
-            return;
-        }
-
-        // 2. Se siamo in un sub-itinerario (senza dettaglio aperto), non fare nulla
-        if(currentSubItinerary) return;
-
-        // 3. Navigazione tra sezioni
-        if(dx<0){
-            if(currentSection===-1) goTo(0);
-            else if(currentSection<sections.length-1) goTo(currentSection+1);
-        }else{
-            if(currentSection>0) goTo(currentSection-1);
-            else if(currentSection===0) goTo(-1);
-        }
-    },{passive:true});
     
     // Inizializza fullscreen listeners
     initFullscreenListeners();

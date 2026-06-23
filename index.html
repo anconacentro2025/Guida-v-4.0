@@ -705,7 +705,24 @@
         L.marker([HOME_COORDS.lat,HOME_COORDS.lng],{icon:starIcon,zIndexOffset:1000}).addTo(leafletMap).bindPopup('<b style="font-size:.78rem">★ Ancona Centro</b><br><span style="font-size:.68rem;color:#888">📍 Piazza Roma 3</span>');
     }
 
-    if('serviceWorker' in navigator)window.addEventListener('load',()=>{navigator.serviceWorker.register('./sw.js',{scope:'./'}).catch(()=>{});});
+    if('serviceWorker' in navigator)window.addEventListener('load',()=>{
+        navigator.serviceWorker.register('./sw.js',{scope:'./'}).then(reg=>{
+            reg.addEventListener('updatefound',()=>{
+                const newWorker=reg.installing;
+                if(!newWorker)return;
+                newWorker.addEventListener('statechange',()=>{
+                    if(newWorker.state==='activated'&&navigator.serviceWorker.controller){
+                        window.location.reload();
+                    }
+                });
+            });
+        }).catch(()=>{});
+        // ricarica se il SW ha preso il controllo durante questa sessione
+        let refreshing=false;
+        navigator.serviceWorker.addEventListener('controllerchange',()=>{
+            if(!refreshing){refreshing=true;window.location.reload();}
+        });
+    });
     window.addEventListener('beforeinstallprompt',(e)=>{e.preventDefault();deferredPrompt=e;const installBtn=document.getElementById('install-btn');if(installBtn)installBtn.style.display='inline-flex';});
     window.addEventListener('appinstalled',()=>{deferredPrompt=null;const installBtn=document.getElementById('install-btn');if(installBtn)installBtn.style.display='none';});
     if(window.matchMedia('(display-mode:standalone)').matches){const installBtn=document.getElementById('install-btn');if(installBtn)installBtn.style.display='none';}

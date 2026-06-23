@@ -1,10 +1,8 @@
-// Service Worker per Affittacamere Ancona Centro - Guida Ospiti V4.1.2
-// FIX CRIT-4: fallback offline restituisce Response valida invece di undefined
-// FIX CRIT-5: cache name allineato alla versione app
-// FIX CRIT-2: strategia HTML cambiata in Stale-While-Revalidate
-// FIX CRIT-5b: aggiunta cache fonts.gstatic.com per woff2
+// Service Worker per Affittacamere Ancona Centro - Guida Ospiti V4.1.7
+// skipWaiting + clients.claim già presenti → aggiornamento automatico garantito
+// CACHE_NAME aggiornato → vecchie cache eliminate all'activate
 
-const CACHE_NAME = 'ancona-guida-v4.1.2';
+const CACHE_NAME = 'ancona-guida-v4.1.7';
 const TILES_CACHE_NAME = CACHE_NAME + '-tiles';
 const MAX_TILES = 200;
 
@@ -39,38 +37,28 @@ async function trimTilesCache() {
 }
 
 self.addEventListener('install', (event) => {
-    console.log('🔄 Service Worker: installazione in corso...');
     event.waitUntil(
         caches.open(CACHE_NAME)
             .then((cache) => {
-                console.log('✅ Cache aperta, salvataggio assets...');
                 return cache.addAll(ASSETS_TO_CACHE).catch(err => {
-                    console.warn('⚠️ Alcuni assets non sono stati cachati:', err);
+                    console.warn('⚠️ Alcuni assets non cachati:', err);
                 });
             })
-            .then(() => {
-                console.log('✅ Installazione completata');
-                return self.skipWaiting();
-            })
+            .then(() => self.skipWaiting())
     );
 });
 
 self.addEventListener('activate', (event) => {
-    console.log('🔄 Service Worker: attivazione');
     event.waitUntil(
         caches.keys().then((cacheNames) => {
             return Promise.all(
                 cacheNames.map((cacheName) => {
                     if (cacheName !== CACHE_NAME && cacheName !== TILES_CACHE_NAME) {
-                        console.log('🗑️ Rimozione vecchia cache:', cacheName);
                         return caches.delete(cacheName);
                     }
                 })
             );
-        }).then(() => {
-            console.log('✅ Attivazione completata');
-            return self.clients.claim();
-        })
+        }).then(() => self.clients.claim())
     );
 });
 
@@ -80,21 +68,18 @@ self.addEventListener('fetch', (event) => {
     if (event.request.method !== 'GET') return;
 
     if (url.hostname.includes('google-analytics.com') ||
-        url.hostname.includes('facebook.com/tr')) return;
+        url.hostname.includes('facebook.com/tr') ||
+        url.hostname.includes('open-meteo.com')) return;
 
     if (url.pathname.endsWith('/') || url.pathname.endsWith('.html') || url.pathname === './') {
+        // HTML: network-first con fallback cache, poi offline
         event.respondWith(
-            caches.match(event.request).then((cachedResponse) => {
-                const fetchPromise = fetch(event.request).then((networkResponse) => {
-                    const responseClone = networkResponse.clone();
-                    caches.open(CACHE_NAME).then((cache) => {
-                        cache.put(event.request, responseClone);
-                    });
-                    return networkResponse;
-                }).catch(() => {
-                    return cachedResponse || offlineFallback();
-                });
-                return cachedResponse || fetchPromise;
+            fetch(event.request).then((networkResponse) => {
+                const clone = networkResponse.clone();
+                caches.open(CACHE_NAME).then(c => c.put(event.request, clone));
+                return networkResponse;
+            }).catch(() => {
+                return caches.match(event.request).then(cached => cached || offlineFallback());
             })
         );
         return;
@@ -102,96 +87,31 @@ self.addEventListener('fetch', (event) => {
 
     if (url.hostname.includes('tile.openstreetmap.org')) {
         event.respondWith(
-            caches.match(event.request)
-                .then((cachedResponse) => {
-                    if (cachedResponse) return cachedResponse;
-                    return fetch(event.request).then((response) => {
-                        const responseClone = response.clone();
-                        caches.open(TILES_CACHE_NAME).then((cache) => {
-                            cache.put(event.request, responseClone);
-                            trimTilesCache();
-                        });
-                        return response;
-                    }).catch(() => {
-                        return new Response('', { status: 503, headers: { 'Content-Type': 'image/png' } });
-                    });
-                })
+            caches.match(event.request).then((cached) => {
+                if (cached) return cached;
+                return fetch(event.request).then((response) => {
+                    const clone = response.clone();
+                    caches.open(TILES_CACHE_NAME).then(c => { c.put(event.request, clone); trimTilesCache(); });
+                    return response;
+                }).catch(() => new Response('', { status: 503, headers: { 'Content-Type': 'image/png' } }));
+            })
         );
         return;
     }
 
-    if (url.hostname.includes('raw.githubusercontent.com')) {
-        event.respondWith(
-            caches.match(event.request)
-                .then((cachedResponse) => {
-                    return cachedResponse || fetch(event.request).then((response) => {
-                        const responseClone = response.clone();
-                        caches.open(CACHE_NAME).then((cache) => {
-                            cache.put(event.request, responseClone);
-                        });
-                        return response;
-                    }).catch(() => {
-                        return new Response('', { status: 503 });
-                    });
-                })
-        );
-        return;
-    }
-
-    if (url.hostname.includes('fonts.googleapis.com') ||
-        url.hostname.includes('fonts.gstatic.com')) {
-        event.respondWith(
-            caches.match(event.request)
-                .then((cachedResponse) => {
-                    return cachedResponse || fetch(event.request).then((response) => {
-                        const responseClone = response.clone();
-                        caches.open(CACHE_NAME).then((cache) => {
-                            cache.put(event.request, responseClone);
-                        });
-                        return response;
-                    }).catch(() => {
-                        return new Response('', { status: 503 });
-                    });
-                })
-        );
-        return;
-    }
-
-    if (url.hostname.includes('unpkg.com')) {
-        event.respondWith(
-            caches.match(event.request)
-                .then((cachedResponse) => {
-                    return cachedResponse || fetch(event.request).then((response) => {
-                        const responseClone = response.clone();
-                        caches.open(CACHE_NAME).then((cache) => {
-                            cache.put(event.request, responseClone);
-                        });
-                        return response;
-                    }).catch(() => {
-                        return new Response('', { status: 503 });
-                    });
-                })
-        );
-        return;
-    }
-
+    // Tutto il resto: cache-first con aggiornamento in background
     event.respondWith(
-        fetch(event.request)
-            .then((response) => {
-                const responseClone = response.clone();
-                caches.open(CACHE_NAME).then((cache) => {
-                    cache.put(event.request, responseClone);
-                });
-                return response;
-            })
-            .catch(() => {
-                return caches.match(event.request).then(cached => cached || offlineFallback());
-            })
+        caches.match(event.request).then((cached) => {
+            const fetchPromise = fetch(event.request).then((networkResponse) => {
+                const clone = networkResponse.clone();
+                caches.open(CACHE_NAME).then(c => c.put(event.request, clone));
+                return networkResponse;
+            }).catch(() => cached || offlineFallback());
+            return cached || fetchPromise;
+        })
     );
 });
 
 self.addEventListener('message', (event) => {
-    if (event.data === 'skipWaiting') {
-        self.skipWaiting();
-    }
+    if (event.data === 'skipWaiting') self.skipWaiting();
 });

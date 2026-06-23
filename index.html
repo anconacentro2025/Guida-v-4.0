@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- Affittacamere Ancona Centro - Guida Ospiti V4.1.9 | 23/06/26 12:00 -->
+<!-- Affittacamere Ancona Centro - Guida Ospiti V4.2.0 | 23/06/26 12:30 -->
 <html lang="it">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Ancona Centro · Guida Ospiti V4.1.9</title>
+    <title>Ancona Centro · Guida Ospiti V4.2.0</title>
     <link rel="manifest" href="./manifest.json">
     <meta name="theme-color" content="#0B1F33">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -13,7 +13,7 @@
     <link rel="apple-touch-icon" sizes="180x180" href="https://raw.githubusercontent.com/anconacentro2025/Guida-v-4.0/main/img/icon-512.png">
     <meta name="apple-mobile-web-app-title" content="Ancona Guide">
     <link rel="icon" type="image/png" sizes="192x192" href="https://raw.githubusercontent.com/anconacentro2025/Guida-v-4.0/main/img/icon-192.png">
-    <meta property="og:title" content="Affittacamere Ancona Centro · Guida V4.1.9">
+    <meta property="og:title" content="Affittacamere Ancona Centro · Guida V4.2.0">
     <meta property="og:description" content="La tua guida digitale per scoprire Ancona passo dopo passo. Itinerari consigliati, ristoranti e info utili.">
     <meta property="og:image" content="https://raw.githubusercontent.com/anconacentro2025/Guida-v-4.0/main/img/home.jpg">
     <meta property="og:type" content="website">
@@ -230,7 +230,7 @@
                     <button class="lang-btn" id="btn-de" role="radio" aria-checked="false" aria-label="Deutsch">DE</button>
                     <button class="lang-btn" id="btn-pl" role="radio" aria-checked="false" aria-label="Polski">PL</button>
                 </div>
-                <div class="version-info">V4.1.9 · <span id="release-time">23/06/26 12:00</span></div>
+                <div class="version-info">V4.2.0 · <span id="release-time">23/06/26 12:30</span></div>
             </div>
         </div>
     </header>
@@ -252,7 +252,7 @@
         <div id="fullscreenMap"></div>
     </div>
 
-    <div class="copyright-footer">© 2026 Affittacamere Ancona Centro · Guida V4.1.9 · All rights reserved</div>
+    <div class="copyright-footer">© 2026 Affittacamere Ancona Centro · Guida V4.2.0 · All rights reserved</div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
@@ -482,7 +482,6 @@
         if(gpsMarker&&leafletMap)leafletMap.removeLayer(gpsMarker);
         if(gpsCircle&&leafletMap)leafletMap.removeLayer(gpsCircle);
         gpsMarker=null;gpsCircle=null;
-        // RIMOSSO: window._activeReachTab='auto'; (Preserva la scelta dell'utente)
         distSortActive=false;
         currentSection=i;currentPlaceDetail=-1;currentSubItinerary=null;placeDataMap={};
         if(leafletMap){leafletMap.remove();leafletMap=null;}
@@ -1014,15 +1013,37 @@
     document.addEventListener('touchend',(e)=>{
         // Ignora se il tocco è su una mappa Leaflet
         if(e.target.closest('.leaflet-container'))return;
+
         const dx=e.changedTouches[0].clientX-swipeStartX;
         if(Math.abs(dx)<60)return;
-        if(currentPlaceDetail>=0||currentSubItinerary)return;
+
+        // 1. Se siamo dentro un dettaglio (luogo singolo)
+        if(currentPlaceDetail>=0){
+            let items=currentSectionPlaces;
+            let total=items.length;
+            if(currentSubItinerary){
+                items=appData.subItineraries[currentSubItinerary]||[];
+                total=items.length;
+            }
+            if(total>0){
+                let newIndex=currentPlaceDetail;
+                if(dx<0) newIndex=Math.min(currentPlaceDetail+1,total-1);
+                else newIndex=Math.max(currentPlaceDetail-1,0);
+                if(newIndex!==currentPlaceDetail) selectPlaceDetail(newIndex);
+            }
+            return;
+        }
+
+        // 2. Se siamo in un sub-itinerario (senza dettaglio aperto), non fare nulla
+        if(currentSubItinerary) return;
+
+        // 3. Navigazione tra sezioni
         if(dx<0){
-            if(currentSection===-1)goTo(0);
-            else if(currentSection<sections.length-1)goTo(currentSection+1);
+            if(currentSection===-1) goTo(0);
+            else if(currentSection<sections.length-1) goTo(currentSection+1);
         }else{
-            if(currentSection>0)goTo(currentSection-1);
-            else if(currentSection===0)goTo(-1);
+            if(currentSection>0) goTo(currentSection-1);
+            else if(currentSection===0) goTo(-1);
         }
     },{passive:true});
     

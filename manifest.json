@@ -1,6 +1,6 @@
 {
   "name": "Ancona Centro · Guida Ospiti",
-  "short_name": "Ancona Guide",
+  "short_name": "Ancona Centro",
   "description": "Guida digitale per l'Affittacamere Ancona Centro con tour, mappe e info utili.",
   "start_url": "./index.html",
   "display": "standalone",

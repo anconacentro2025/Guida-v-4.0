@@ -1,11 +1,11 @@
 
 <!DOCTYPE html>
-<!-- Affittacamere Ancona Centro - Guida Ospiti V4.1.6 | 22/06/26 20:40 -->
+<!-- Affittacamere Ancona Centro - Guida Ospiti V4.1.7 | 23/06/26 09:00 -->
 <html lang="it">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Ancona Centro · Guida Ospiti V4.1.6</title>
+    <title>Ancona Centro · Guida Ospiti V4.1.7</title>
     <link rel="manifest" href="./manifest.json">
     <meta name="theme-color" content="#0B1F33">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -14,7 +14,7 @@
     <link rel="apple-touch-icon" sizes="180x180" href="https://raw.githubusercontent.com/anconacentro2025/Guida-v-4.0/main/img/icon-512.png">
     <meta name="apple-mobile-web-app-title" content="Ancona Guide">
     <link rel="icon" type="image/png" sizes="192x192" href="https://raw.githubusercontent.com/anconacentro2025/Guida-v-4.0/main/img/icon-192.png">
-    <meta property="og:title" content="Affittacamere Ancona Centro · Guida V4.1.6">
+    <meta property="og:title" content="Affittacamere Ancona Centro · Guida V4.1.7">
     <meta property="og:description" content="La tua guida digitale per scoprire Ancona passo dopo passo. Itinerari consigliati, ristoranti e info utili.">
     <meta property="og:image" content="https://raw.githubusercontent.com/anconacentro2025/Guida-v-4.0/main/img/home.jpg">
     <meta property="og:type" content="website">
@@ -179,6 +179,36 @@
         .reach-sub-btn{flex:1;border:1px solid var(--border);padding:8px 4px;border-radius:8px;font-size:.72rem;font-weight:500;transition:all .2s;outline:none;background:var(--bg);color:var(--text)}
         .reach-sub-btn.active{background:var(--navy);color:var(--white);font-weight:600}
         .reach-content{font-size:.82rem;line-height:1.6;color:var(--text)}
+        /* Orari apertura */
+        .hours-badge{display:inline-flex;align-items:center;gap:4px;font-size:.65rem;font-weight:600;padding:2px 8px;border-radius:10px;margin-top:4px}
+        .hours-badge.open{background:#D1FAE5;color:#065F46}
+        .hours-badge.closed{background:#FEE2E2;color:#991B1B}
+        .hours-badge.holiday{background:#FEF3C7;color:#92400E}
+        .hours-text{font-size:.68rem;color:var(--muted);margin-top:2px}
+        /* Meteo widget */
+        .meteo-widget{background:linear-gradient(135deg,var(--navy-2) 0%,var(--navy-3) 100%);border-radius:10px;padding:10px 14px;margin:8px 16px 0;display:flex;align-items:center;justify-content:space-between;border:1px solid rgba(200,164,90,.25);color:var(--white);min-height:48px}
+        .meteo-left{display:flex;align-items:center;gap:10px}
+        .meteo-icon{font-size:1.6rem}
+        .meteo-temp{font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-weight:600;color:var(--gold-2)}
+        .meteo-desc{font-size:.65rem;color:rgba(255,255,255,.6);margin-top:1px;text-transform:capitalize}
+        .meteo-right{text-align:right;font-size:.62rem;color:rgba(255,255,255,.45)}
+        /* Filtro distanza */
+        .dist-sort-btn{display:inline-flex;align-items:center;gap:5px;background:var(--bg);border:1px solid var(--border);color:var(--muted);font-size:.65rem;font-weight:500;padding:4px 10px;border-radius:14px;cursor:pointer;transition:all .2s;margin-bottom:8px}
+        .dist-sort-btn.active{background:var(--navy);color:var(--white);border-color:var(--navy)}
+        /* Frasi utili */
+        .phrase-row{display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid var(--bg-2)}
+        .phrase-row:last-child{border-bottom:none}
+        .phrase-it{font-size:.8rem;font-weight:600;color:var(--navy);flex:1}
+        .phrase-tr{font-size:.75rem;color:var(--muted);flex:1;font-style:italic}
+        /* Home static map */
+        .home-map-wrap{margin:8px 16px 0;border-radius:10px;overflow:hidden;height:130px;border:1px solid var(--border);box-shadow:var(--shadow)}
+        /* Countdown */
+        .checkout-countdown{background:linear-gradient(135deg,#FEF3C7,#FDE68A);border-radius:10px;padding:10px 14px;margin:8px 16px 0;border:1px solid #F59E0B;display:flex;align-items:center;gap:12px}
+        .countdown-icon{font-size:1.4rem}
+        .countdown-text{font-size:.75rem;color:#92400E;line-height:1.4}
+        .countdown-value{font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-weight:600;color:#78350F}
+        /* Swipe hint */
+        .swipe-hint{text-align:center;font-size:.58rem;color:var(--muted);padding:4px 0 0;opacity:.5;letter-spacing:.05em}
     </style>
 </head>
 <body>
@@ -196,7 +226,7 @@
                     <button class="lang-btn" id="btn-de" role="radio" aria-checked="false" aria-label="Deutsch">DE</button>
                     <button class="lang-btn" id="btn-pl" role="radio" aria-checked="false" aria-label="Polski">PL</button>
                 </div>
-                <div class="version-info">V4.1.6 · <span id="release-time">22/06/26 20:40</span></div>
+                <div class="version-info">V4.1.7 · <span id="release-time">23/06/26 09:00</span></div>
             </div>
         </div>
     </header>
@@ -208,7 +238,7 @@
     <div class="gold-bar" aria-hidden="true"></div>
     <nav class="nav-scroll" id="nav" style="display:none" role="navigation" aria-label="Sezioni"></nav>
     <main class="content" id="content" role="main"></main>
-    <div class="copyright-footer">© 2026 Affittacamere Ancona Centro · Guida V4.1.6 · All rights reserved</div>
+    <div class="copyright-footer">© 2026 Affittacamere Ancona Centro · Guida V4.1.7 · All rights reserved</div>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
     const NO_GPS_SECTIONS = ['apartment', 'contact', 'transport'];
@@ -216,7 +246,11 @@
     const HOST_EMAIL = 'anconacentro@yahoo.com';
     const PHOTO_BASE = 'https://raw.githubusercontent.com/anconacentro2025/Guida-v-4.0/main/img/';
     const HOME_COORDS = { lat: 43.6181895, lng: 13.5129489 };
-    const headerSubTr = { it: 'Guida Ospiti · Piazza Roma 3', en: 'Guest Guide · Piazza Roma 3', de: 'Gästeführer · Piazza Roma 3', pl: 'Przewodnik dla gości · Piazza Roma 3' };
+    const headerSubTr = { it: 'Guida Ospiti · Piazza Roma 3', en: 'Guest Guide · Piazza Roma 3', de: 'Gästeführer · Piazza Roma 3', pl: 'Przewodnik für Gäste · Piazza Roma 3' };
+    const ANCONA_LAT = 43.6181895, ANCONA_LNG = 13.5129489;
+    let distSortActive = false;
+    let homeStaticMap = null;
+    let swipeStartX = 0;
 
     const appData = {
         apartment: {
@@ -275,29 +309,29 @@
             ]
         },
         restaurants: [
-            { name:'La Cantineta', emoji:'🍷', photo:'rist-cantineta.jpg', it:'Trattoria tipica, da gustare i tagliolini allo scoglio e lo stoccafisso all\'anconetana.', en:'Typical trattoria: enjoy tagliolini allo scoglio and stockfish Ancona-style.', de:'Typische Trattoria: genießen Sie tagliolini allo scoglio und Stockfisch nach Ancona-Art.', pl:'Typowa trattoria: warto spróbować tagliolini allo scoglio i sztokfisza po ankońsku.', dist:'🚶 300 m – 4 min', mapQuery:'La Cantineta Ancona', lat:43.6192908, lng:13.5102798 },
-            { name:'Osteria del Pozzo', emoji:'🍲', photo:'rist-pozzo.jpg', it:'Ristorante tipico con un ottimo rapporto qualità prezzo.', en:'Typical restaurant with excellent value for money.', de:'Typisches Restaurant mit ausgezeichnetem Preis-Leistungs-Verhältnis.', pl:'Typowa restauracja z doskonałym stosunkiem jakości do ceny.', dist:'🚶 350 m – 4 min', mapQuery:'Il Pozzo Ancona', lat:43.6199425, lng:13.5104826 },
-            { name:'Trattoria La Moretta', emoji:'🍸', photo:'rist-moretta.jpg', it:'Ristorante tipico marchigiano affacciato su Piazza del Plebiscito.', en:'Typical restaurant from the Marche region overlooking Piazza del Plebiscito.', de:'Typisches Restaurant aus den Marken mit Blick auf die Piazza del Plebiscito.', pl:'Typowa restauracja marchijska z widokiem na Piazza del Plebiscito.', dist:'🚶 200 m – 3 min', mapQuery:'La Moretta Ancona', lat:43.6195442, lng:13.5114100 },
-            { name:'La Degosteria', emoji:'🍝', photo:'degosteria.jpg', it:'Ristorante del centro storico alle spalle della Chiesa di Santa Maria della Piazza.', en:'Restaurant in the historic centre, behind the Church of Santa Maria della Piazza.', de:'Restaurant im historischen Zentrum, hinter der Kirche Santa Maria della Piazza.', pl:'Restauracja w historycznym centrum, za Kościołem Santa Maria della Piazza.', dist:'🚶 400 m – 6 min', mapQuery:'La Degosteria Ancona', lat:43.6202772, lng:13.5110345 },
-            { name:'Vino e Cucina Miscia', emoji:'🐟', photo:'rist-miscia.jpg', it:'Ristorante di pesce nel quartiere Archi.', en:'Fish restaurant in the Archi district.', de:'Fischrestaurant im Archi-Viertel.', pl:'Restauracja rybna w dzielnicy Archi.', dist:'🚗 1 km – 2 min', mapQuery:'Vino e Cucina Miscia Ancona', lat:43.6126474, lng:13.5044134 },
-            { name:'Amélie', emoji:'🦐', photo:'rist-amelie.jpg', it:'Ristorante famigliare e amichevole. Ottimo il fritto misto di pesce.', en:'Family-run and friendly restaurant. Excellent mixed fried fish.', de:'Familiengeführtes und freundliches Restaurant. Ausgezeichnete gemischte frittierte Fischgerichte.', pl:'Rodzinna i przyjazna restauracja. Doskonałe mieszane smażone ryby.', dist:'🚗 2 km – 3 min', mapQuery:'Amelie Ancona', lat:43.6022208, lng:13.5060781 },
-            { name:'Giardino', emoji:'🌿', photo:'rist-giardino.jpg', it:'Ristorante elegante lungo il viale della Vittoria che non delude mai.', en:'Elegant restaurant along Viale della Vittoria that never disappoints.', de:'Elegantes Restaurant entlang der Viale della Vittoria, das nie enttäuscht.', pl:'Elegancka restauracja wzdłuż Viale della Vittoria, która nigdy nie zawodzi.', dist:'🚶 1350 m – 18 min', mapQuery:'Il Giardino Ancona', lat:43.6158317, lng:13.5257132 },
-            { name:'Marcello (Portonovo)', emoji:'🍝', photo:'rist-marcello.jpg', it:'Storico ristorante di pesce affacciato sul mare della baia di Portonovo. Nelle sere d\'estate si mangia sulla spiaggia.', en:'Historic fish restaurant overlooking the sea of Portonovo bay. On summer evenings, you dine right on the beach.', de:'Historisches Fischrestaurant mit Blick auf das Meer der Bucht von Portonovo. An Sommerabenden speist man direkt am Strand.', pl:'Historyczna restauracja rybna z widokiem na morze w zatoce Portonovo. W letnie wieczory jada się na plaży.', dist:'🚌 12 km – 25 min', mapQuery:'Ristorante Marcello Portonovo Ancona', lat:43.5641460, lng:13.5910907 }
+            { name:'La Cantineta', emoji:'🍷', photo:'rist-cantineta.jpg', hours:'12:30–14:30, 19:30–22:30', closedOn:[0,1], it:'Trattoria tipica, da gustare i tagliolini allo scoglio e lo stoccafisso all\'anconetana.', en:'Typical trattoria: enjoy tagliolini allo scoglio and stockfish Ancona-style.', de:'Typische Trattoria: genießen Sie tagliolini allo scoglio und Stockfisch nach Ancona-Art.', pl:'Typowa trattoria: warto spróbować tagliolini allo scoglio i sztokfisza po ankońsku.', dist:'🚶 300 m – 4 min', mapQuery:'La Cantineta Ancona', lat:43.6192908, lng:13.5102798 },
+            { name:'Osteria del Pozzo', emoji:'🍲', photo:'rist-pozzo.jpg', hours:'12:30–14:30, 19:30–22:00', closedOn:[0], it:'Ristorante tipico con un ottimo rapporto qualità prezzo.', en:'Typical restaurant with excellent value for money.', de:'Typisches Restaurant mit ausgezeichnetem Preis-Leistungs-Verhältnis.', pl:'Typowa restauracja z doskonałym stosunkiem jakości do ceny.', dist:'🚶 350 m – 4 min', mapQuery:'Il Pozzo Ancona', lat:43.6199425, lng:13.5104826 },
+            { name:'Trattoria La Moretta', emoji:'🍸', photo:'rist-moretta.jpg', hours:'12:00–15:00, 19:00–23:00', closedOn:[2], it:'Ristorante tipico marchigiano affacciato su Piazza del Plebiscito.', en:'Typical restaurant from the Marche region overlooking Piazza del Plebiscito.', de:'Typisches Restaurant aus den Marken mit Blick auf die Piazza del Plebiscito.', pl:'Typowa restauracja marchijska z widokiem na Piazza del Plebiscito.', dist:'🚶 200 m – 3 min', mapQuery:'La Moretta Ancona', lat:43.6195442, lng:13.5114100 },
+            { name:'La Degosteria', emoji:'🍝', photo:'degosteria.jpg', hours:'12:30–14:30, 19:30–22:30', closedOn:[1], it:'Ristorante del centro storico alle spalle della Chiesa di Santa Maria della Piazza.', en:'Restaurant in the historic centre, behind the Church of Santa Maria della Piazza.', de:'Restaurant im historischen Zentrum, hinter der Kirche Santa Maria della Piazza.', pl:'Restauracja w historycznym centrum, za Kościołem Santa Maria della Piazza.', dist:'🚶 400 m – 6 min', mapQuery:'La Degosteria Ancona', lat:43.6202772, lng:13.5110345 },
+            { name:'Vino e Cucina Miscia', emoji:'🐟', photo:'rist-miscia.jpg', hours:'12:30–15:00, 19:30–22:30', closedOn:[0,1], it:'Ristorante di pesce nel quartiere Archi.', en:'Fish restaurant in the Archi district.', de:'Fischrestaurant im Archi-Viertel.', pl:'Restauracja rybna w dzielnicy Archi.', dist:'🚗 1 km – 2 min', mapQuery:'Vino e Cucina Miscia Ancona', lat:43.6126474, lng:13.5044134 },
+            { name:'Amélie', emoji:'🦐', photo:'rist-amelie.jpg', hours:'12:00–15:00, 19:30–22:30', closedOn:[1], it:'Ristorante famigliare e amichevole. Ottimo il fritto misto di pesce.', en:'Family-run and friendly restaurant. Excellent mixed fried fish.', de:'Familiengeführtes und freundliches Restaurant. Ausgezeichnete gemischte frittierte Fischgerichte.', pl:'Rodzinna i przyjazna restauracja. Doskonałe mieszane smażone ryby.', dist:'🚗 2 km – 3 min', mapQuery:'Amelie Ancona', lat:43.6022208, lng:13.5060781 },
+            { name:'Giardino', emoji:'🌿', photo:'rist-giardino.jpg', hours:'12:30–14:30, 19:30–22:30', closedOn:[1], it:'Ristorante elegante lungo il viale della Vittoria che non delude mai.', en:'Elegant restaurant along Viale della Vittoria that never disappoints.', de:'Elegantes Restaurant entlang der Viale della Vittoria, das nie enttäuscht.', pl:'Elegancka restauracja wzdłuż Viale della Vittoria, która nigdy nie zawodzi.', dist:'🚶 1350 m – 18 min', mapQuery:'Il Giardino Ancona', lat:43.6158317, lng:13.5257132 },
+            { name:'Marcello (Portonovo)', emoji:'🍝', photo:'rist-marcello.jpg', hours:'12:00–15:30, 19:30–22:30', closedOn:[], it:'Storico ristorante di pesce affacciato sul mare della baia di Portonovo. Nelle sere d\'estate si mangia sulla spiaggia.', en:'Historic fish restaurant overlooking the sea of Portonovo bay. On summer evenings, you dine right on the beach.', de:'Historisches Fischrestaurant mit Blick auf das Meer der Bucht von Portonovo. An Sommerabenden speist man direkt am Strand.', pl:'Historyczna restauracja rybna z widokiem na morze w zatoce Portonovo. W letnie wieczory jada się na plaży.', dist:'🚌 12 km – 25 min', mapQuery:'Ristorante Marcello Portonovo Ancona', lat:43.5641460, lng:13.5910907 }
         ],
         barpub: [
-            { name:'Bar Torino', emoji:'☕', photo:'', it:'Storico bar di Corso Garibaldi famoso per cocktail e aperitivi.', en:'Historic bar on Corso Garibaldi famous for cocktails and aperitifs.', de:'Historische Bar am Corso Garibaldi, berühmt für Cocktails und Aperitifs.', pl:'Historyczny bar przy Corso Garibaldi słynący z koktajli i aperitifów.', dist:'🚶 100 m – 1 min', mapQuery:'Bar Torino Ancona', lat:43.6182553, lng:13.5118948 },
-            { name:'Bar Giuliani', emoji:'☕', photo:'', it:'Bar, tabacchi, gelateria, ristorante, pizzeria. L\'unico bar del centro aperto anche la domenica. Aperto fino a tarda ora.', en:'Bar, tobacconist, ice cream parlour, restaurant, pizzeria. The only bar in the centre open on Sundays too. Open until late.', de:'Bar, Tabakladen, Eisdiele, Restaurant, Pizzeria. Die einzige Bar im Zentrum, die auch sonntags geöffnet ist. Bis spät geöffnet.', pl:'Bar, tytoń, lodziarnia, restauracja, pizzeria. Jedyny bar w centrum otwarty również w niedziele. Czynny do późna.', dist:'🚶 300 m – 4 min', mapQuery:'Bar Giuliani Ancona', lat:43.6186929, lng:13.5101527 },
-            { name:'Lasagneria Filotea', emoji:'🍝', photo:'rist-filotea.jpg', it:'Ottime lasagne da asporto a due passi da casa.', en:'Excellent takeaway lasagne just a stone\'s throw from home.', de:'Ausgezeichnete Lasagne zum Mitnehmen, nur einen Steinwurf von zu Hause entfernt.', pl:'Doskonałe lasagne na wynos o rzut kamieniem od domu.', dist:'🚶 200 m – 3 min', mapQuery:'Lasagneria Filotea Ancona', lat:43.6175592, lng:13.5143695 },
-            { name:'Pizzeria Domus', emoji:'🍕', photo:'rist-domus.jpg', it:'Ottima pizzeria a pochi passi da casa. Consigliata la pizza regina 😉', en:'Great pizzeria just a few steps from home. The "pizza regina" is highly recommended 😉', de:'Großartige Pizzeria nur wenige Schritte von zu Hause entfernt. Die "Pizza Regina" wird sehr empfohlen 😉', pl:'Doskonała pizzeria o kilka kroków od domu. Polecana pizza regina 😉', dist:'🚶 100 m – 1 min', mapQuery:'Pizzeria Domus Ancona', lat:43.6182580, lng:13.5138206 },
-            { name:'La Farina', emoji:'🍕', photo:'', it:'Buona pizzeria al taglio.', en:'Good pizza by the slice.', de:'Gute Pizzeria mit Pizzastücken.', pl:'Dobra pizzeria na kawałki.', dist:'🚶 300 m – 4 min', mapQuery:'La Farina Ancona', lat:43.6191247, lng:13.5103683 },
-            { name:'Il Chiosco', emoji:'🍹', photo:'', it:'Bar all\'aperto in piazza Cavour con nuova gestione giovane e pimpante.', en:'Open-air bar in Piazza Cavour with new, young and lively management.', de:'Freiluftbar an der Piazza Cavour mit neuem, jungem und lebhaftem Management.', pl:'Bar na świeżym powietrzu na Piazza Cavour z nowym, młodym i energicznym kierownictwem.', dist:'🚶 550 m – 7 min', mapQuery:'Il Chiosco Ancona', lat:43.6168065, lng:13.5175774 },
-            { name:'Donegal Irish Pub', emoji:'🍺', photo:'', it:'Pub irlandese, birre alla spina e musica dal vivo.', en:'Irish pub, draught beer and live music.', de:'Irish Pub, Bier vom Fass und Livemusik.', pl:'Irlandzki pub, piwo z kranu i muzyka na żywo.', dist:'🚶 400 m – 5 min', mapQuery:'Donegal Irish Pub Ancona', lat:43.6163846, lng:13.5156090 }
+            { name:'Bar Torino', emoji:'☕', photo:'', hours:'06:30–21:00', closedOn:[0], it:'Storico bar di Corso Garibaldi famoso per cocktail e aperitivi.', en:'Historic bar on Corso Garibaldi famous for cocktails and aperitifs.', de:'Historische Bar am Corso Garibaldi, berühmt für Cocktails und Aperitifs.', pl:'Historyczny bar przy Corso Garibaldi słynący z koktajli i aperitifów.', dist:'🚶 100 m – 1 min', mapQuery:'Bar Torino Ancona', lat:43.6182553, lng:13.5118948 },
+            { name:'Bar Giuliani', emoji:'☕', photo:'', hours:'06:00–24:00', closedOn:[], it:'Bar, tabacchi, gelateria, ristorante, pizzeria. L\'unico bar del centro aperto anche la domenica. Aperto fino a tarda ora.', en:'Bar, tobacconist, ice cream parlour, restaurant, pizzeria. The only bar in the centre open on Sundays too. Open until late.', de:'Bar, Tabakladen, Eisdiele, Restaurant, Pizzeria. Die einzige Bar im Zentrum, die auch sonntags geöffnet ist. Bis spät geöffnet.', pl:'Bar, tytoń, lodziarnia, restauracja, pizzeria. Jedyny bar w centrum otwarty również w niedziele. Czynny do późna.', dist:'🚶 300 m – 4 min', mapQuery:'Bar Giuliani Ancona', lat:43.6186929, lng:13.5101527 },
+            { name:'Lasagneria Filotea', emoji:'🍝', photo:'rist-filotea.jpg', hours:'11:30–14:30', closedOn:[0,6], it:'Ottime lasagne da asporto a due passi da casa.', en:'Excellent takeaway lasagne just a stone\'s throw from home.', de:'Ausgezeichnete Lasagne zum Mitnehmen, nur einen Steinwurf von zu Hause entfernt.', pl:'Doskonałe lasagne na wynos o rzut kamieniem od domu.', dist:'🚶 200 m – 3 min', mapQuery:'Lasagneria Filotea Ancona', lat:43.6175592, lng:13.5143695 },
+            { name:'Pizzeria Domus', emoji:'🍕', photo:'rist-domus.jpg', hours:'12:00–14:30, 19:00–23:00', closedOn:[1], it:'Ottima pizzeria a pochi passi da casa. Consigliata la pizza regina 😉', en:'Great pizzeria just a few steps from home. The "pizza regina" is highly recommended 😉', de:'Großartige Pizzeria nur wenige Schritte von zu Hause entfernt. Die "Pizza Regina" wird sehr empfohlen 😉', pl:'Doskonała pizzeria o kilka kroków od domu. Polecana pizza regina 😉', dist:'🚶 100 m – 1 min', mapQuery:'Pizzeria Domus Ancona', lat:43.6182580, lng:13.5138206 },
+            { name:'La Farina', emoji:'🍕', photo:'', hours:'08:00–20:00', closedOn:[0], it:'Buona pizzeria al taglio.', en:'Good pizza by the slice.', de:'Gute Pizzeria mit Pizzastücken.', pl:'Dobra pizzeria na kawałki.', dist:'🚶 300 m – 4 min', mapQuery:'La Farina Ancona', lat:43.6191247, lng:13.5103683 },
+            { name:'Il Chiosco', emoji:'🍹', photo:'', hours:'08:00–24:00', closedOn:[], it:'Bar all\'aperto in piazza Cavour con nuova gestione giovane e pimpante.', en:'Open-air bar in Piazza Cavour with new, young and lively management.', de:'Freiluftbar an der Piazza Cavour mit neuem, jungem und lebhaftem Management.', pl:'Bar na świeżym powietrzu na Piazza Cavour z nowym, młodym i energicznym kierownictwem.', dist:'🚶 550 m – 7 min', mapQuery:'Il Chiosco Ancona', lat:43.6168065, lng:13.5175774 },
+            { name:'Donegal Irish Pub', emoji:'🍺', photo:'', hours:'18:00–02:00', closedOn:[1], it:'Pub irlandese, birre alla spina e musica dal vivo.', en:'Irish pub, draught beer and live music.', de:'Irish Pub, Bier vom Fass und Livemusik.', pl:'Irlandzki pub, piwo z kranu i muzyka na żywo.', dist:'🚶 400 m – 5 min', mapQuery:'Donegal Irish Pub Ancona', lat:43.6163846, lng:13.5156090 }
         ],
         supermarkets: [
-            { name:'Coal – Via Podesti', emoji:'🛒', photo:'', it:'Supermercato ben fornito. Il più vicino a casa.', en:'Well-stocked supermarket. The closest one to home.', de:'Gut sortierter Supermarkt. Der nächste zu Hause.', pl:'Dobrze zaopatrzony supermarket. Najbliższy domu.', dist:'🚶 150 m – 2 min', mapQuery:'Coal Via Podesti Ancona', lat:43.6181806, lng:13.5112789 },
-            { name:'Mercato delle Erbe', emoji:'🥬', photo:'mercato-erbe.jpg', it:'Storico mercato coperto aperto solo la mattina con frutta e verdura di produzione locale, banchi di pesce fresco, forno, stoccafisso, macelleria.', en:'Historic covered market open only in the morning with locally produced fruit and vegetables, fresh fish stalls, bakery, stockfish, butcher\'s.', de:'Historischer überdachter Markt, nur morgens geöffnet, mit lokal produziertem Obst und Gemüse, Frischfischständen, Bäckerei, Stockfisch, Metzgerei.', pl:'Historyczny kryty targ otwarty tylko rano z lokalnie produkowanymi owocami i warzywami, straganami ze świeżymi rybami, piekarnią, sztokfiszem, masarnią.', dist:'🚶 100 m – 1 min', mapQuery:'Mercato delle Erbe Ancona', lat:43.6182992, lng:13.5140040 },
-            { name:'Coal – Via San Martino', emoji:'🛒', photo:'', it:'Supermercato aperto anche la mattina di domenica e festivi.', en:'Supermarket open also on Sunday mornings and public holidays.', de:'Supermarkt auch sonntagmorgens und an Feiertagen geöffnet.', pl:'Supermarket otwarty również w niedzielne poranki i święta.', dist:'🚶 400 m – 5 min', mapQuery:'Coal Via San Martino Ancona', lat:43.6158232, lng:13.5145948 },
-            { name:'Sì con te', emoji:'🛒', photo:'', it:'Supermercato in via Matteotti.', en:'Supermarket in Via Matteotti.', de:'Supermarkt in der Via Matteotti.', pl:'Supermarket przy Via Matteotti.', dist:'🚶 350 m – 5 min', mapQuery:'Via Matteotti 115 Ancona', lat:43.6186104, lng:13.5163007 }
+            { name:'Coal – Via Podesti', emoji:'🛒', photo:'', hours:'08:00–20:00', closedOn:[0], it:'Supermercato ben fornito. Il più vicino a casa.', en:'Well-stocked supermarket. The closest one to home.', de:'Gut sortierter Supermarkt. Der nächste zu Hause.', pl:'Dobrze zaopatrzony supermarket. Najbliższy domu.', dist:'🚶 150 m – 2 min', mapQuery:'Coal Via Podesti Ancona', lat:43.6181806, lng:13.5112789 },
+            { name:'Mercato delle Erbe', emoji:'🥬', photo:'mercato-erbe.jpg', hours:'07:00–13:30', closedOn:[0], it:'Storico mercato coperto aperto solo la mattina con frutta e verdura di produzione locale, banchi di pesce fresco, forno, stoccafisso, macelleria.', en:'Historic covered market open only in the morning with locally produced fruit and vegetables, fresh fish stalls, bakery, stockfish, butcher\'s.', de:'Historischer überdachter Markt, nur morgens geöffnet, mit lokal produziertem Obst und Gemüse, Frischfischständen, Bäckerei, Stockfisch, Metzgerei.', pl:'Historyczny kryty targ otwarty tylko rano z lokalnie produkowanymi owocami i warzywami, straganami ze świeżymi rybami, piekarnią, sztokfiszem, masarnią.', dist:'🚶 100 m – 1 min', mapQuery:'Mercato delle Erbe Ancona', lat:43.6182992, lng:13.5140040 },
+            { name:'Coal – Via San Martino', emoji:'🛒', photo:'', hours:'08:00–20:00', closedOn:[], it:'Supermercato aperto anche la mattina di domenica e festivi.', en:'Supermarket open also on Sunday mornings and public holidays.', de:'Supermarkt auch sonntagmorgens und an Feiertagen geöffnet.', pl:'Supermarket otwarty również w niedzielne poranki i święta.', dist:'🚶 400 m – 5 min', mapQuery:'Coal Via San Martino Ancona', lat:43.6158232, lng:13.5145948 },
+            { name:'Sì con te', emoji:'🛒', photo:'', hours:'08:00–20:30', closedOn:[0], it:'Supermercato in via Matteotti.', en:'Supermarket in Via Matteotti.', de:'Supermarkt in der Via Matteotti.', pl:'Supermarket przy Via Matteotti.', dist:'🚶 350 m – 5 min', mapQuery:'Via Matteotti 115 Ancona', lat:43.6186104, lng:13.5163007 }
         ],
         beaches: [
             { name:'Spiaggia del Passetto', emoji:'🌊', photo:'passetto.jpg', it:'Scogli e sabbia grossa con grotte scavate nella roccia, ascensore panoramico, raggiungibile a piedi.', en:'Rocks and coarse sand with grottoes carved into the cliff, panoramic lift, reachable on foot.', de:'Felsen und grober Sand mit in den Fels gehauenen Grotten, Panoramaaufzug, zu Fuß erreichbar.', pl:'Skały i gruby piasek z grotami wykutymi w klifie, panoramiczna winda, dostępna pieszo.', dist:'🚶 2150 m – 29 min', mapQuery:'Spiaggia del Passetto Ancona', lat:43.616139, lng:13.533622 },
@@ -352,16 +386,74 @@
     let placeDataMap = {}, _mapRetryCount = 0;
     let gpsWatchId = null, gpsMarker = null, gpsCircle = null, gpsConsentGiven = null, gpsBoxCollapsed = false, deferredPrompt = null;
     try { gpsConsentGiven = sessionStorage.getItem('gpsConsent'); } catch(e) {}
+    // #4 lingua persistente + #12 URL param lingua
+    try {
+        const urlLang = new URLSearchParams(window.location.search).get('lang');
+        const stored = localStorage.getItem('guida_lang');
+        const valid = ['it','en','de','pl'];
+        if (urlLang && valid.includes(urlLang)) currentLang = urlLang;
+        else if (stored && valid.includes(stored)) currentLang = stored;
+    } catch(e) {}
 
     function tr(it, en, de, pl) {
         const val = (currentLang === 'en') ? (en || it) : (currentLang === 'de') ? (de || en || it) : (currentLang === 'pl') ? (pl || en || it) : it;
         return val || '';
     }
-    function setLang(lang) { currentLang=lang; document.documentElement.lang=lang; document.querySelectorAll('.lang-btn').forEach(btn=>{ const isActive=btn.id==='btn-'+lang; btn.classList.toggle('active',isActive); btn.setAttribute('aria-checked',isActive?'true':'false'); }); if(leafletMap){leafletMap.remove();leafletMap=null;} renderAll(); }
+    function setLang(lang) { currentLang=lang; document.documentElement.lang=lang; try{localStorage.setItem('guida_lang',lang);}catch(e){} document.querySelectorAll('.lang-btn').forEach(btn=>{ const isActive=btn.id==='btn-'+lang; btn.classList.toggle('active',isActive); btn.setAttribute('aria-checked',isActive?'true':'false'); }); if(leafletMap){leafletMap.remove();leafletMap=null;} renderAll(); }
     document.querySelectorAll('.lang-btn').forEach(btn => { btn.addEventListener('click', function() { setLang(this.id.replace('btn-', '')); }); });
 
     function getMapLink(query, noSuffix) { const q = noSuffix ? query : query + ', Ancona Italia'; return 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(q); }
     function getImgSearchUrl(p) { const q = p.imgQuery || (p.name + ' Ancona'); return 'https://www.google.com/search?tbm=isch&q=' + encodeURIComponent(q); }
+
+    // #2 Orari apertura + giorno chiusura
+    function getHoursBadge(p) {
+        if (!p.hours) return '';
+        const now = new Date();
+        const day = now.getDay(); // 0=dom,1=lun,...,6=sab
+        const dayNames = { it:['Dom','Lun','Mar','Mer','Gio','Ven','Sab'], en:['Sun','Mon','Tue','Wed','Thu','Fri','Sat'], de:['So','Mo','Di','Mi','Do','Fr','Sa'], pl:['Nd','Pn','Wt','Śr','Cz','Pt','Sb'] };
+        const closedOn = p.closedOn || [];
+        if (closedOn.includes(day)) {
+            const closedLabel = tr('Chiuso oggi','Closed today','Heute geschlossen','Dziś zamknięte');
+            return '<div><span class="hours-badge holiday">🔴 '+closedLabel+'</span><div class="hours-text">🕐 '+p.hours+'</div></div>';
+        }
+        const hm = now.getHours()*60+now.getMinutes();
+        const slots = p.hours.split(',').map(s=>s.trim());
+        let isOpen = false;
+        for (const slot of slots) {
+            const parts = slot.split('–').map(t=>{ const [h,m]=t.trim().split(':'); return parseInt(h)*60+(parseInt(m)||0); });
+            if (parts.length===2 && hm>=parts[0] && hm<=parts[1]) { isOpen=true; break; }
+        }
+        const badge = isOpen
+            ? '<span class="hours-badge open">🟢 '+tr('Aperto ora','Open now','Jetzt geöffnet','Teraz otwarte')+'</span>'
+            : '<span class="hours-badge closed">🔴 '+tr('Chiuso ora','Closed now','Jetzt geschlossen','Teraz zamknięte')+'</span>';
+        let closedDaysStr = '';
+        if (closedOn.length) {
+            const dn = dayNames[currentLang] || dayNames.it;
+            closedDaysStr = ' · '+tr('Chiuso il','Closed on','Geschlossen am','Zamknięte:')+' '+closedOn.map(d=>dn[d]).join(', ');
+        }
+        return '<div>'+badge+'<div class="hours-text">🕐 '+p.hours+closedDaysStr+'</div></div>';
+    }
+
+    // #1 METEO — già presente come link nella home (meteoam.it), widget rimosso
+
+    // #5 Countdown checkout da URL param ?checkout=YYYY-MM-DD
+    function getCountdownHtml() {
+        try {
+            const co = new URLSearchParams(window.location.search).get('checkout');
+            if (!co) return '';
+            const target = new Date(co+'T11:00:00');
+            const now = new Date();
+            const diff = target - now;
+            if (diff <= 0 || diff > 7*24*3600*1000) return '';
+            const h = Math.floor(diff/3600000);
+            const m = Math.floor((diff%3600000)/60000);
+            const label = tr('Check-out tra','Check-out in','Check-out in','Wymeldowanie za');
+            const timeStr = h > 0 ? h+'h '+m+'m' : m+' min';
+            return '<div class="checkout-countdown"><div class="countdown-icon">🧳</div><div class="countdown-text"><div>'+label+'</div><div class="countdown-value">'+timeStr+'</div><div style="font-size:.62rem;margin-top:2px;opacity:.7">'+tr('entro le 11:00','by 11:00','bis 11:00 Uhr','do 11:00')+'</div></div></div>';
+        } catch(e) { return ''; }
+    }
+
+    // #14 FRASI UTILI — rimosso su richiesta
     function photoFallback(wrapId) { const el = document.getElementById(wrapId); const p = placeDataMap[wrapId]; if (el && p) el.innerHTML = '<a href="'+getImgSearchUrl(p)+'" target="_blank" rel="noopener" class="detail-photo-link" aria-label="Cerca foto di '+p.name+' su Google Immagini"><span class="placeholder-emoji" aria-hidden="true">🖼️</span><span class="placeholder-text">'+tr('Clicca per vedere le foto','Click to see photos','Klicken, um Fotos zu sehen','Kliknij, aby zobaczyć zdjęcia')+'</span></a>'; }
     function calcDistance(lat1, lon1, lat2, lon2) { const R=6371; const dLat=(lat2-lat1)*Math.PI/180; const dLon=(lon2-lon1)*Math.PI/180; const a=Math.sin(dLat/2)*Math.sin(dLat/2)+Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)*Math.sin(dLon/2); return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a)); }
 
@@ -375,8 +467,10 @@
         if(gpsCircle&&leafletMap)leafletMap.removeLayer(gpsCircle);
         gpsMarker=null;gpsCircle=null;
         if(currentSection>=0&&sections[currentSection]&&sections[currentSection].id==='apartment'&&targetId!=='apartment'){window._activeReachTab='auto';}
+        distSortActive=false;
         currentSection=i;currentPlaceDetail=-1;currentSubItinerary=null;placeDataMap={};
         if(leafletMap){leafletMap.remove();leafletMap=null;}
+        try{const hash=i>=0&&sections[i]?'#'+sections[i].id:'';history.replaceState(null,'',hash||window.location.pathname);}catch(e){}
         renderAll();window.scrollTo({top:0,behavior:'smooth'});
     }
 
@@ -483,11 +577,25 @@
         const socialHtml='<div class="home-social"><div><div class="home-social-label">Social</div><div class="home-social-links"><a href="'+appData.social.instagram+'" target="_blank" rel="noopener" class="social-link" aria-label="Profilo Instagram @anconacentro">📷 Instagram</a><a href="'+appData.social.facebook+'" target="_blank" rel="noopener" class="social-link" aria-label="Pagina Facebook">📘 Facebook</a><a href="https://www.meteoam.it/it/meteo-citta/ancona" target="_blank" rel="noopener" class="social-link" aria-label="Meteo Ancona">🌤️ Meteo</a></div><div class="home-social-text">'+tr('Informazioni e aggiornamenti costanti sui profili social','Constant information and updates on social profiles','Ständige Informationen und Updates auf den Social-Media-Profilen','Stałe informacje i aktualizacje na profilach społecznościowych')+'</div></div></div>';
         const tiles=sections.map((s,i)=>'<button class="nav-tile" data-index="'+i+'" aria-label="'+tr(s.it,s.en,s.de,s.pl)+'"><div class="nav-tile-icon" aria-hidden="true">'+s.icon+'</div><div class="nav-tile-label">'+tr(s.it,s.en,s.de,s.pl)+'</div></button>').join('');
         const installBtnHtml='<button id="install-btn" class="install-btn" style="display:none">📲 '+tr('Aggiungi alla schermata Home','Add to Home Screen','Zum Startbildschirm hinzufügen','Dodaj do ekranu głównego')+'</button>';
-        const html='<section class="section active"><div class="home-welcome"><div class="home-welcome-left"><img src="'+hostImgSrc+'" alt="Foto dell\'host" class="host-photo" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\';"><div class="host-photo-placeholder" style="display:none">👋</div></div><div class="home-welcome-right"><div class="home-welcome-title">'+tr('Benvenuti!','Welcome!','Willkommen!','Witamy!')+'</div><div class="home-welcome-sub">'+tr('Siamo felici di ospitarvi','We are happy to host you','Wir freuen uns, Sie zu beherbergen','Cieszymy się, że możemy Was gościć')+'</div></div></div>'+installBtnHtml+socialHtml+'<div class="nav-grid">'+tiles+'</div></section>';
+        const countdownHtml=getCountdownHtml();
+        const swipeHint='<div class="swipe-hint">← '+tr('scorri per navigare','swipe to navigate','wischen zum Navigieren','przesuń aby nawigować')+' →</div>';
+        const staticMapHtml='<div class="home-map-wrap" id="home-static-map"></div>';
+        const html='<section class="section active"><div class="home-welcome"><div class="home-welcome-left"><img src="'+hostImgSrc+'" alt="Foto dell\'host" class="host-photo" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\';"><div class="host-photo-placeholder" style="display:none">👋</div></div><div class="home-welcome-right"><div class="home-welcome-title">'+tr('Benvenuti!','Welcome!','Willkommen!','Witamy!')+'</div><div class="home-welcome-sub">'+tr('Siamo felici di ospitarvi','We are happy to host you','Wir freuen uns, Sie zu beherbergen','Cieszymy się, że możemy Was gościć')+'</div></div></div>'+installBtnHtml+countdownHtml+socialHtml+staticMapHtml+'<div class="nav-grid">'+tiles+'</div>'+swipeHint+'</section>';
         cont.innerHTML=html;
         document.querySelectorAll('.nav-tile').forEach(btn=>btn.addEventListener('click',function(){goTo(parseInt(this.dataset.index));}));
         const installBtn=document.getElementById('install-btn');
         if(installBtn){installBtn.addEventListener('click',async()=>{if(deferredPrompt){deferredPrompt.prompt();const{outcome}=await deferredPrompt.userChoice;deferredPrompt=null;installBtn.style.display='none';}});if(deferredPrompt)installBtn.style.display='inline-flex';else if(window.matchMedia('(display-mode:standalone)').matches)installBtn.style.display='none';}
+        // #15 mappa statica home
+        setTimeout(()=>{
+            const mapEl=document.getElementById('home-static-map');
+            if(!mapEl||typeof L==='undefined')return;
+            if(homeStaticMap){homeStaticMap.remove();homeStaticMap=null;}
+            homeStaticMap=L.map('home-static-map',{zoomControl:false,attributionControl:false,dragging:false,scrollWheelZoom:false,doubleClickZoom:false,boxZoom:false,keyboard:false,touchZoom:false});
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19}).addTo(homeStaticMap);
+            homeStaticMap.setView([HOME_COORDS.lat,HOME_COORDS.lng],16);
+            const starIcon=L.divIcon({html:'<div class="map-marker-star" aria-label="Ancona Centro" role="img">★</div>',className:'',iconSize:[28,28],iconAnchor:[14,14]});
+            L.marker([HOME_COORDS.lat,HOME_COORDS.lng],{icon:starIcon}).addTo(homeStaticMap).bindPopup('<b style="font-size:.78rem">★ Ancona Centro</b><br><span style="font-size:.68rem">📍 Piazza Roma 3</span>').openPopup();
+        },0);
     }
 
     function renderSection(id){
@@ -516,14 +624,22 @@
             return'<button class="back-btn" id="sub-back-btn">← '+tr('Torna al tour principale','Back to main tour','Zurück zur Haupttour','Powrót do głównej trasy')+'</button>'+descHtml+'<div class="map-list-wrap"><div id="sectionMap" class="section-map-el" role="application" aria-label="Mappa dei luoghi"></div><div class="place-btn-col">'+starBtnHtml()+subBtns+'</div></div>'+parkingInfoBox;
         }
         if(currentPlaceDetail>=0&&currentPlaceDetail<items.length)return renderAnyPlaceDetail(items[currentPlaceDetail],currentPlaceDetail,items.length,false)+parkingInfoBox;
-        const btns=items.map((p,i)=>{const dn=getDisplayNumber(p,i),sel=(i===currentPlaceDetail)?' selected':'',subBadge=p.isSubItinerary?' 🔀':'',subHint=p.isSubItinerary?' – '+tr('mini-percorso','mini-tour','Mini-Tour','mini-trasa'):'';return'<button class="place-btn-mini'+sel+'" data-index="'+i+'" aria-label="'+p.name+subHint+'">'+dn+'. '+p.name+subBadge+'</button>';}).join('');
-        return'<div class="map-list-wrap"><div id="sectionMap" class="section-map-el" role="application" aria-label="Mappa dei luoghi"></div><div class="place-btn-col">'+starBtnHtml()+btns+'</div></div>'+parkingInfoBox;
+        const sortedItems = distSortActive ? items.slice().sort((a,b)=>(a._dist||Infinity)-(b._dist||Infinity)) : items;
+        const distSortLabel = distSortActive ? '📍 '+tr('Ordine distanza','By distance','Nach Entfernung','Wg odległości') : '📍 '+tr('Ordina per distanza','Sort by distance','Nach Entfernung sortieren','Sortuj wg odl.');
+        const distSortBtn = '<button class="dist-sort-btn'+(distSortActive?' active':'')+'" id="dist-sort-btn">'+distSortLabel+'</button>';
+        const btns=sortedItems.map((p,i)=>{const origIdx=items.indexOf(p),dn=getDisplayNumber(p,origIdx),sel=(origIdx===currentPlaceDetail)?' selected':'',subBadge=p.isSubItinerary?' 🔀':'',subHint=p.isSubItinerary?' – '+tr('mini-percorso','mini-tour','Mini-Tour','mini-trasa'):'';return'<button class="place-btn-mini'+sel+'" data-index="'+origIdx+'" aria-label="'+p.name+subHint+'">'+dn+'. '+p.name+subBadge+'</button>';}).join('');
+        return'<div class="map-list-wrap"><div id="sectionMap" class="section-map-el" role="application" aria-label="Mappa dei luoghi"></div><div class="place-btn-col">'+starBtnHtml()+distSortBtn+btns+'</div></div>'+parkingInfoBox;
     }
 
-    function attachPlaceSectionListeners(){document.querySelectorAll('.place-btn-mini').forEach(btn=>btn.addEventListener('click',function(){selectPlaceDetail(parseInt(this.dataset.index));}));document.getElementById('star-home-btn')?.addEventListener('click',panToHome);}
+    function attachPlaceSectionListeners(){
+        document.querySelectorAll('.place-btn-mini').forEach(btn=>btn.addEventListener('click',function(){selectPlaceDetail(parseInt(this.dataset.index));}));
+        document.getElementById('star-home-btn')?.addEventListener('click',panToHome);
+        document.getElementById('dist-sort-btn')?.addEventListener('click',function(){distSortActive=!distSortActive;renderAll();});
+    }
 
     function renderAnyPlaceDetail(p,index,total,isSubMode){
         const wrapId='photowrap_'+index;placeDataMap[wrapId]=p;const desc=tr(p.it,p.en,p.de,p.pl);
+        const hoursBadge=getHoursBadge(p);
         let photoHtml;
         if(p.photo){const src=PHOTO_BASE+p.photo;photoHtml='<div class="detail-photo-wrap" id="'+wrapId+'"><div class="detail-photo-placeholder" id="ph_'+index+'" aria-hidden="true">'+p.emoji+'</div><img class="detail-photo" src="'+src+'" alt="Foto di '+p.name+'" loading="lazy" id="img_'+index+'"></div>';}
         else photoHtml='<div class="detail-photo-wrap"><a href="'+getImgSearchUrl(p)+'" target="_blank" rel="noopener" class="detail-photo-link" aria-label="Cerca foto di '+p.name+' su Google Immagini"><span class="placeholder-emoji" aria-hidden="true">🖼️</span><span class="placeholder-text">'+tr('Clicca per vedere le foto','Click to see photos','Klicken, um Fotos zu sehen','Kliknij, aby zobaczyć zdjęcia')+'</span></a></div>';
@@ -533,7 +649,7 @@
         const backLabel=tr('Tutti i luoghi','All places','Alle Orte','Wszystkie miejsca');
         const prev=index>0?'<button class="nav-detail-btn" data-prev="'+(index-1)+'" aria-label="Luogo precedente">◀ '+tr('Prec.','Prev','Vor.','Poprz.')+'</button>':'<span></span>';
         const next=index<total-1?'<button class="nav-detail-btn" data-next="'+(index+1)+'" aria-label="Luogo successivo">'+tr('Succ.','Next','Näch.','Nast.')+' ▶</button>':'<span></span>';
-        const html='<button class="back-btn" id="detail-back-btn" aria-label="Torna alla lista dei luoghi">← '+backLabel+'</button><div class="place-card">'+photoHtml+'<div class="place-body"><div class="place-emoji-sm" aria-hidden="true">'+p.emoji+'</div><div><div class="place-name">'+p.name+'</div><div class="place-dist">'+p.dist+'</div><div class="place-desc" style="margin-top:5px">'+desc+'</div></div></div><div class="place-actions">'+btns+'</div></div><div class="detail-nav">'+prev+'<span class="detail-counter">'+displayNum+' / '+totalDisplay+'</span>'+next+'</div>';
+        const html='<button class="back-btn" id="detail-back-btn" aria-label="Torna alla lista dei luoghi">← '+backLabel+'</button><div class="place-card">'+photoHtml+'<div class="place-body"><div class="place-emoji-sm" aria-hidden="true">'+p.emoji+'</div><div><div class="place-name">'+p.name+'</div><div class="place-dist">'+p.dist+'</div>'+hoursBadge+'<div class="place-desc" style="margin-top:5px">'+desc+'</div></div></div><div class="place-actions">'+btns+'</div></div><div class="detail-nav">'+prev+'<span class="detail-counter">'+displayNum+' / '+totalDisplay+'</span>'+next+'</div>';
         setTimeout(()=>{const img=document.getElementById('img_'+index),placeholder=document.getElementById('ph_'+index);if(img){img.addEventListener('load',function(){this.classList.add('loaded');if(placeholder)placeholder.classList.add('hidden');});img.addEventListener('error',function(){photoFallback(wrapId);});if(img.complete){img.classList.add('loaded');if(placeholder)placeholder.classList.add('hidden');}}},0);
         return html;
     }
@@ -594,6 +710,24 @@
     window.addEventListener('appinstalled',()=>{deferredPrompt=null;const installBtn=document.getElementById('install-btn');if(installBtn)installBtn.style.display='none';});
     if(window.matchMedia('(display-mode:standalone)').matches){const installBtn=document.getElementById('install-btn');if(installBtn)installBtn.style.display='none';}
     window.addEventListener('load',()=>{const hash=window.location.hash.replace('#','');if(hash&&sectionHashMap[hash]!==undefined)goTo(sectionHashMap[hash]);});
+
+    // #11 popstate per back/forward browser
+    window.addEventListener('popstate',()=>{const hash=window.location.hash.replace('#','');if(!hash){if(currentSection!==-1)goTo(-1);}else if(sectionHashMap[hash]!==undefined&&sectionHashMap[hash]!==currentSection)goTo(sectionHashMap[hash]);});
+
+    // #6 Swipe orizzontale tra sezioni
+    document.addEventListener('touchstart',(e)=>{swipeStartX=e.touches[0].clientX;},{passive:true});
+    document.addEventListener('touchend',(e)=>{
+        const dx=e.changedTouches[0].clientX-swipeStartX;
+        if(Math.abs(dx)<60)return;
+        if(currentPlaceDetail>=0||currentSubItinerary)return; // no swipe in detail/sub
+        if(dx<0){// swipe left → sezione successiva
+            if(currentSection===-1)goTo(0);
+            else if(currentSection<sections.length-1)goTo(currentSection+1);
+        }else{// swipe right → sezione precedente o home
+            if(currentSection>0)goTo(currentSection-1);
+            else if(currentSection===0)goTo(-1);
+        }
+    },{passive:true});
     renderAll();
     setTimeout(updateGpsUI,300);
     </script>

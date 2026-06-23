@@ -1,11 +1,11 @@
 
 <!DOCTYPE html>
-<!-- Affittacamere Ancona Centro - Guida Ospiti V4.1.7 | 23/06/26 09:00 -->
+<!-- Affittacamere Ancona Centro - Guida Ospiti V4.1.8 | 23/06/26 -->
 <html lang="it">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Ancona Centro · Guida Ospiti V4.1.7</title>
+    <title>Ancona Centro · Guida Ospiti V4.1.8</title>
     <link rel="manifest" href="./manifest.json">
     <meta name="theme-color" content="#0B1F33">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -14,7 +14,7 @@
     <link rel="apple-touch-icon" sizes="180x180" href="https://raw.githubusercontent.com/anconacentro2025/Guida-v-4.0/main/img/icon-512.png">
     <meta name="apple-mobile-web-app-title" content="Ancona Guide">
     <link rel="icon" type="image/png" sizes="192x192" href="https://raw.githubusercontent.com/anconacentro2025/Guida-v-4.0/main/img/icon-192.png">
-    <meta property="og:title" content="Affittacamere Ancona Centro · Guida V4.1.7">
+    <meta property="og:title" content="Affittacamere Ancona Centro · Guida V4.1.8">
     <meta property="og:description" content="La tua guida digitale per scoprire Ancona passo dopo passo. Itinerari consigliati, ristoranti e info utili.">
     <meta property="og:image" content="https://raw.githubusercontent.com/anconacentro2025/Guida-v-4.0/main/img/home.jpg">
     <meta property="og:type" content="website">
@@ -38,7 +38,7 @@
         .lang-toggle{display:flex;background:rgba(255,255,255,.08);border-radius:22px;overflow:hidden;border:1px solid rgba(200,164,90,.30);justify-content:center}
         .lang-btn{padding:5px 11px;font-size:.68rem;font-weight:500;border:none;background:transparent;color:rgba(255,255,255,.55);transition:all .2s}
         .lang-btn.active{background:var(--gold);color:var(--navy);font-weight:600}
-        .version-info{font-size:.55rem;color:var(--gold-3);text-align:center;margin-top:4px;opacity:.6;letter-spacing:.05em}
+        .version-info{font-size:.55rem;color:var(--gold-3);text-align:center;margin-top:4px;opacity:.6;letter-spacing:.05em} /* V4.1.8 */
         .hero{width:100%;height:320px;overflow:hidden;position:relative;background:linear-gradient(160deg,var(--navy) 0%,var(--navy-2) 50%,var(--navy-3) 100%);transition:height .3s ease}
         .hero.section-mode{height:68px}
         @media(max-height:700px){.hero.section-mode{height:48px}}
@@ -737,6 +737,9 @@
         const dx=e.changedTouches[0].clientX-swipeStartX;
         if(Math.abs(dx)<60)return;
         if(currentPlaceDetail>=0||currentSubItinerary)return; // no swipe in detail/sub
+        // Blocca se il touch è terminato dentro la mappa Leaflet
+        const mapEl=document.getElementById('sectionMap')||document.getElementById('home-static-map');
+        if(mapEl&&mapEl.contains(e.target))return;
         if(dx<0){// swipe left → sezione successiva
             if(currentSection===-1)goTo(0);
             else if(currentSection<sections.length-1)goTo(currentSection+1);

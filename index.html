@@ -1,11 +1,10 @@
-
 <!DOCTYPE html>
-<!-- Affittacamere Ancona Centro - Guida Ospiti V4.1.8 | 23/06/26 -->
+<!-- Affittacamere Ancona Centro - Guida Ospiti V4.1.9 | 23/06/26 12:00 -->
 <html lang="it">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Ancona Centro · Guida Ospiti V4.1.8</title>
+    <title>Ancona Centro · Guida Ospiti V4.1.9</title>
     <link rel="manifest" href="./manifest.json">
     <meta name="theme-color" content="#0B1F33">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -14,7 +13,7 @@
     <link rel="apple-touch-icon" sizes="180x180" href="https://raw.githubusercontent.com/anconacentro2025/Guida-v-4.0/main/img/icon-512.png">
     <meta name="apple-mobile-web-app-title" content="Ancona Guide">
     <link rel="icon" type="image/png" sizes="192x192" href="https://raw.githubusercontent.com/anconacentro2025/Guida-v-4.0/main/img/icon-192.png">
-    <meta property="og:title" content="Affittacamere Ancona Centro · Guida V4.1.8">
+    <meta property="og:title" content="Affittacamere Ancona Centro · Guida V4.1.9">
     <meta property="og:description" content="La tua guida digitale per scoprire Ancona passo dopo passo. Itinerari consigliati, ristoranti e info utili.">
     <meta property="og:image" content="https://raw.githubusercontent.com/anconacentro2025/Guida-v-4.0/main/img/home.jpg">
     <meta property="og:type" content="website">
@@ -38,7 +37,7 @@
         .lang-toggle{display:flex;background:rgba(255,255,255,.08);border-radius:22px;overflow:hidden;border:1px solid rgba(200,164,90,.30);justify-content:center}
         .lang-btn{padding:5px 11px;font-size:.68rem;font-weight:500;border:none;background:transparent;color:rgba(255,255,255,.55);transition:all .2s}
         .lang-btn.active{background:var(--gold);color:var(--navy);font-weight:600}
-        .version-info{font-size:.55rem;color:var(--gold-3);text-align:center;margin-top:4px;opacity:.6;letter-spacing:.05em} /* V4.1.8 */
+        .version-info{font-size:.55rem;color:var(--gold-3);text-align:center;margin-top:4px;opacity:.6;letter-spacing:.05em}
         .hero{width:100%;height:320px;overflow:hidden;position:relative;background:linear-gradient(160deg,var(--navy) 0%,var(--navy-2) 50%,var(--navy-3) 100%);transition:height .3s ease}
         .hero.section-mode{height:68px}
         @media(max-height:700px){.hero.section-mode{height:48px}}
@@ -179,36 +178,41 @@
         .reach-sub-btn{flex:1;border:1px solid var(--border);padding:8px 4px;border-radius:8px;font-size:.72rem;font-weight:500;transition:all .2s;outline:none;background:var(--bg);color:var(--text)}
         .reach-sub-btn.active{background:var(--navy);color:var(--white);font-weight:600}
         .reach-content{font-size:.82rem;line-height:1.6;color:var(--text)}
-        /* Orari apertura */
         .hours-badge{display:inline-flex;align-items:center;gap:4px;font-size:.65rem;font-weight:600;padding:2px 8px;border-radius:10px;margin-top:4px}
         .hours-badge.open{background:#D1FAE5;color:#065F46}
         .hours-badge.closed{background:#FEE2E2;color:#991B1B}
         .hours-badge.holiday{background:#FEF3C7;color:#92400E}
         .hours-text{font-size:.68rem;color:var(--muted);margin-top:2px}
-        /* Meteo widget */
         .meteo-widget{background:linear-gradient(135deg,var(--navy-2) 0%,var(--navy-3) 100%);border-radius:10px;padding:10px 14px;margin:8px 16px 0;display:flex;align-items:center;justify-content:space-between;border:1px solid rgba(200,164,90,.25);color:var(--white);min-height:48px}
         .meteo-left{display:flex;align-items:center;gap:10px}
         .meteo-icon{font-size:1.6rem}
         .meteo-temp{font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-weight:600;color:var(--gold-2)}
         .meteo-desc{font-size:.65rem;color:rgba(255,255,255,.6);margin-top:1px;text-transform:capitalize}
         .meteo-right{text-align:right;font-size:.62rem;color:rgba(255,255,255,.45)}
-        /* Filtro distanza */
         .dist-sort-btn{display:inline-flex;align-items:center;gap:5px;background:var(--bg);border:1px solid var(--border);color:var(--muted);font-size:.65rem;font-weight:500;padding:4px 10px;border-radius:14px;cursor:pointer;transition:all .2s;margin-bottom:8px}
         .dist-sort-btn.active{background:var(--navy);color:var(--white);border-color:var(--navy)}
-        /* Frasi utili */
         .phrase-row{display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid var(--bg-2)}
         .phrase-row:last-child{border-bottom:none}
         .phrase-it{font-size:.8rem;font-weight:600;color:var(--navy);flex:1}
         .phrase-tr{font-size:.75rem;color:var(--muted);flex:1;font-style:italic}
-        /* Home static map */
-        .home-map-wrap{margin:8px 16px 0;border-radius:10px;overflow:hidden;height:130px;border:1px solid var(--border);box-shadow:var(--shadow)}
-        /* Countdown */
+        .home-map-wrap{margin:8px 16px 0;border-radius:10px;overflow:hidden;height:130px;border:1px solid var(--border);box-shadow:var(--shadow);cursor:pointer;transition:transform .2s}
+        .home-map-wrap:hover{transform:scale(1.01)}
+        .home-map-wrap:active{transform:scale(.98)}
         .checkout-countdown{background:linear-gradient(135deg,#FEF3C7,#FDE68A);border-radius:10px;padding:10px 14px;margin:8px 16px 0;border:1px solid #F59E0B;display:flex;align-items:center;gap:12px}
         .countdown-icon{font-size:1.4rem}
         .countdown-text{font-size:.75rem;color:#92400E;line-height:1.4}
         .countdown-value{font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-weight:600;color:#78350F}
-        /* Swipe hint */
         .swipe-hint{text-align:center;font-size:.58rem;color:var(--muted);padding:4px 0 0;opacity:.5;letter-spacing:.05em}
+
+        /* === MAPPA FULL-SCREEN OVERLAY === */
+        .map-fullscreen-overlay{position:fixed;top:0;left:0;width:100vw;height:100vh;background:var(--navy);z-index:9999;display:none;flex-direction:column;opacity:0;transition:opacity .3s ease}
+        .map-fullscreen-overlay.active{display:flex;opacity:1}
+        .map-fullscreen-overlay .map-fs-header{display:flex;justify-content:space-between;align-items:center;padding:12px 18px;background:var(--navy);border-bottom:1px solid rgba(200,164,90,.25);flex-shrink:0;z-index:10}
+        .map-fullscreen-overlay .map-fs-title{font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-weight:600;color:var(--white)}
+        .map-fullscreen-overlay .map-fs-close{background:rgba(255,255,255,.12);border:1px solid rgba(200,164,90,.30);color:var(--white);padding:6px 18px;border-radius:22px;font-size:.85rem;font-weight:500;cursor:pointer;transition:all .2s}
+        .map-fullscreen-overlay .map-fs-close:hover{background:var(--gold);color:var(--navy)}
+        .map-fullscreen-overlay .map-fs-close:active{transform:scale(.95)}
+        .map-fullscreen-overlay #fullscreenMap{flex:1;min-height:0;background:var(--bg)}
     </style>
 </head>
 <body>
@@ -226,7 +230,7 @@
                     <button class="lang-btn" id="btn-de" role="radio" aria-checked="false" aria-label="Deutsch">DE</button>
                     <button class="lang-btn" id="btn-pl" role="radio" aria-checked="false" aria-label="Polski">PL</button>
                 </div>
-                <div class="version-info">V4.1.7 · <span id="release-time">23/06/26 09:00</span></div>
+                <div class="version-info">V4.1.9 · <span id="release-time">23/06/26 12:00</span></div>
             </div>
         </div>
     </header>
@@ -238,7 +242,18 @@
     <div class="gold-bar" aria-hidden="true"></div>
     <nav class="nav-scroll" id="nav" style="display:none" role="navigation" aria-label="Sezioni"></nav>
     <main class="content" id="content" role="main"></main>
-    <div class="copyright-footer">© 2026 Affittacamere Ancona Centro · Guida V4.1.7 · All rights reserved</div>
+
+    <!-- FULLSCREEN MAP OVERLAY -->
+    <div class="map-fullscreen-overlay" id="map-fullscreen-overlay">
+        <div class="map-fs-header">
+            <span class="map-fs-title" id="map-fs-title">🗺️ Mappa</span>
+            <button class="map-fs-close" id="map-fs-close">✕ Chiudi</button>
+        </div>
+        <div id="fullscreenMap"></div>
+    </div>
+
+    <div class="copyright-footer">© 2026 Affittacamere Ancona Centro · Guida V4.1.9 · All rights reserved</div>
+
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
     const NO_GPS_SECTIONS = ['apartment', 'contact', 'transport'];
@@ -251,6 +266,13 @@
     let distSortActive = false;
     let homeStaticMap = null;
     let swipeStartX = 0;
+
+    // === FULLSCREEN MAP VARIABLES ===
+    let fullscreenMapInstance = null;
+    let fsStoredPlaces = [];
+    let fsIsHome = false;
+    let fsSubItineraryId = null;
+    let fsListenersInitialized = false;
 
     const appData = {
         apartment: {
@@ -386,7 +408,6 @@
     let placeDataMap = {}, _mapRetryCount = 0;
     let gpsWatchId = null, gpsMarker = null, gpsCircle = null, gpsConsentGiven = null, gpsBoxCollapsed = false, deferredPrompt = null;
     try { gpsConsentGiven = sessionStorage.getItem('gpsConsent'); } catch(e) {}
-    // #4 lingua persistente + #12 URL param lingua
     try {
         const urlLang = new URLSearchParams(window.location.search).get('lang');
         const stored = localStorage.getItem('guida_lang');
@@ -405,11 +426,10 @@
     function getMapLink(query, noSuffix) { const q = noSuffix ? query : query + ', Ancona Italia'; return 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(q); }
     function getImgSearchUrl(p) { const q = p.imgQuery || (p.name + ' Ancona'); return 'https://www.google.com/search?tbm=isch&q=' + encodeURIComponent(q); }
 
-    // #2 Orari apertura + giorno chiusura
     function getHoursBadge(p) {
         if (!p.hours) return '';
         const now = new Date();
-        const day = now.getDay(); // 0=dom,1=lun,...,6=sab
+        const day = now.getDay();
         const dayNames = { it:['Dom','Lun','Mar','Mer','Gio','Ven','Sab'], en:['Sun','Mon','Tue','Wed','Thu','Fri','Sat'], de:['So','Mo','Di','Mi','Do','Fr','Sa'], pl:['Nd','Pn','Wt','Śr','Cz','Pt','Sb'] };
         const closedOn = p.closedOn || [];
         if (closedOn.includes(day)) {
@@ -434,9 +454,6 @@
         return '<div>'+badge+'<div class="hours-text">🕐 '+p.hours+closedDaysStr+'</div></div>';
     }
 
-    // #1 METEO — già presente come link nella home (meteoam.it), widget rimosso
-
-    // #5 Countdown checkout da URL param ?checkout=YYYY-MM-DD
     function getCountdownHtml() {
         try {
             const co = new URLSearchParams(window.location.search).get('checkout');
@@ -453,7 +470,6 @@
         } catch(e) { return ''; }
     }
 
-    // #14 FRASI UTILI — rimosso su richiesta
     function photoFallback(wrapId) { const el = document.getElementById(wrapId); const p = placeDataMap[wrapId]; if (el && p) el.innerHTML = '<a href="'+getImgSearchUrl(p)+'" target="_blank" rel="noopener" class="detail-photo-link" aria-label="Cerca foto di '+p.name+' su Google Immagini"><span class="placeholder-emoji" aria-hidden="true">🖼️</span><span class="placeholder-text">'+tr('Clicca per vedere le foto','Click to see photos','Klicken, um Fotos zu sehen','Kliknij, aby zobaczyć zdjęcia')+'</span></a>'; }
     function calcDistance(lat1, lon1, lat2, lon2) { const R=6371; const dLat=(lat2-lat1)*Math.PI/180; const dLon=(lon2-lon1)*Math.PI/180; const a=Math.sin(dLat/2)*Math.sin(dLat/2)+Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)*Math.sin(dLon/2); return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a)); }
 
@@ -466,7 +482,7 @@
         if(gpsMarker&&leafletMap)leafletMap.removeLayer(gpsMarker);
         if(gpsCircle&&leafletMap)leafletMap.removeLayer(gpsCircle);
         gpsMarker=null;gpsCircle=null;
-        if(currentSection>=0&&sections[currentSection]&&sections[currentSection].id==='apartment'&&targetId!=='apartment'){window._activeReachTab='auto';}
+        // RIMOSSO: window._activeReachTab='auto'; (Preserva la scelta dell'utente)
         distSortActive=false;
         currentSection=i;currentPlaceDetail=-1;currentSubItinerary=null;placeDataMap={};
         if(leafletMap){leafletMap.remove();leafletMap=null;}
@@ -548,6 +564,246 @@
         gpsWatchId=navigator.geolocation.watchPosition((position)=>{const lat=position.coords.latitude,lng=position.coords.longitude,accuracy=position.coords.accuracy;if(!leafletMap)return;if(gpsMarker)gpsMarker.setLatLng([lat,lng]);else{const gpsIcon=L.divIcon({html:'<div class="gps-blue-dot-wrap"><div class="gps-blue-dot"></div><div class="gps-blue-dot-pulse"></div></div>',className:'',iconSize:[20,20],iconAnchor:[10,10]});gpsMarker=L.marker([lat,lng],{icon:gpsIcon,zIndexOffset:2000}).addTo(leafletMap);}if(gpsCircle){gpsCircle.setLatLng([lat,lng]);gpsCircle.setRadius(accuracy);}else gpsCircle=L.circle([lat,lng],{radius:accuracy,color:'#007aff',fillColor:'#007aff',fillOpacity:.15,weight:1}).addTo(leafletMap);updateGpsUI();},(error)=>{if(error.code===error.PERMISSION_DENIED){const textEl=document.querySelector('.gps-box .gps-text'),btnsEl=document.querySelector('.gps-box .gps-buttons');if(textEl)textEl.innerHTML='<strong>🔒 '+tr('Accesso GPS negato','GPS access denied','GPS-Zugriff verweigert','Odmowa dostępu GPS')+'</strong><br>'+tr('Abilita i permessi di localizzazione nelle impostazioni del browser.','Enable location permissions in your browser settings.','Aktivieren Sie die Standortberechtigungen in den Browser-Einstellungen.','Włącz uprawnienia lokalizacji w ustawieniach przeglądarki.');if(btnsEl)btnsEl.innerHTML='';if(gpsWatchId!==null)toggleGpsTracking();}},{enableHighAccuracy:true,timeout:10000,maximumAge:2000});updateGpsUI();
     }
 
+    // === FULLSCREEN MAP FUNCTIONS ===
+    function openFullscreenMap() {
+        console.log('[Fullscreen] Apertura...');
+        const overlay = document.getElementById('map-fullscreen-overlay');
+        if (!overlay) {
+            console.error('[Fullscreen] Overlay non trovato!');
+            return;
+        }
+        
+        fsIsHome = (currentSection === -1);
+        fsSubItineraryId = currentSubItinerary || null;
+        
+        if (fsIsHome) {
+            fsStoredPlaces = [];
+            console.log('[Fullscreen] Modalità Home');
+        } else {
+            const places = currentSectionPlaces || [];
+            fsStoredPlaces = places
+                .filter(p => p && p.lat && p.lng)
+                .map(p => {
+                    const copy = { ...p };
+                    copy._originalIndex = places.indexOf(p);
+                    return copy;
+                });
+            console.log('[Fullscreen] Luoghi salvati:', fsStoredPlaces.length);
+        }
+        
+        const titleEl = document.getElementById('map-fs-title');
+        if (titleEl) {
+            if (fsIsHome) {
+                titleEl.textContent = '🗺️ Ancona Centro';
+            } else if (fsSubItineraryId) {
+                const parent = appData.mustsee.find(m => m.subId === fsSubItineraryId);
+                titleEl.textContent = '🗺️ ' + (parent ? parent.name : 'Percorso');
+            } else if (currentSection >= 0 && sections[currentSection]) {
+                const s = sections[currentSection];
+                titleEl.textContent = '🗺️ ' + tr(s.it, s.en, s.de, s.pl);
+            } else {
+                titleEl.textContent = '🗺️ Mappa';
+            }
+        }
+        
+        overlay.classList.add('active');
+        document.body.style.overflow = 'hidden';
+        
+        requestAnimationFrame(() => {
+            initFullscreenMap();
+        });
+    }
+
+    function closeFullscreenMap() {
+        console.log('[Fullscreen] Chiusura...');
+        const overlay = document.getElementById('map-fullscreen-overlay');
+        if (!overlay) return;
+        
+        overlay.classList.remove('active');
+        document.body.style.overflow = '';
+        
+        if (fullscreenMapInstance) {
+            if (fullscreenMapInstance._resizeHandler) {
+                window.removeEventListener('resize', fullscreenMapInstance._resizeHandler);
+            }
+            fullscreenMapInstance.remove();
+            fullscreenMapInstance = null;
+            console.log('[Fullscreen] Mappa distrutta');
+        }
+        fsStoredPlaces = [];
+        fsIsHome = false;
+        fsSubItineraryId = null;
+    }
+
+    function initFullscreenMap() {
+        console.log('[Fullscreen] Inizializzazione mappa...');
+        const el = document.getElementById('fullscreenMap');
+        if (!el) {
+            console.error('[Fullscreen] Elemento #fullscreenMap non trovato!');
+            return;
+        }
+        
+        if (typeof L === 'undefined') {
+            console.log('[Fullscreen] Leaflet non caricato, riprovo...');
+            setTimeout(initFullscreenMap, 300);
+            return;
+        }
+        
+        if (fullscreenMapInstance) {
+            if (fullscreenMapInstance._resizeHandler) {
+                window.removeEventListener('resize', fullscreenMapInstance._resizeHandler);
+            }
+            fullscreenMapInstance.remove();
+            fullscreenMapInstance = null;
+        }
+        
+        fullscreenMapInstance = L.map('fullscreenMap', {
+            zoomControl: true,
+            attributionControl: true
+        });
+        
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19
+        }).addTo(fullscreenMapInstance);
+        
+        const bounds = [];
+        const places = fsStoredPlaces || [];
+        const isSub = !!fsSubItineraryId;
+        
+        console.log('[Fullscreen] Aggiungo', places.length, 'luoghi');
+        
+        places.forEach((p, idx) => {
+            if (!p.lat || !p.lng) {
+                console.warn('[Fullscreen] Luogo senza coordinate:', p.name);
+                return;
+            }
+            
+            let displayNum;
+            if (isSub) {
+                displayNum = String.fromCharCode(65 + idx);
+            } else if (typeof p.order === 'number') {
+                displayNum = p.order;
+            } else if (typeof p.order === 'string' && p.order.indexOf('bis') > -1) {
+                displayNum = p.order.replace('-bis', 'b');
+            } else {
+                displayNum = idx + 1;
+            }
+            
+            let markerClass = 'map-marker-num';
+            if (isSub && (fsSubItineraryId === 'cardeto' || fsSubItineraryId === 'cittadella')) {
+                markerClass += ' ' + fsSubItineraryId;
+            }
+            if (p.isSubItinerary) markerClass += ' has-sub';
+            
+            const icon = L.divIcon({
+                html: '<div class="' + markerClass + '" aria-label="' + p.name + '" role="img">' + displayNum + '</div>',
+                className: '',
+                iconSize: [24, 24],
+                iconAnchor: [12, 12],
+                popupAnchor: [0, -14]
+            });
+            
+            const m = L.marker([p.lat, p.lng], { icon: icon }).addTo(fullscreenMapInstance);
+            m.bindPopup('<b style="font-size:.78rem">' + p.emoji + ' ' + p.name + '</b><br><span style="font-size:.68rem;color:#888">' + (p.dist || '') + '</span>');
+            
+            m.on('click', function() {
+                console.log('[Fullscreen] Click su marker:', p.name);
+                const originalIndex = p._originalIndex !== undefined ? p._originalIndex : idx;
+                closeFullscreenMap();
+                if (originalIndex >= 0 && typeof selectPlaceDetail === 'function') {
+                    setTimeout(() => {
+                        selectPlaceDetail(originalIndex);
+                    }, 400);
+                }
+            });
+            bounds.push([p.lat, p.lng]);
+        });
+        
+        const starIcon = L.divIcon({
+            html: '<div class="map-marker-star" aria-label="Ancona Centro" role="img">★</div>',
+            className: '',
+            iconSize: [28, 28],
+            iconAnchor: [14, 14],
+            popupAnchor: [0, -16]
+        });
+        L.marker([HOME_COORDS.lat, HOME_COORDS.lng], { 
+            icon: starIcon, 
+            zIndexOffset: 1000 
+        }).addTo(fullscreenMapInstance)
+        .bindPopup('<b style="font-size:.78rem">★ Ancona Centro</b><br><span style="font-size:.68rem;color:#888">📍 Piazza Roma 3</span>');
+        bounds.push([HOME_COORDS.lat, HOME_COORDS.lng]);
+        
+        if (bounds.length > 1) {
+            fullscreenMapInstance.fitBounds(bounds, { padding: [30, 30] });
+        } else {
+            fullscreenMapInstance.setView([HOME_COORDS.lat, HOME_COORDS.lng], 15);
+        }
+        
+        try {
+            if (gpsWatchId !== null && gpsMarker && typeof gpsMarker.getLatLng === 'function') {
+                const gpsLatLng = gpsMarker.getLatLng();
+                if (gpsLatLng && gpsLatLng.lat && gpsLatLng.lng) {
+                    console.log('[Fullscreen] Aggiungo GPS:', gpsLatLng.lat, gpsLatLng.lng);
+                    const gpsIcon = L.divIcon({
+                        html: '<div class="gps-blue-dot-wrap"><div class="gps-blue-dot"></div><div class="gps-blue-dot-pulse"></div></div>',
+                        className: '',
+                        iconSize: [20, 20],
+                        iconAnchor: [10, 10]
+                    });
+                    L.marker([gpsLatLng.lat, gpsLatLng.lng], { 
+                        icon: gpsIcon, 
+                        zIndexOffset: 2000 
+                    }).addTo(fullscreenMapInstance);
+                }
+            }
+        } catch(e) {
+            console.warn('[Fullscreen] Errore GPS:', e.message);
+        }
+        
+        setTimeout(() => {
+            if (fullscreenMapInstance) {
+                fullscreenMapInstance.invalidateSize();
+                console.log('[Fullscreen] Mappa resized');
+            }
+        }, 500);
+        
+        const resizeHandler = function() {
+            if (fullscreenMapInstance) {
+                fullscreenMapInstance.invalidateSize();
+            }
+        };
+        window.addEventListener('resize', resizeHandler);
+        fullscreenMapInstance._resizeHandler = resizeHandler;
+    }
+
+    function initFullscreenListeners() {
+        if (fsListenersInitialized) return;
+        fsListenersInitialized = true;
+        
+        const closeBtn = document.getElementById('map-fs-close');
+        if (closeBtn) {
+            closeBtn.addEventListener('click', closeFullscreenMap);
+        }
+        
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                const overlay = document.getElementById('map-fullscreen-overlay');
+                if (overlay && overlay.classList.contains('active')) {
+                    closeFullscreenMap();
+                }
+            }
+        });
+        
+        const overlay = document.getElementById('map-fullscreen-overlay');
+        if (overlay) {
+            overlay.addEventListener('click', function(e) {
+                if (e.target === this) closeFullscreenMap();
+            });
+        }
+        
+        console.log('[Fullscreen] Listener inizializzati');
+    }
+
     function renderAll(){
         document.getElementById('header-sub').textContent=tr(headerSubTr.it,headerSubTr.en,headerSubTr.de,headerSubTr.pl);
         document.documentElement.lang=currentLang;
@@ -568,7 +824,7 @@
             gpsContainer.innerHTML='<div class="gps-box"><div class="gps-row"><div class="gps-icon">🧭</div><div class="gps-text"></div><div class="gps-buttons"></div></div></div><div class="gps-icon-overlay" id="gps-overlay-icon">📍</div>';
             if(cardsEl)cardsEl.insertBefore(gpsContainer,cardsEl.firstChild);
             document.getElementById('gps-overlay-icon')?.addEventListener('click',toggleGpsBox);
-            updateGpsUI();setTimeout(initSectionMap,0);
+            updateGpsUI();requestAnimationFrame(initSectionMap);
         }
     }
 
@@ -585,7 +841,6 @@
         document.querySelectorAll('.nav-tile').forEach(btn=>btn.addEventListener('click',function(){goTo(parseInt(this.dataset.index));}));
         const installBtn=document.getElementById('install-btn');
         if(installBtn){installBtn.addEventListener('click',async()=>{if(deferredPrompt){deferredPrompt.prompt();const{outcome}=await deferredPrompt.userChoice;deferredPrompt=null;installBtn.style.display='none';}});if(deferredPrompt)installBtn.style.display='inline-flex';else if(window.matchMedia('(display-mode:standalone)').matches)installBtn.style.display='none';}
-        // #15 mappa statica home
         setTimeout(()=>{
             const mapEl=document.getElementById('home-static-map');
             if(!mapEl||typeof L==='undefined')return;
@@ -593,6 +848,16 @@
             homeStaticMap=L.map('home-static-map',{zoomControl:false,attributionControl:false,dragging:false,scrollWheelZoom:false,doubleClickZoom:false,boxZoom:false,keyboard:false,touchZoom:false});
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19}).addTo(homeStaticMap);
             homeStaticMap.setView([HOME_COORDS.lat,HOME_COORDS.lng],16);
+            
+            // Aggiungi evento click per fullscreen
+            if (homeStaticMap) {
+                homeStaticMap.on('click', function() {
+                    console.log('[Home] Click sulla mappa');
+                    openFullscreenMap();
+                });
+                mapEl.style.cursor = 'pointer';
+            }
+            
             const starIcon=L.divIcon({html:'<div class="map-marker-star" aria-label="Ancona Centro" role="img">★</div>',className:'',iconSize:[28,28],iconAnchor:[14,14]});
             L.marker([HOME_COORDS.lat,HOME_COORDS.lng],{icon:starIcon}).addTo(homeStaticMap).bindPopup('<b style="font-size:.78rem">★ Ancona Centro</b><br><span style="font-size:.68rem">📍 Piazza Roma 3</span>').openPopup();
         },0);
@@ -699,8 +964,26 @@
         leafletMap=L.map('sectionMap',{zoomControl:true,attributionControl:true});
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19}).addTo(leafletMap);
         const bounds=[];
-        valid.forEach((p,idx)=>{const displayNum=getDisplayNumber(p,idx);let markerClass='map-marker-num';if(currentSubItinerary==='cardeto'||currentSubItinerary==='cittadella')markerClass+=' '+currentSubItinerary;if(p.isSubItinerary)markerClass+=' has-sub';const icon=L.divIcon({html:'<div class="'+markerClass+'" aria-label="'+p.name+'" role="img">'+displayNum+'</div>',className:'',iconSize:[24,24],iconAnchor:[12,12],popupAnchor:[0,-14]});const m=L.marker([p.lat,p.lng],{icon:icon}).addTo(leafletMap);m.bindPopup('<b style="font-size:.78rem">'+p.emoji+' '+p.name+'</b><br><span style="font-size:.68rem;color:#888">'+p.dist+'</span>');m.on('click',()=>selectPlaceDetail(idx));bounds.push([p.lat,p.lng]);});
+        valid.forEach((p,idx)=>{const displayNum=getDisplayNumber(p,idx);let markerClass='map-marker-num';if(currentSubItinerary==='cardeto'||currentSubItinerary==='cittadella')markerClass+=' '+currentSubItinerary;if(p.isSubItinerary)markerClass+=' has-sub';const icon=L.divIcon({html:'<div class="'+markerClass+'" aria-label="'+p.name+'" role="img">'+displayNum+'</div>',className:'',iconSize:[24,24],iconAnchor:[12,12],popupAnchor:[0,-14]});const m=L.marker([p.lat,p.lng],{icon:icon}).addTo(leafletMap);m.bindPopup('<b style="font-size:.78rem">'+p.emoji+' '+p.name+'</b><br><span style="font-size:.68rem;color:#888">'+p.dist+'</span>');
+            m.on('click',function(){
+                // Evidenzia il marker selezionato
+                document.querySelectorAll('.map-marker-num').forEach(el=>el.classList.remove('selected'));
+                this.getElement().querySelector('.map-marker-num')?.classList.add('selected');
+                selectPlaceDetail(idx);
+            });
+            bounds.push([p.lat,p.lng]);
+        });
         if(bounds.length)leafletMap.fitBounds(bounds,{padding:[22,22]});
+        
+        // Aggiungi evento click per fullscreen
+        if (leafletMap) {
+            leafletMap.on('click', function() {
+                console.log('[Sezione] Click sulla mappa');
+                openFullscreenMap();
+            });
+            el.style.cursor = 'pointer';
+        }
+        
         const starIcon=L.divIcon({html:'<div class="map-marker-star" aria-label="Ancona Centro" role="img">★</div>',className:'',iconSize:[28,28],iconAnchor:[14,14],popupAnchor:[0,-16]});
         L.marker([HOME_COORDS.lat,HOME_COORDS.lng],{icon:starIcon,zIndexOffset:1000}).addTo(leafletMap).bindPopup('<b style="font-size:.78rem">★ Ancona Centro</b><br><span style="font-size:.68rem;color:#888">📍 Piazza Roma 3</span>');
     }
@@ -717,7 +1000,6 @@
                 });
             });
         }).catch(()=>{});
-        // ricarica se il SW ha preso il controllo durante questa sessione
         let refreshing=false;
         navigator.serviceWorker.addEventListener('controllerchange',()=>{
             if(!refreshing){refreshing=true;window.location.reload();}
@@ -727,27 +1009,25 @@
     window.addEventListener('appinstalled',()=>{deferredPrompt=null;const installBtn=document.getElementById('install-btn');if(installBtn)installBtn.style.display='none';});
     if(window.matchMedia('(display-mode:standalone)').matches){const installBtn=document.getElementById('install-btn');if(installBtn)installBtn.style.display='none';}
     window.addEventListener('load',()=>{const hash=window.location.hash.replace('#','');if(hash&&sectionHashMap[hash]!==undefined)goTo(sectionHashMap[hash]);});
-
-    // #11 popstate per back/forward browser
     window.addEventListener('popstate',()=>{const hash=window.location.hash.replace('#','');if(!hash){if(currentSection!==-1)goTo(-1);}else if(sectionHashMap[hash]!==undefined&&sectionHashMap[hash]!==currentSection)goTo(sectionHashMap[hash]);});
-
-    // #6 Swipe orizzontale tra sezioni
     document.addEventListener('touchstart',(e)=>{swipeStartX=e.touches[0].clientX;},{passive:true});
     document.addEventListener('touchend',(e)=>{
+        // Ignora se il tocco è su una mappa Leaflet
+        if(e.target.closest('.leaflet-container'))return;
         const dx=e.changedTouches[0].clientX-swipeStartX;
         if(Math.abs(dx)<60)return;
-        if(currentPlaceDetail>=0||currentSubItinerary)return; // no swipe in detail/sub
-        // Blocca se il touch è terminato dentro la mappa Leaflet
-        const mapEl=document.getElementById('sectionMap')||document.getElementById('home-static-map');
-        if(mapEl&&mapEl.contains(e.target))return;
-        if(dx<0){// swipe left → sezione successiva
+        if(currentPlaceDetail>=0||currentSubItinerary)return;
+        if(dx<0){
             if(currentSection===-1)goTo(0);
             else if(currentSection<sections.length-1)goTo(currentSection+1);
-        }else{// swipe right → sezione precedente o home
+        }else{
             if(currentSection>0)goTo(currentSection-1);
             else if(currentSection===0)goTo(-1);
         }
     },{passive:true});
+    
+    // Inizializza fullscreen listeners
+    initFullscreenListeners();
     renderAll();
     setTimeout(updateGpsUI,300);
     </script>

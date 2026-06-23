@@ -1,10 +1,10 @@
-// Service Worker per Affittacamere Ancona Centro - Guida Ospiti V4.1.9
+// Service Worker per Affittacamere Ancona Centro - Guida Ospiti V4.2.0
 // FIX CRIT-4: fallback offline restituisce Response valida invece di undefined
 // FIX CRIT-5: cache name allineato alla versione app
 // FIX CRIT-2: strategia HTML cambiata in Stale-While-Revalidate
 // FIX CRIT-5b: aggiunta cache fonts.gstatic.com per woff2
 
-const CACHE_NAME = 'ancona-guida-v4.1.9';
+const CACHE_NAME = 'ancona-guida-v4.2.0';
 const TILES_CACHE_NAME = CACHE_NAME + '-tiles';
 const MAX_TILES = 200;
 

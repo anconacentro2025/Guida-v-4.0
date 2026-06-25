@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- Affittacamere Ancona Centro - Guida Ospiti V4.2.1 | 25/06/26 0910 -->
+<!-- Affittacamere Ancona Centro - Guida Ospiti V4.2.1 | 25/06/26 10:30 -->
 <html lang="it">
 <head>
     <meta charset="UTF-8">
@@ -28,7 +28,7 @@
         body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;-webkit-font-smoothing:antialiased}
         a{color:inherit;text-decoration:none}
         button{font-family:'Outfit',sans-serif;cursor:pointer}
-        .header{background:var(--navy);color:var(--white);position:sticky;top:0;z-index:200;box-shadow:0 2px 20px rgba(0,0,0,.30)}
+        .header{background:var(--navy);color:var(--white);position:sticky;top:0;z-index:200;box-shadow:0 2px 20px rgba(0,0,0,.30);padding-top:env(safe-area-inset-top,0px)}
         .header-inner{display:flex;align-items:center;justify-content:space-between;padding:13px max(28px,calc(env(safe-area-inset-left,0px)+18px));padding-left:max(28px,calc(env(safe-area-inset-left,0px)+18px));padding-right:max(28px,calc(env(safe-area-inset-right,0px)+18px));border-bottom:1px solid rgba(200,164,90,.18)}
         .header-title{font-family:'Cormorant Garamond',serif;font-size:1.25rem;font-weight:600;line-height:1.15;color:var(--white)}
         .header-sub{font-size:.65rem;font-weight:300;opacity:.6;letter-spacing:.1em;text-transform:uppercase;margin-top:1px}
@@ -206,7 +206,7 @@
         /* === MAPPA FULL-SCREEN OVERLAY === */
         .map-fullscreen-overlay{position:fixed;top:0;left:0;width:100vw;height:100vh;background:var(--navy);z-index:9999;display:none;flex-direction:column;opacity:0;transition:opacity .3s ease}
         .map-fullscreen-overlay.active{display:flex;opacity:1}
-        .map-fullscreen-overlay .map-fs-header{display:flex;justify-content:space-between;align-items:center;padding:12px 18px;background:var(--navy);border-bottom:1px solid rgba(200,164,90,.25);flex-shrink:0;z-index:1000;position:relative;pointer-events:auto;isolation:isolate}
+        .map-fullscreen-overlay .map-fs-header{display:flex;justify-content:space-between;align-items:center;padding:12px 18px;padding-top:calc(12px + env(safe-area-inset-top,0px));background:var(--navy);border-bottom:1px solid rgba(200,164,90,.25);flex-shrink:0;z-index:1000;position:relative;pointer-events:auto;isolation:isolate}
         .map-fullscreen-overlay .map-fs-title{font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-weight:600;color:var(--white)}
         .map-fullscreen-overlay .map-fs-close{background:rgba(255,255,255,.12);border:1px solid rgba(200,164,90,.30);color:var(--white);padding:6px 18px;border-radius:22px;font-size:.85rem;font-weight:500;cursor:pointer;transition:all .2s;z-index:1002;position:relative;pointer-events:auto;-webkit-tap-highlight-color:rgba(200,164,90,.3);touch-action:manipulation;-webkit-appearance:none;appearance:none}
         .map-fullscreen-overlay .map-fs-close:hover{background:var(--gold);color:var(--navy)}
@@ -238,7 +238,7 @@
                     <button class="lang-btn" id="btn-de" role="radio" aria-checked="false" aria-label="Deutsch">DE</button>
                     <button class="lang-btn" id="btn-pl" role="radio" aria-checked="false" aria-label="Polski">PL</button>
                 </div>
-                <div class="version-info">V4.2.1 · <span id="release-time">25/06/26 09:10</span></div>
+                <div class="version-info">V4.2.1 · <span id="release-time">25/06/26 10:30</span></div>
             </div>
         </div>
     </header>

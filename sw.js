@@ -5,7 +5,7 @@
 // FIX CRIT-5b: aggiunta cache fonts.gstatic.com per woff2
 // V4.2.1 25/06/26 09:10: postMessage 'SW_UPDATED' quando nuova versione disponibile
 
-const CACHE_NAME = 'ancona-guida-v4.2.1-0910';
+const CACHE_NAME = 'ancona-guida-v4.2.1-1030';
 const TILES_CACHE_NAME = CACHE_NAME + '-tiles';
 const MAX_TILES = 200;
 

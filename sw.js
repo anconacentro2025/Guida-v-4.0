@@ -4,8 +4,10 @@
 // FIX CRIT-2: strategia HTML cambiata in Stale-While-Revalidate
 // FIX CRIT-5b: aggiunta cache fonts.gstatic.com per woff2
 // V4.2.1 25/06/26 09:10: postMessage 'SW_UPDATED' quando nuova versione disponibile
+// FIX #8  V4.2.1 27/06/26: delay 1500ms in notifyClientsUpdated per dare tempo ai client di registrare il listener
+// FIX #10 V4.2.1 27/06/26: tile fallback restituisce 404 senza Content-Type invece di body vuoto con image/png
 
-const CACHE_NAME = 'ancona-guida-v4.2.1-1030';
+const CACHE_NAME = 'ancona-guida-v4.2.1-1610';
 const TILES_CACHE_NAME = CACHE_NAME + '-tiles';
 const MAX_TILES = 200;
 
@@ -39,8 +41,12 @@ async function trimTilesCache() {
     }
 }
 
-// Notifica tutti i client aperti che c'è una nuova versione
+// FIX #8 V4.2.1 27/06/26: delay 1500ms per dare tempo ai client appena caricati
+// di registrare il listener 'message' prima che il messaggio SW_UPDATED venga inviato.
+// Senza delay il messaggio viene spedito durante activate+claim, troppo presto per
+// le pagine che stanno ancora inizializzando il proprio JS.
 async function notifyClientsUpdated() {
+    await new Promise(resolve => setTimeout(resolve, 1500));
     const clients = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
     for (const client of clients) {
         client.postMessage({ type: 'SW_UPDATED', version: CACHE_NAME });
@@ -70,7 +76,6 @@ self.addEventListener('activate', (event) => {
                 })
             );
         }).then(() => self.clients.claim())
-        // Dopo claim() notifica le pagine già aperte che il SW è aggiornato
         .then(() => notifyClientsUpdated())
     );
 });
@@ -114,7 +119,11 @@ self.addEventListener('fetch', (event) => {
                     });
                     return response;
                 }).catch(() => {
-                    return new Response('', { status: 503, headers: { 'Content-Type': 'image/png' } });
+                    // FIX #10 V4.2.1 27/06/26: restituisce 404 senza Content-Type
+                    // invece di body vuoto con 'image/png', che causa errori di decodifica
+                    // PNG in Leaflet. Con 404, Leaflet gestisce il tile mancante con il
+                    // suo fallback nativo senza errori silenziosi nel canvas.
+                    return new Response('', { status: 404 });
                 });
             })
         );

@@ -3,11 +3,11 @@
 // FIX CRIT-5: cache name allineato alla versione app
 // FIX CRIT-2: strategia HTML cambiata in Stale-While-Revalidate
 // FIX CRIT-5b: aggiunta cache fonts.gstatic.com per woff2
-// V4.2.1 25/06/26 09:10: postMessage 'SW_UPDATED' quando nuova versione disponibile
+// V4.2.1 27/06/26 17:30: postMessage 'SW_UPDATED' quando nuova versione disponibile
 // FIX #8  V4.2.1 27/06/26: delay 1500ms in notifyClientsUpdated per dare tempo ai client di registrare il listener
 // FIX #10 V4.2.1 27/06/26: tile fallback restituisce 404 senza Content-Type invece di body vuoto con image/png
 
-const CACHE_NAME = 'ancona-guida-v4.2.1-1610';
+const CACHE_NAME = 'ancona-guida-v4.2.1-1730';
 const TILES_CACHE_NAME = CACHE_NAME + '-tiles';
 const MAX_TILES = 200;
 

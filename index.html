@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- Affittacamere Ancona Centro - Guida Ospiti V4.2.1 | 27/06/26 17:30 -->
+<!-- Affittacamere Ancona Centro - Guida Ospiti V4.2.1 | 27/06/26 18:15 -->
 <html lang="it">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Ancona Centro · Guida Ospiti V4.2.1 27/06/26 17:30</title>
+    <title>Ancona Centro · Guida Ospiti V4.2.1 27/06/26 18:15</title>
     <link rel="manifest" href="./manifest.json">
     <meta name="theme-color" content="#0B1F33">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -13,7 +13,7 @@
     <link rel="apple-touch-icon" sizes="180x180" href="https://raw.githubusercontent.com/anconacentro2025/Guida-v-4.0/main/img/icon-512.png">
     <meta name="apple-mobile-web-app-title" content="Ancona Guide">
     <link rel="icon" type="image/png" sizes="192x192" href="https://raw.githubusercontent.com/anconacentro2025/Guida-v-4.0/main/img/icon-192.png">
-    <meta property="og:title" content="Affittacamere Ancona Centro · Guida V4.2.1 27/06/26 17:30">
+    <meta property="og:title" content="Affittacamere Ancona Centro · Guida V4.2.1 27/06/26 18:15">
     <meta property="og:description" content="La tua guida digitale per scoprire Ancona passo dopo passo. Itinerari consigliati, ristoranti e info utili.">
     <meta property="og:image" content="https://raw.githubusercontent.com/anconacentro2025/Guida-v-4.0/main/img/home.jpg">
     <meta property="og:type" content="website">
@@ -198,10 +198,13 @@
         .home-map-wrap{margin:8px 16px 0;border-radius:10px;overflow:hidden;height:130px;border:1px solid var(--border);box-shadow:var(--shadow);cursor:pointer;transition:transform .2s}
         .home-map-wrap:hover{transform:scale(1.01)}
         .home-map-wrap:active{transform:scale(.98)}
-        .checkout-countdown{background:linear-gradient(135deg,#FEF3C7,#FDE68A);border-radius:10px;padding:10px 14px;margin:8px 16px 0;border:1px solid #F59E0B;display:flex;align-items:center;gap:12px}
-        .countdown-icon{font-size:1.4rem}
-        .countdown-text{font-size:.75rem;color:#92400E;line-height:1.4}
-        .countdown-value{font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-weight:600;color:#78350F}
+        .checkout-countdown{background:linear-gradient(135deg,#FEF3C7,#FDE68A);border-radius:10px;padding:12px 16px;margin:8px 16px 0;border:1px solid #F59E0B;display:flex;align-items:center;gap:0}
+        .countdown-left{flex:1;display:flex;flex-direction:column;gap:1px;padding-right:14px;border-right:1px solid rgba(245,158,11,.4)}
+        .countdown-left-label{font-size:.68rem;color:#92400E;text-transform:uppercase;letter-spacing:.04em;font-weight:500}
+        .countdown-left-date{font-family:'Cormorant Garamond',serif;font-size:1.35rem;font-weight:600;color:#78350F;line-height:1.15;margin-top:1px}
+        .countdown-center{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding-left:14px;gap:1px}
+        .countdown-center-label{font-size:.68rem;color:#92400E;text-transform:uppercase;letter-spacing:.04em;font-weight:500}
+        .countdown-center-value{font-family:'Cormorant Garamond',serif;font-size:1.35rem;font-weight:600;color:#78350F;line-height:1.15}
 
         /* === MAPPA FULL-SCREEN OVERLAY === */
         .map-fullscreen-overlay{position:fixed;top:0;left:0;width:100vw;height:100vh;background:var(--navy);z-index:9999;display:none;flex-direction:column;opacity:0;transition:opacity .3s ease}
@@ -238,7 +241,7 @@
                     <button class="lang-btn" id="btn-de" role="radio" aria-checked="false" aria-label="Deutsch">DE</button>
                     <button class="lang-btn" id="btn-pl" role="radio" aria-checked="false" aria-label="Polski">PL</button>
                 </div>
-                <div class="version-info">V4.2.1 · <span id="release-time">27/06/26 17:30</span></div>
+                <div class="version-info">V4.2.1 · <span id="release-time">27/06/26 18:15</span></div>
             </div>
         </div>
     </header>
@@ -260,7 +263,7 @@
         <div id="fullscreenMap"></div>
     </div>
 
-    <div class="copyright-footer">© 2026 Affittacamere Ancona Centro · Guida V4.2.1 27/06/26 17:30 · All rights reserved</div>
+    <div class="copyright-footer">© 2026 Affittacamere Ancona Centro · Guida V4.2.1 27/06/26 18:15 · All rights reserved</div>
 
     <!-- BANNER AGGIORNAMENTO SW -->
     <div id="sw-update-banner" role="alert" aria-live="polite">
@@ -467,9 +470,28 @@
             const d = Math.floor(diff/86400000);
             const h = Math.floor((diff%86400000)/3600000);
             const m = Math.floor((diff%3600000)/60000);
-            const label = tr('Check-out tra','Check-out in','Check-out in','Wymeldowanie za');
+            // Data leggibile localizzata
+            const months_it=['gennaio','febbraio','marzo','aprile','maggio','giugno','luglio','agosto','settembre','ottobre','novembre','dicembre'];
+            const months_en=['January','February','March','April','May','June','July','August','September','October','November','December'];
+            const months_de=['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
+            const months_pl=['stycznia','lutego','marca','kwietnia','maja','czerwca','lipca','sierpnia','września','października','listopada','grudnia'];
+            const day=target.getDate();
+            const mi=target.getMonth();
+            const dateStr=tr(day+' '+months_it[mi], day+' '+months_en[mi], day+'. '+months_de[mi], day+' '+months_pl[mi]);
+            // Stringa tempo mancante
             const timeStr = d > 0 ? d+'g '+h+'h' : h > 0 ? h+'h '+m+'m' : m+' min';
-            return '<div class="checkout-countdown"><div class="countdown-icon">🧳</div><div class="countdown-text"><div>'+label+'</div><div class="countdown-value">'+timeStr+'</div><div style="font-size:.62rem;margin-top:2px;opacity:.7">'+tr('entro le 11:00','by 11:00','bis 11:00 Uhr','do 11:00')+'</div></div></div>';
+            const labelLeft = tr('Check-out entro le 11:00','Check-out by 11:00','Check-out bis 11:00 Uhr','Wymeldowanie do 11:00');
+            const labelCenter = tr('Mancano','Remaining','Noch','Pozostało');
+            return '<div class="checkout-countdown">'
+                +'<div class="countdown-left">'
+                +'<div class="countdown-left-label">'+labelLeft+'</div>'
+                +'<div class="countdown-left-date">'+dateStr+'</div>'
+                +'</div>'
+                +'<div class="countdown-center">'
+                +'<div class="countdown-center-label">'+labelCenter+'</div>'
+                +'<div class="countdown-center-value">'+timeStr+'</div>'
+                +'</div>'
+                +'</div>';
         } catch(e) { return ''; }
     }
 

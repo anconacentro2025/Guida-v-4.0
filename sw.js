@@ -1,4 +1,4 @@
-// Service Worker per Affittacamere Ancona Centro - Guida Ospiti V4.2.1
+// Service Worker per Affittacamere Ancona Centro - Guida Ospiti V4.2.4
 // FIX CRIT-4: fallback offline restituisce Response valida invece di undefined
 // FIX CRIT-5: cache name allineato alla versione app
 // FIX CRIT-2: strategia HTML cambiata in Stale-While-Revalidate

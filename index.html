@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- Affittacamere Ancona Centro - Guida Ospiti V4.2.4 | 01/07/26 08:00 -->
+<!-- Affittacamere Ancona Centro - Guida Ospiti V4.2.4 | 02/07/26 07:50 -->
 <html lang="it">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Ancona Centro · Guida Ospiti V4.2.4 01/07/26 08:00</title>
+    <title>Ancona Centro · Guida Ospiti V4.2.4 02/07/26 07:50</title>
     <link rel="manifest" href="./manifest.json">
     <meta name="theme-color" content="#0B1F33">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -13,7 +13,7 @@
     <link rel="apple-touch-icon" sizes="180x180" href="https://raw.githubusercontent.com/anconacentro2025/Guida-v-4.0/main/img/icon-512.png">
     <meta name="apple-mobile-web-app-title" content="Ancona Guide">
     <link rel="icon" type="image/png" sizes="192x192" href="https://raw.githubusercontent.com/anconacentro2025/Guida-v-4.0/main/img/icon-192.png">
-    <meta property="og:title" content="Affittacamere Ancona Centro · Guida V4.2.4 01/07/26 08:00">
+    <meta property="og:title" content="Affittacamere Ancona Centro · Guida V4.2.4 02/07/26 07:50">
     <meta property="og:description" content="La tua guida digitale per scoprire Ancona passo dopo passo. Itinerari consigliati, ristoranti e info utili.">
     <meta property="og:image" content="https://raw.githubusercontent.com/anconacentro2025/Guida-v-4.0/main/img/home.jpg">
     <meta property="og:type" content="website">
@@ -244,7 +244,7 @@
                     <button class="lang-btn" id="btn-de" role="radio" aria-checked="false" aria-label="Deutsch">DE</button>
                     <button class="lang-btn" id="btn-pl" role="radio" aria-checked="false" aria-label="Polski">PL</button>
                 </div>
-                <div class="version-info">V4.2.4 · <span id="release-time">01/07/26 08:00</span></div>
+                <div class="version-info">V4.2.4 · <span id="release-time">02/07/26 07:50</span></div>
             </div>
         </div>
     </header>
@@ -266,7 +266,7 @@
         <div id="fullscreenMap"></div>
     </div>
 
-    <div class="copyright-footer">© 2026 Affittacamere Ancona Centro · Guida V4.2.4 01/07/26 08:00 · All rights reserved</div>
+    <div class="copyright-footer">© 2026 Affittacamere Ancona Centro · Guida V4.2.4 02/07/26 07:50 · All rights reserved</div>
 
     <!-- BANNER AGGIORNAMENTO SW -->
     <div id="sw-update-banner" role="alert" aria-live="polite">
@@ -968,7 +968,7 @@
     }
 
     function meteoWidgetHtml(){
-        return '<div class="meteo-widget" id="meteo-widget" style="display:none"><div class="meteo-left"><span class="meteo-icon" id="meteo-icon" aria-hidden="true">🌡️</span><div><div class="meteo-temp" id="meteo-temp">--°</div><div class="meteo-desc" id="meteo-desc">'+tr('Caricamento...','Loading...','Lädt...','Ładowanie...')+'</div></div></div><div class="meteo-right">Ancona<br>'+tr('ora','now','jetzt','teraz')+'</div></div>';
+        return '<a href="https://www.meteoam.it/it/meteo-citta/ancona" target="_blank" rel="noopener noreferrer" class="meteo-widget" id="meteo-widget" style="display:none;text-decoration:none"><div class="meteo-left"><span class="meteo-icon" id="meteo-icon" aria-hidden="true">🌡️</span><div><div class="meteo-temp" id="meteo-temp">--°</div><div class="meteo-desc" id="meteo-desc">'+tr('Caricamento...','Loading...','Lädt...','Ładowanie...')+'</div></div></div><div class="meteo-right">Ancona<br>'+tr('ora','now','jetzt','teraz')+'</div></a>';
     }
 
     function loadMeteoWidget(){
@@ -988,7 +988,7 @@
 
     function renderHome(){
         const cont=document.getElementById('content'),hostImgSrc='https://raw.githubusercontent.com/anconacentro2025/Guida-v-4.0/main/img/host.jpg';
-        const socialHtml='<div class="home-social"><div><div class="home-social-label">Social</div><div class="home-social-links"><a href="'+appData.social.instagram+'" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="Profilo Instagram @anconacentro">📷 Instagram</a><a href="'+appData.social.facebook+'" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="Pagina Facebook">📘 Facebook</a><a href="'+appData.social.signal+'" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="Contatta su Signal">🔒 Signal</a><a href="'+appData.social.telegram+'" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="Contatta su Telegram">✈️ Telegram</a><a href="https://www.meteoam.it/it/meteo-citta/ancona" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="Meteo Ancona">🌤️ Meteo</a></div><div class="home-social-text">'+tr('Informazioni e aggiornamenti costanti sui profili social','Constant information and updates on social profiles','Ständige Informationen und Updates auf den Social-Media-Profilen','Stałe informacje i aktualizacje na profilach społecznościowych')+'</div></div></div>';
+        const socialHtml='<div class="home-social"><div><div class="home-social-label">Social</div><div class="home-social-links"><a href="'+appData.social.instagram+'" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="Profilo Instagram @anconacentro">📷 Instagram</a><a href="'+appData.social.facebook+'" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="Pagina Facebook">📘 Facebook</a><a href="'+appData.social.signal+'" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="Contatta su Signal">🔒 Signal</a><a href="'+appData.social.telegram+'" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="Contatta su Telegram">✈️ Telegram</a></div><div class="home-social-text">'+tr('Informazioni e aggiornamenti costanti sui profili social','Constant information and updates on social profiles','Ständige Informationen und Updates auf den Social-Media-Profilen','Stałe informacje i aktualizacje na profilach społecznościowych')+'</div></div></div>';
         const tiles=sections.map((s,i)=>'<button class="nav-tile" data-index="'+i+'" aria-label="'+tr(s.it,s.en,s.de,s.pl)+'"><div class="nav-tile-icon" aria-hidden="true">'+s.icon+'</div><div class="nav-tile-label">'+tr(s.it,s.en,s.de,s.pl)+'</div></button>').join('');
         const installBtnHtml='<button id="install-btn" class="install-btn" style="display:none">📲 '+tr('Aggiungi alla schermata Home','Add to Home Screen','Zum Startbildschirm hinzufügen','Dodaj do ekranu głównego')+'</button>';
         // I6 V4.2.4 30/06/26: tasto WhatsApp diretto in home, affiancato alla foto di benvenuto,

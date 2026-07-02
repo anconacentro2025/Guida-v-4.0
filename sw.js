@@ -1,14 +1,12 @@
-// Service Worker per Affittacamere Ancona Centro - Guida Ospiti V4.2.4
-// FIX CRIT-4: fallback offline restituisce Response valida invece di undefined
-// FIX CRIT-5: cache name allineato alla versione app
-// FIX CRIT-2: strategia HTML cambiata in Stale-While-Revalidate
-// FIX CRIT-5b: aggiunta cache fonts.gstatic.com per woff2
-// V4.2.1 27/06/26 17:30: postMessage 'SW_UPDATED' quando nuova versione disponibile
-// FIX #8  V4.2.1 27/06/26: delay 1500ms in notifyClientsUpdated per dare tempo ai client di registrare il listener
-// FIX #10 V4.2.1 27/06/26: tile fallback restituisce 404 senza Content-Type invece di body vuoto con image/png
+// Service Worker — Affittacamere Ancona Centro · Guida Ospiti V4.2.4 01/07/26
+// Aggiornamento: flusso updatefound+skipWaiting gestito da index.html (banner)
+// FIX #10: tile fallback 404 invece di body vuoto con image/png
 
-const CACHE_NAME = 'ancona-guida-v4.2.4-0800';
-const TILES_CACHE_NAME = CACHE_NAME + '-tiles';
+// CACHE_NAME non è più hardcoded: viene ricevuto da index.html tramite postMessage
+// {type:'SET_CACHE_NAME', cacheName:'...'} subito dopo la registrazione.
+// Il valore di fallback copre il primo avvio prima che il messaggio arrivi.
+let CACHE_NAME = 'ancona-guida-v4.2.4-0800';
+let TILES_CACHE_NAME = CACHE_NAME + '-tiles';
 const MAX_TILES = 200;
 
 const ASSETS_TO_CACHE = [
@@ -41,17 +39,7 @@ async function trimTilesCache() {
     }
 }
 
-// FIX #8 V4.2.1 27/06/26: delay 1500ms per dare tempo ai client appena caricati
-// di registrare il listener 'message' prima che il messaggio SW_UPDATED venga inviato.
-// Senza delay il messaggio viene spedito durante activate+claim, troppo presto per
-// le pagine che stanno ancora inizializzando il proprio JS.
-async function notifyClientsUpdated() {
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    const clients = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
-    for (const client of clients) {
-        client.postMessage({ type: 'SW_UPDATED', version: CACHE_NAME });
-    }
-}
+
 
 self.addEventListener('install', (event) => {
     event.waitUntil(
@@ -76,7 +64,6 @@ self.addEventListener('activate', (event) => {
                 })
             );
         }).then(() => self.clients.claim())
-        .then(() => notifyClientsUpdated())
     );
 });
 
@@ -186,5 +173,11 @@ self.addEventListener('fetch', (event) => {
 self.addEventListener('message', (event) => {
     if (event.data === 'skipWaiting') {
         self.skipWaiting();
+        return;
+    }
+    // Riceve il CACHE_NAME da index.html — non serve più aggiornare sw.js ad ogni versione
+    if (event.data && event.data.type === 'SET_CACHE_NAME' && event.data.cacheName) {
+        CACHE_NAME = event.data.cacheName;
+        TILES_CACHE_NAME = CACHE_NAME + '-tiles';
     }
 });

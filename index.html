@@ -191,10 +191,7 @@
         .meteo-temp{font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-weight:600;color:var(--gold-2)}
         .meteo-desc{font-size:.65rem;color:rgba(255,255,255,.6);margin-top:1px;text-transform:capitalize}
         .meteo-right{text-align:right;font-size:.62rem;color:rgba(255,255,255,.45)}
-        .market-tip-card{display:flex;align-items:center;gap:10px;background:rgba(212,175,55,.1);border:1px solid rgba(212,175,55,.3);border-radius:10px;padding:10px 14px;margin:8px 16px 0;cursor:pointer;text-align:left}
-        .market-tip-emoji{font-size:1.4rem;flex-shrink:0}
-        .market-tip-title{font-size:.8rem;font-weight:600;color:var(--navy)}
-        .market-tip-sub{font-size:.68rem;color:var(--muted);margin-top:1px}
+
         .dist-sort-btn{display:inline-flex;align-items:center;gap:5px;background:var(--bg);border:1px solid var(--border);color:var(--muted);font-size:.65rem;font-weight:500;padding:4px 10px;border-radius:14px;cursor:pointer;transition:all .2s;margin-bottom:8px}
         .dist-sort-btn.active{background:var(--navy);color:var(--white);border-color:var(--navy)}
         .phrase-row{display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid var(--bg-2)}
@@ -286,6 +283,10 @@
     const HOST_PHONE = '3356750269';
     const HOST_EMAIL = 'anconacentro@yahoo.com';
     const PHOTO_BASE = 'https://raw.githubusercontent.com/anconacentro2025/Guida-v-4.0/main/img/';
+    // Unica fonte di verità per la versione cache.
+    // Aggiornare solo questo valore ad ogni release — il SW lo riceve via postMessage,
+    // non serve più modificare sw.js ad ogni versione.
+    const APP_CACHE_NAME = 'ancona-guida-v4.2.4-0800';
     const HOME_COORDS = { lat: 43.6181895, lng: 13.5129489 };
     const headerSubTr = { it: 'Guida Ospiti · Piazza Roma 3', en: 'Guest Guide · Piazza Roma 3', de: 'Gästeführer · Piazza Roma 3', pl: 'Przewodnik dla gości · Piazza Roma 3' };
     const ANCONA_LAT = 43.6181895, ANCONA_LNG = 13.5129489;
@@ -535,20 +536,6 @@
         renderAll();window.scrollTo({top:0,behavior:'smooth'});
     }
 
-    // I4 V4.2.4 30/06/26: naviga a una sezione per id e seleziona un luogo specifico per nome.
-    // Usa l'id della sezione invece di un indice hardcoded per restare robusta a riordini
-    // futuri dell'array sections. Usata per il link rapido al Mercato delle Erbe dalla home.
-    function goToPlace(sectionId, placeName){
-        const idx=sections.findIndex(s=>s.id===sectionId);
-        if(idx<0)return;
-        goTo(idx);
-        setTimeout(function(){
-            const list=appData[sectionId];
-            if(!Array.isArray(list))return;
-            const pIdx=list.findIndex(p=>p.name===placeName);
-            if(pIdx>=0)selectPlaceDetail(pIdx);
-        },50);
-    }
 
     function selectPlaceDetail(i) {
         const items=currentSubItinerary?(appData.subItineraries[currentSubItinerary]||[]):currentSectionPlaces;
@@ -1010,18 +997,13 @@
         const countdownHtml=getCountdownHtml();
         const meteoHtml=meteoWidgetHtml();
         const staticMapHtml='<div class="home-map-wrap" id="home-static-map"></div>';
-        // I4 V4.2.4 30/06/26: card promozionale per il Mercato delle Erbe, poco visibile finora
-        // perché sepolto dentro la sezione Dintorni. Cliccabile, porta direttamente al dettaglio.
-        const marketTipHtml='<button class="market-tip-card" id="market-tip-btn"><span class="market-tip-emoji" aria-hidden="true">🥬</span><div><div class="market-tip-title">'+tr('A 1 minuto da qui: il Mercato delle Erbe','1 minute away: the Mercato delle Erbe','1 Minute entfernt: der Mercato delle Erbe','1 minuta stąd: Mercato delle Erbe')+'</div><div class="market-tip-sub">'+tr('Mercato storico coperto, solo la mattina (chiuso domenica)','Historic covered market, mornings only (closed Sunday)','Historischer überdachter Markt, nur morgens (sonntags geschlossen)','Historyczny kryty targ, tylko rano (zamknięty w niedzielę)')+'</div></div></button>';
-        const html='<section class="section active"><div class="home-welcome"><div class="home-welcome-left"><img src="'+hostImgSrc+'" alt="Foto dell\'host" class="host-photo" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\';"><div class="host-photo-placeholder" style="display:none">👋</div></div><div class="home-welcome-right"><div class="home-welcome-title">'+tr('Benvenuti!','Welcome!','Willkommen!','Witamy!')+'</div><div class="home-welcome-sub">'+tr('Siamo felici di ospitarvi','We are happy to host you','Wir freuen uns, Sie zu beherbergen','Cieszymy się, że możemy Was gościć')+'</div></div>'+whatsappBtnHtml+'</div>'+installBtnHtml+countdownHtml+meteoHtml+marketTipHtml+socialHtml+staticMapHtml+'<div class="nav-grid">'+tiles+'</div></section>';
+        const html='<section class="section active"><div class="home-welcome"><div class="home-welcome-left"><img src="'+hostImgSrc+'" alt="Foto dell\'host" class="host-photo" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\';"><div class="host-photo-placeholder" style="display:none">👋</div></div><div class="home-welcome-right"><div class="home-welcome-title">'+tr('Benvenuti!','Welcome!','Willkommen!','Witamy!')+'</div><div class="home-welcome-sub">'+tr('Siamo felici di ospitarvi','We are happy to host you','Wir freuen uns, Sie zu beherbergen','Cieszymy się, że możemy Was gościć')+'</div></div>'+whatsappBtnHtml+'</div>'+installBtnHtml+countdownHtml+meteoHtml+socialHtml+staticMapHtml+'<div class="nav-grid">'+tiles+'</div></section>';
         cont.innerHTML=html;
         // FIX #5 V4.2.1 27/06/26: avvia refresh countdown se presente
         if(countdownHtml) startCountdownRefresh(); else clearInterval(_countdownInterval);
         // I1 V4.2.4 30/06/26: carica il meteo in modo asincrono dopo il render
         loadMeteoWidget();
-        // I4 V4.2.4 30/06/26: click sulla card mercato -> naviga a 'around' e apre il dettaglio
-        const marketBtn=document.getElementById('market-tip-btn');
-        if(marketBtn)marketBtn.addEventListener('click',function(){goToPlace('around','Mercato delle Erbe');});
+
         document.querySelectorAll('.nav-tile').forEach(btn=>btn.addEventListener('click',function(){goTo(parseInt(this.dataset.index));}));
         const installBtn=document.getElementById('install-btn');
         if(installBtn){installBtn.addEventListener('click',async()=>{if(deferredPrompt){deferredPrompt.prompt();const{outcome}=await deferredPrompt.userChoice;deferredPrompt=null;installBtn.style.display='none';}});if(deferredPrompt)installBtn.style.display='inline-flex';else if(window.matchMedia('(display-mode:standalone)').matches)installBtn.style.display='none';}
@@ -1216,34 +1198,52 @@
     }
 
     if('serviceWorker' in navigator)window.addEventListener('load',()=>{
-        navigator.serviceWorker.register('./sw.js',{scope:'./'}).catch(()=>{});
+        navigator.serviceWorker.register('./sw.js',{scope:'./'}).then(reg=>{
+            // Invia APP_CACHE_NAME al SW (attivo, in waiting o in installazione)
+            // così sw.js non ha più bisogno del CACHE_NAME hardcoded
+            const sendVersion=sw=>{if(sw)sw.postMessage({type:'SET_CACHE_NAME',cacheName:APP_CACHE_NAME});};
+            sendVersion(reg.active);
+            sendVersion(reg.waiting);
+            sendVersion(reg.installing);
 
-        // Ascolta il messaggio SW_UPDATED inviato dal sw.js dopo activate+claim
-        navigator.serviceWorker.addEventListener('message',(event)=>{
-            if(event.data && event.data.type==='SW_UPDATED'){
-                const banner=document.getElementById('sw-update-banner');
-                const btn=document.getElementById('sw-update-btn');
-                if(banner) banner.classList.add('visible');
-                if(btn){
-                    const _tap=function(e){
-                        e.preventDefault();
-                        btn.removeEventListener('touchend',_tap);
-                        btn.removeEventListener('click',_tap);
-                        window.location.reload();
-                    };
-                    btn.addEventListener('touchend',_tap,{passive:false});
-                    btn.addEventListener('click',_tap);
-                }
-            }
-        });
+            // Mostra banner se c'è già un SW in waiting al momento del caricamento
+            if(reg.waiting) showUpdateBanner(reg.waiting);
 
-        // Fallback: controllerchange per browser che non supportano postMessage dal SW
-        let refreshing=false;
+            reg.addEventListener('updatefound',()=>{
+                const newSW=reg.installing;
+                if(!newSW)return;
+                sendVersion(newSW);
+                newSW.addEventListener('statechange',()=>{
+                    if(newSW.state==='installed'&&navigator.serviceWorker.controller){
+                        showUpdateBanner(newSW);
+                    }
+                });
+            });
+        }).catch(()=>{});
+
+        let _reloading=false;
         navigator.serviceWorker.addEventListener('controllerchange',()=>{
-            // Non ricaricare automaticamente — mostra il banner invece
-            // (il reload automatico è rimosso: disturba l'utente mentre naviga)
+            if(_reloading)return;
+            _reloading=true;
+            window.location.reload();
         });
     });
+
+    function showUpdateBanner(swWaiting){
+        const banner=document.getElementById('sw-update-banner');
+        const btn=document.getElementById('sw-update-btn');
+        if(!banner||!btn)return;
+        banner.classList.add('visible');
+        // Al click: invia skipWaiting al SW in attesa → controllerchange → reload
+        const _tap=function(e){
+            e.preventDefault();
+            btn.removeEventListener('touchend',_tap);
+            btn.removeEventListener('click',_tap);
+            if(swWaiting)swWaiting.postMessage('skipWaiting');
+        };
+        btn.addEventListener('touchend',_tap,{passive:false});
+        btn.addEventListener('click',_tap);
+    }
     window.addEventListener('beforeinstallprompt',(e)=>{e.preventDefault();deferredPrompt=e;const installBtn=document.getElementById('install-btn');if(installBtn)installBtn.style.display='inline-flex';});
     window.addEventListener('appinstalled',()=>{deferredPrompt=null;const installBtn=document.getElementById('install-btn');if(installBtn)installBtn.style.display='none';});
     if(window.matchMedia('(display-mode:standalone)').matches){const installBtn=document.getElementById('install-btn');if(installBtn)installBtn.style.display='none';}

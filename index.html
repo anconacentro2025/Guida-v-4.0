@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- Affittacamere Ancona Centro - Guida Ospiti V4.2.5 | 03/07/26 09:30 -->
+<!-- Affittacamere Ancona Centro - Guida Ospiti V4.2.5 | 03/07/26 09:35 -->
 <html lang="it">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Ancona Centro · Guida Ospiti V4.2.5 03/07/26 09:30</title>
+    <title>Ancona Centro · Guida Ospiti V4.2.5 03/07/26 09:35</title>
     <link rel="manifest" href="./manifest.json">
     <meta name="theme-color" content="#0B1F33">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -13,7 +13,7 @@
     <link rel="apple-touch-icon" sizes="180x180" href="https://raw.githubusercontent.com/anconacentro2025/Guida-v-4.0/main/img/icon-512.png">
     <meta name="apple-mobile-web-app-title" content="Ancona Guide">
     <link rel="icon" type="image/png" sizes="192x192" href="https://raw.githubusercontent.com/anconacentro2025/Guida-v-4.0/main/img/icon-192.png">
-    <meta property="og:title" content="Affittacamere Ancona Centro · Guida V4.2.5 03/07/26 09:30">
+    <meta property="og:title" content="Affittacamere Ancona Centro · Guida V4.2.5 03/07/26 09:35">
     <meta property="og:description" content="La tua guida digitale per scoprire Ancona passo dopo passo. Itinerari consigliati, ristoranti e info utili.">
     <meta property="og:image" content="https://raw.githubusercontent.com/anconacentro2025/Guida-v-4.0/main/img/home.jpg">
     <meta property="og:type" content="website">
@@ -34,9 +34,14 @@
         .header-sub{font-size:.65rem;font-weight:300;opacity:.6;letter-spacing:.1em;text-transform:uppercase;margin-top:1px}
         .header-cin{font-size:.6rem;font-weight:300;opacity:.5;letter-spacing:.05em;margin-top:2px;color:var(--gold-3)}
         .header-right{text-align:center}
-        .lang-toggle{display:flex;background:rgba(255,255,255,.08);border-radius:22px;overflow:hidden;border:1px solid rgba(200,164,90,.30);justify-content:center}
-        .lang-btn{padding:5px 11px;font-size:.68rem;font-weight:500;border:none;background:transparent;color:rgba(255,255,255,.55);transition:all .2s}
-        .lang-btn.active{background:var(--gold);color:var(--navy);font-weight:600}
+        .lang-picker{position:relative;display:inline-block}
+        .lang-current{font-size:1.4rem;background:rgba(255,255,255,.08);border:1px solid rgba(200,164,90,.30);border-radius:10px;padding:4px 8px;cursor:pointer;line-height:1;display:flex;align-items:center;gap:4px}
+        .lang-current::after{content:'▾';font-size:.55rem;color:rgba(255,255,255,.5);margin-top:1px}
+        .lang-dropdown{display:none;position:absolute;right:0;top:calc(100% + 6px);background:var(--navy);border:1px solid rgba(200,164,90,.35);border-radius:10px;overflow:hidden;z-index:999;min-width:44px;box-shadow:0 4px 16px rgba(0,0,0,.35)}
+        .lang-dropdown.open{display:block}
+        .lang-option{display:flex;align-items:center;gap:8px;padding:9px 14px;font-size:1.1rem;cursor:pointer;white-space:nowrap;color:rgba(255,255,255,.75);font-size:.8rem}
+        .lang-option:hover,.lang-option.active{background:rgba(200,164,90,.2);color:var(--white)}
+        .lang-option-flag{font-size:1.2rem;line-height:1}
         .version-info{font-size:.55rem;color:var(--gold-3);text-align:center;margin-top:4px;opacity:.6;letter-spacing:.05em}
         .hero{width:100%;height:320px;overflow:hidden;position:relative;background:linear-gradient(160deg,var(--navy) 0%,var(--navy-2) 50%,var(--navy-3) 100%);transition:height .3s ease}
         .hero.section-mode{height:68px}
@@ -238,13 +243,16 @@
                 <div class="header-cin">CIN: IT042002C2QZRH9TPJ</div>
             </div>
             <div class="header-right">
-                <div class="lang-toggle" role="radiogroup" aria-label="Selezione lingua">
-                    <button class="lang-btn active" id="btn-it" role="radio" aria-checked="true" aria-label="Italiano">IT</button>
-                    <button class="lang-btn" id="btn-en" role="radio" aria-checked="false" aria-label="English">EN</button>
-                    <button class="lang-btn" id="btn-de" role="radio" aria-checked="false" aria-label="Deutsch">DE</button>
-                    <button class="lang-btn" id="btn-pl" role="radio" aria-checked="false" aria-label="Polski">PL</button>
+                <div class="lang-picker" id="lang-picker" aria-label="Selezione lingua">
+                    <button class="lang-current" id="lang-current-btn" aria-haspopup="true" aria-expanded="false" aria-label="Cambia lingua">🇮🇹</button>
+                    <div class="lang-dropdown" id="lang-dropdown" role="listbox">
+                        <div class="lang-option active" data-lang="it" role="option"><span class="lang-option-flag">🇮🇹</span>Italiano</div>
+                        <div class="lang-option" data-lang="en" role="option"><span class="lang-option-flag">🇬🇧</span>English</div>
+                        <div class="lang-option" data-lang="de" role="option"><span class="lang-option-flag">🇩🇪</span>Deutsch</div>
+                        <div class="lang-option" data-lang="pl" role="option"><span class="lang-option-flag">🇵🇱</span>Polski</div>
+                    </div>
                 </div>
-                <div class="version-info">V4.2.5 · <span id="release-time">03/07/26 09:30</span></div>
+                <div class="version-info">V4.2.5 · <span id="release-time">03/07/26 09:35</span></div>
             </div>
         </div>
     </header>
@@ -266,7 +274,7 @@
         <div id="fullscreenMap"></div>
     </div>
 
-    <div class="copyright-footer">© 2026 Affittacamere Ancona Centro · Guida V4.2.5 03/07/26 09:30 · All rights reserved</div>
+    <div class="copyright-footer">© 2026 Affittacamere Ancona Centro · Guida V4.2.5 03/07/26 09:35 · All rights reserved</div>
 
     <!-- BANNER AGGIORNAMENTO SW -->
     <div id="sw-update-banner" role="alert" aria-live="polite">
@@ -466,13 +474,59 @@
         if (urlLang && valid.includes(urlLang)) currentLang = urlLang;
         else if (stored && valid.includes(stored)) currentLang = stored;
     } catch(e) {}
+    // Applica la lingua iniziale al picker prima del primo render
+    (function(){
+        const btn=document.getElementById('lang-current-btn');
+        if(btn&&LANG_FLAGS[currentLang]) btn.textContent=LANG_FLAGS[currentLang];
+        document.querySelectorAll('.lang-option').forEach(opt=>{
+            opt.classList.toggle('active', opt.dataset.lang===currentLang);
+        });
+        document.documentElement.lang=currentLang;
+    })();
 
     function tr(it, en, de, pl) {
         const val = (currentLang === 'en') ? (en || it) : (currentLang === 'de') ? (de || en || it) : (currentLang === 'pl') ? (pl || en || it) : it;
         return val || '';
     }
-    function setLang(lang) { currentLang=lang; document.documentElement.lang=lang; try{localStorage.setItem('guida_lang',lang);}catch(e){} document.querySelectorAll('.lang-btn').forEach(btn=>{ const isActive=btn.id==='btn-'+lang; btn.classList.toggle('active',isActive); btn.setAttribute('aria-checked',isActive?'true':'false'); }); if(leafletMap){leafletMap.remove();leafletMap=null;} if(homeStaticMap){homeStaticMap.remove();homeStaticMap=null;} /* FIX B2 V4.2.3 30/06/26: distrugge anche homeStaticMap, non solo leafletMap, per evitare istanza orfana dopo cambio lingua */ _rf_lang=null; /* FIX #A: invalida dirty flag per forzare re-render */ renderAll(); }
-    document.querySelectorAll('.lang-btn').forEach(btn => { btn.addEventListener('click', function() { setLang(this.id.replace('btn-', '')); }); });
+    const LANG_FLAGS = {it:'🇮🇹', en:'🇬🇧', de:'🇩🇪', pl:'🇵🇱'};
+    function setLang(lang) {
+        currentLang=lang; document.documentElement.lang=lang;
+        try{localStorage.setItem('guida_lang',lang);}catch(e){}
+        // Aggiorna bandiera corrente nel picker
+        const currentBtn=document.getElementById('lang-current-btn');
+        if(currentBtn) currentBtn.textContent=LANG_FLAGS[lang]||lang.toUpperCase();
+        // Aggiorna stato active nelle opzioni dropdown
+        document.querySelectorAll('.lang-option').forEach(opt=>{
+            opt.classList.toggle('active', opt.dataset.lang===lang);
+        });
+        // Chiude il dropdown
+        const dd=document.getElementById('lang-dropdown');
+        if(dd) dd.classList.remove('open');
+        const cb=document.getElementById('lang-current-btn');
+        if(cb) cb.setAttribute('aria-expanded','false');
+        if(leafletMap){leafletMap.remove();leafletMap=null;}
+        if(homeStaticMap){homeStaticMap.remove();homeStaticMap=null;}
+        _rf_lang=null;
+        renderAll();
+    }
+    // Toggle dropdown al click sulla bandiera corrente
+    document.getElementById('lang-current-btn').addEventListener('click', function(e){
+        e.stopPropagation();
+        const dd=document.getElementById('lang-dropdown');
+        const isOpen=dd.classList.toggle('open');
+        this.setAttribute('aria-expanded', isOpen?'true':'false');
+    });
+    // Selezione lingua dal dropdown
+    document.querySelectorAll('.lang-option').forEach(opt=>{
+        opt.addEventListener('click', function(){ setLang(this.dataset.lang); });
+    });
+    // Chiudi dropdown cliccando fuori
+    document.addEventListener('click', function(){
+        const dd=document.getElementById('lang-dropdown');
+        if(dd) dd.classList.remove('open');
+        const cb=document.getElementById('lang-current-btn');
+        if(cb) cb.setAttribute('aria-expanded','false');
+    });
 
     // Item 4 V4.2.1: controllo query undefined/null prima di encodeURIComponent
     function getMapLink(query, noSuffix) { if (!query || typeof query !== 'string') return '#'; const q = noSuffix ? query : query + ', Ancona Italia'; return 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(q); }

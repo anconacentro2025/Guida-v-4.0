@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- Affittacamere Ancona Centro - Guida Ospiti V4.2.4 | 02/07/26 07:50 -->
+<!-- Affittacamere Ancona Centro - Guida Ospiti V4.2.5 | 03/07/26 09:30 -->
 <html lang="it">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Ancona Centro · Guida Ospiti V4.2.4 02/07/26 07:50</title>
+    <title>Ancona Centro · Guida Ospiti V4.2.5 03/07/26 09:30</title>
     <link rel="manifest" href="./manifest.json">
     <meta name="theme-color" content="#0B1F33">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -13,7 +13,7 @@
     <link rel="apple-touch-icon" sizes="180x180" href="https://raw.githubusercontent.com/anconacentro2025/Guida-v-4.0/main/img/icon-512.png">
     <meta name="apple-mobile-web-app-title" content="Ancona Guide">
     <link rel="icon" type="image/png" sizes="192x192" href="https://raw.githubusercontent.com/anconacentro2025/Guida-v-4.0/main/img/icon-192.png">
-    <meta property="og:title" content="Affittacamere Ancona Centro · Guida V4.2.4 02/07/26 07:50">
+    <meta property="og:title" content="Affittacamere Ancona Centro · Guida V4.2.5 03/07/26 09:30">
     <meta property="og:description" content="La tua guida digitale per scoprire Ancona passo dopo passo. Itinerari consigliati, ristoranti e info utili.">
     <meta property="og:image" content="https://raw.githubusercontent.com/anconacentro2025/Guida-v-4.0/main/img/home.jpg">
     <meta property="og:type" content="website">
@@ -244,7 +244,7 @@
                     <button class="lang-btn" id="btn-de" role="radio" aria-checked="false" aria-label="Deutsch">DE</button>
                     <button class="lang-btn" id="btn-pl" role="radio" aria-checked="false" aria-label="Polski">PL</button>
                 </div>
-                <div class="version-info">V4.2.4 · <span id="release-time">02/07/26 07:50</span></div>
+                <div class="version-info">V4.2.5 · <span id="release-time">03/07/26 09:30</span></div>
             </div>
         </div>
     </header>
@@ -266,7 +266,7 @@
         <div id="fullscreenMap"></div>
     </div>
 
-    <div class="copyright-footer">© 2026 Affittacamere Ancona Centro · Guida V4.2.4 02/07/26 07:50 · All rights reserved</div>
+    <div class="copyright-footer">© 2026 Affittacamere Ancona Centro · Guida V4.2.5 03/07/26 09:30 · All rights reserved</div>
 
     <!-- BANNER AGGIORNAMENTO SW -->
     <div id="sw-update-banner" role="alert" aria-live="polite">
@@ -286,7 +286,7 @@
     // Unica fonte di verità per la versione cache.
     // Aggiornare solo questo valore ad ogni release — il SW lo riceve via postMessage,
     // non serve più modificare sw.js ad ogni versione.
-    const APP_CACHE_NAME = 'ancona-guida-v4.2.4-0800';
+    const APP_CACHE_NAME = 'ancona-guida-v4.2.5-0800';
     const HOME_COORDS = { lat: 43.6181895, lng: 13.5129489 };
     const headerSubTr = { it: 'Guida Ospiti · Piazza Roma 3', en: 'Guest Guide · Piazza Roma 3', de: 'Gästeführer · Piazza Roma 3', pl: 'Przewodnik dla gości · Piazza Roma 3' };
     const ANCONA_LAT = 43.6181895, ANCONA_LNG = 13.5129489;
@@ -420,6 +420,8 @@
             { name:'Sirolo e Numana', emoji:'🏖️', photo:'sirolo.jpg', it:'Perle del Conero, spiagge tra le più belle delle Marche.', en:'Gems of the Conero, among the most beautiful beaches in Marche.', de:'Perlen des Conero, mit die schönsten Strände der Marken.', pl:'Perły Conero, jedne z najpiękniejszych plaż w Marchii.', dist:'🚗 14 km – 21 min', mapQuery:'Sirolo AN', lat:43.5231225, lng:13.6200824 },
             { name:'Offagna', emoji:'🏰', photo:'offagna.jpg', it:'Piccolo borgo medievale con rocca visitabile, panorama sulla campagna marchigiana. A luglio e agosto ospita la Festa Medievale, tra le più suggestive della regione.', en:'Small medieval village with a fortress open to visitors, views over the Marche countryside. In July and August it hosts the Medieval Festival, among the most evocative in the region.', de:'Kleines mittelalterliches Dorf mit besichtigbarer Festung, Blick über die Landschaft der Marken. Im Juli und August findet hier das Mittelalterfest statt, eines der eindrucksvollsten der Region.', pl:'Małe średniowieczne miasteczko z zamkiem dostępnym do zwiedzania, widok na wieś marchijską. W lipcu i sierpniu odbywa się tu Festiwal Średniowieczny, jeden z najbardziej sugestywnych w regionie.', dist:'🚗 12 km – 18 min', mapQuery:'Offagna Ancona', lat:43.5274876, lng:13.4412360 },
             { name:'Loreto', emoji:'⛪', photo:'loreto.jpg', it:'Santuario della Santa Casa, mèta di pellegrinaggio. Raggiungibile anche in treno da Ancona in circa 20 minuti.', en:'Sanctuary of the Holy House, pilgrimage destination. Also reachable by train from Ancona in about 20 minutes.', de:'Heiligtum des Heiligen Hauses, Pilgerziel. Auch mit dem Zug von Ancona in etwa 20 Minuten erreichbar.', pl:'Sanktuarium Świętego Domu, miejsce pielgrzymek. Dostępne również pociągiem z Ankony w około 20 minut.', dist:'🚗 21 km – 32 min', mapQuery:'Loreto AN', lat:43.4411021, lng:13.6094860 },
+            { name:'Senigallia', emoji:'🏖️', photo:'', it:'Cittadina balneare famosa per la Spiaggia di Velluto, sabbia finissima unica sull\'Adriatico. Centro storico con la Rocca Roveresca (XV sec.) e il porto canale. In estate ospita il Summer Jamboree, festival internazionale di musica e cultura anni \'40–\'50 tra i più grandi d\'Europa.', en:'Seaside town famous for the Velvet Beach, the finest sand on the Adriatic. Historic centre with the 15th-century Rocca Roveresca and the canal port. In summer it hosts the Summer Jamboree, one of Europe\'s largest international 1940s–50s music and culture festivals.', de:'Küstenstadt, bekannt für den Samtenen Strand, den feinsten Sand an der Adria. Historisches Zentrum mit der Rocca Roveresca (15. Jh.) und dem Kanalhafen. Im Sommer findet hier das Summer Jamboree statt, eines der größten internationalen Musik- und Kulturfestivals der 1940er–50er Jahre in Europa.', pl:'Nadmorskie miasto słynące z Aksamitnej Plaży, najdrobniejszego piasku na Adriatyku. Historyczne centrum z Rocca Roveresca (XV w.) i portem kanałowym. Latem odbywa się tu Summer Jamboree, jeden z największych europejskich festiwali muzyki i kultury lat 40.–50.', dist:'🚗 30 km – 30 min', mapQuery:'Senigallia', lat:43.7163, lng:13.2088 },
+            { name:'Jesi', emoji:'🏛️', photo:'', it:'Città medievale nell\'entroterra marchigiano, patria di Federico II di Svevia (1194) e del compositore Giovanni Battista Pergolesi. Le mura medievali sono tra le meglio conservate delle Marche. Rinomata per il Verdicchio dei Castelli di Jesi, uno dei bianchi più pregiati d\'Italia.', en:'Medieval city in the Marche hinterland, birthplace of Frederick II of Swabia (1194) and composer Giovanni Battista Pergolesi. The medieval walls are among the best preserved in the Marche. Renowned for Verdicchio dei Castelli di Jesi, one of Italy\'s finest white wines.', de:'Mittelalterliche Stadt im Hinterland der Marken, Geburtsort Friedrichs II. von Schwaben (1194) und des Komponisten Giovanni Battista Pergolesi. Die mittelalterlichen Stadtmauern gehören zu den besterhaltenen der Marken. Bekannt für den Verdicchio dei Castelli di Jesi, einen der edelsten Weißweine Italiens.', pl:'Średniowieczne miasto w głębi Marchii, rodzinne miasto Fryderyka II Hohenstaufa (1194) i kompozytora Giovanniego Battisty Pergolesiego. Średniowieczne mury należą do najlepiej zachowanych w Marchii. Słynie z Verdicchio dei Castelli di Jesi, jednego z najszlachetniejszych białych win Włoch.', dist:'🚗 30 km – 35 min', mapQuery:'Jesi AN', lat:43.52048, lng:13.23773 },
             { name:'Recanati', emoji:'📖', photo:'recanati.jpg', it:'Città di Leopardi, centro storico intatto.', en:'Birthplace of Giacomo Leopardi, Italy\'s greatest Romantic poet, born here in 1798. The historic centre is beautifully preserved.', de:'Geburtsstadt von Giacomo Leopardi, dem größten italienischen Dichter der Romantik, geboren hier 1798. Der historische Stadtkern ist wunderschön erhalten.', pl:'Miasto rodzinne Giacoma Leopardiego, największego włoskiego poety romantycznego, urodzonego tu w 1798 roku. Pięknie zachowane historyczne centrum.', dist:'🚗 25 km – 38 min', mapQuery:'Recanati', lat:43.3980809, lng:13.5518423 }
         ],
         marche: [
@@ -899,7 +901,7 @@
         nav.style.display='flex';
         nav.innerHTML=sections.map((s,i)=>'<button class="nav-pill'+(i===currentSection?' active':'')+'" data-index="'+i+'" role="tab" aria-selected="'+(i===currentSection?'true':'false')+'">'+s.icon+' '+tr(s.it,s.en,s.de,s.pl)+'</button>').join('');
         nav.querySelectorAll('.nav-pill').forEach(btn=>btn.addEventListener('click',function(){
-            // U2 V4.2.4 01/07/26: feedback immediato al click — riduce opacità del contenuto
+            // U2 V4.2.5 01/07/26: feedback immediato al click — riduce opacità del contenuto
             // corrente prima che renderAll scriva nel DOM, eliminando la latenza percepita
             const cont=document.getElementById('content');
             if(cont)cont.style.opacity='0.4';
@@ -919,7 +921,7 @@
         }
     }
 
-    // I1 V4.2.4 30/06/26: meteo inline tramite Open-Meteo (gratuito, nessuna API key richiesta)
+    // I1 V4.2.5 30/06/26: meteo inline tramite Open-Meteo (gratuito, nessuna API key richiesta)
     // Mappa i WMO weather code (standard meteorologico usato da Open-Meteo) a emoji e testo IT/EN/DE/PL
     const WMO_CODE_MAP = {
         0:{emoji:'☀️',it:'Sereno',en:'Clear sky',de:'Klarer Himmel',pl:'Bezchmurnie'},
@@ -991,7 +993,7 @@
         const socialHtml='<div class="home-social"><div><div class="home-social-label">Social</div><div class="home-social-links"><a href="'+appData.social.instagram+'" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="Profilo Instagram @anconacentro">📷 Instagram</a><a href="'+appData.social.facebook+'" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="Pagina Facebook">📘 Facebook</a><a href="'+appData.social.signal+'" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="Contatta su Signal">🔒 Signal</a><a href="'+appData.social.telegram+'" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="Contatta su Telegram">✈️ Telegram</a></div><div class="home-social-text">'+tr('Informazioni e aggiornamenti costanti sui profili social','Constant information and updates on social profiles','Ständige Informationen und Updates auf den Social-Media-Profilen','Stałe informacje i aktualizacje na profilach społecznościowych')+'</div></div></div>';
         const tiles=sections.map((s,i)=>'<button class="nav-tile" data-index="'+i+'" aria-label="'+tr(s.it,s.en,s.de,s.pl)+'"><div class="nav-tile-icon" aria-hidden="true">'+s.icon+'</div><div class="nav-tile-label">'+tr(s.it,s.en,s.de,s.pl)+'</div></button>').join('');
         const installBtnHtml='<button id="install-btn" class="install-btn" style="display:none">📲 '+tr('Aggiungi alla schermata Home','Add to Home Screen','Zum Startbildschirm hinzufügen','Dodaj do ekranu głównego')+'</button>';
-        // I6 V4.2.4 30/06/26: tasto WhatsApp diretto in home, affiancato alla foto di benvenuto,
+        // I6 V4.2.5 30/06/26: tasto WhatsApp diretto in home, affiancato alla foto di benvenuto,
         // per ridurre le domande perse da chi naviga solo la home senza esplorare Contatti
         const whatsappBtnHtml='<a href="https://wa.me/39'+HOST_PHONE+'" target="_blank" rel="noopener noreferrer" class="home-whatsapp-btn" aria-label="Contatta l\'host su WhatsApp">💬 '+tr('Scrivici','Message us','Schreiben','Napisz')+'</a>';
         const countdownHtml=getCountdownHtml();
@@ -1001,7 +1003,7 @@
         cont.innerHTML=html;
         // FIX #5 V4.2.1 27/06/26: avvia refresh countdown se presente
         if(countdownHtml) startCountdownRefresh(); else clearInterval(_countdownInterval);
-        // I1 V4.2.4 30/06/26: carica il meteo in modo asincrono dopo il render
+        // I1 V4.2.5 30/06/26: carica il meteo in modo asincrono dopo il render
         loadMeteoWidget();
 
         document.querySelectorAll('.nav-tile').forEach(btn=>btn.addEventListener('click',function(){goTo(parseInt(this.dataset.index));}));
@@ -1039,7 +1041,7 @@
     }
 
     function starBtnHtml(){
-        // U3 V4.2.4 01/07/26: usa sempre la distanza fissa da HOME_COORDS per decidere se
+        // U3 V4.2.5 01/07/26: usa sempre la distanza fissa da HOME_COORDS per decidere se
         // mostrare il tasto ★, non _dist che viene ricalcolato dal GPS quando distSortActive=true.
         // Senza questo fix il tasto spariva se l'utente era fuori Ancona con distSort attivo,
         // proprio quando il tasto "centra su Ancona" sarebbe stato più utile.

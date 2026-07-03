@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- Affittacamere Ancona Centro - Guida Ospiti V4.2.5 | 03/07/26 09:30 -->
+<!-- Affittacamere Ancona Centro - Guida Ospiti V4.2.5 | 03/07/26 23:00 -->
 <html lang="it">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Ancona Centro · Guida Ospiti V4.2.5 03/07/26 09:30</title>
+    <title>Ancona Centro · Guida Ospiti V4.2.5 03/07/26 23:00</title>
     <link rel="manifest" href="./manifest.json">
     <meta name="theme-color" content="#0B1F33">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -13,7 +13,7 @@
     <link rel="apple-touch-icon" sizes="180x180" href="https://raw.githubusercontent.com/anconacentro2025/Guida-v-4.0/main/img/icon-512.png">
     <meta name="apple-mobile-web-app-title" content="Ancona Guide">
     <link rel="icon" type="image/png" sizes="192x192" href="https://raw.githubusercontent.com/anconacentro2025/Guida-v-4.0/main/img/icon-192.png">
-    <meta property="og:title" content="Affittacamere Ancona Centro · Guida V4.2.5 03/07/26 09:30">
+    <meta property="og:title" content="Affittacamere Ancona Centro · Guida V4.2.5 03/07/26 23:00">
     <meta property="og:description" content="La tua guida digitale per scoprire Ancona passo dopo passo. Itinerari consigliati, ristoranti e info utili.">
     <meta property="og:image" content="https://raw.githubusercontent.com/anconacentro2025/Guida-v-4.0/main/img/home.jpg">
     <meta property="og:type" content="website">
@@ -186,6 +186,11 @@
         .hours-badge.holiday{background:#FEF3C7;color:#92400E}
         .hours-text{font-size:.68rem;color:var(--muted);margin-top:2px}
         .meteo-widget{background:linear-gradient(135deg,var(--navy-2) 0%,var(--navy-3) 100%);border-radius:10px;padding:10px 14px;margin:8px 16px 0;display:flex;align-items:center;justify-content:space-between;border:1px solid rgba(200,164,90,.25);color:var(--white);min-height:48px}
+        .cultura2028-banner{display:flex;align-items:center;gap:12px;background:linear-gradient(135deg,#0B1F33 0%,#1a3a5c 100%);border-radius:10px;padding:11px 14px;margin:8px 16px 0;border:1px solid rgba(200,164,90,.45);text-decoration:none;color:var(--white)}
+        .cultura2028-emoji{font-size:1.6rem;flex-shrink:0}
+        .cultura2028-title{font-family:'Cormorant Garamond',serif;font-size:1rem;font-weight:600;color:var(--gold);line-height:1.2}
+        .cultura2028-sub{font-size:.67rem;color:rgba(255,255,255,.6);margin-top:2px}
+        .cultura2028-arrow{margin-left:auto;font-size:.8rem;color:rgba(200,164,90,.6);flex-shrink:0}
         .meteo-left{display:flex;align-items:center;gap:10px}
         .meteo-icon{font-size:1.6rem}
         .meteo-temp{font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-weight:600;color:var(--gold-2)}
@@ -244,7 +249,7 @@
                     <button class="lang-btn" id="btn-de" role="radio" aria-checked="false" aria-label="Deutsch">DE</button>
                     <button class="lang-btn" id="btn-pl" role="radio" aria-checked="false" aria-label="Polski">PL</button>
                 </div>
-                <div class="version-info">V4.2.5 · <span id="release-time">03/07/26 09:30</span></div>
+                <div class="version-info">V4.2.5 · <span id="release-time">03/07/26 23:00</span></div>
             </div>
         </div>
     </header>
@@ -266,7 +271,7 @@
         <div id="fullscreenMap"></div>
     </div>
 
-    <div class="copyright-footer">© 2026 Affittacamere Ancona Centro · Guida V4.2.5 03/07/26 09:30 · All rights reserved</div>
+    <div class="copyright-footer">© 2026 Affittacamere Ancona Centro · Guida V4.2.5 03/07/26 23:00 · All rights reserved</div>
 
     <!-- BANNER AGGIORNAMENTO SW -->
     <div id="sw-update-banner" role="alert" aria-live="polite">
@@ -999,8 +1004,9 @@
         const whatsappBtnHtml='<a href="https://wa.me/39'+HOST_PHONE+'" target="_blank" rel="noopener noreferrer" class="home-whatsapp-btn" aria-label="Contatta l\'host su WhatsApp">💬 '+tr('Scrivici','Message us','Schreiben','Napisz')+'</a>';
         const countdownHtml=getCountdownHtml();
         const meteoHtml=meteoWidgetHtml();
+        const culturaHtml='<a href="https://ancona2028.it" target="_blank" rel="noopener noreferrer" class="cultura2028-banner"><span class="cultura2028-emoji" aria-hidden="true">🏛️</span><div><div class="cultura2028-title">Ancona Capitale della Cultura 2028</div><div class="cultura2028-sub">'+tr('Scopri il programma ufficiale','Discover the official programme','Das offizielle Programm entdecken','Odkryj oficjalny program')+'</div></div><span class="cultura2028-arrow">↗</span></a>';
         const staticMapHtml='<div class="home-map-wrap" id="home-static-map"></div>';
-        const html='<section class="section active"><div class="home-welcome"><div class="home-welcome-left"><img src="'+hostImgSrc+'" alt="Foto dell\'host" class="host-photo" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\';"><div class="host-photo-placeholder" style="display:none">👋</div></div><div class="home-welcome-right"><div class="home-welcome-title">'+tr('Benvenuti!','Welcome!','Willkommen!','Witamy!')+'</div><div class="home-welcome-sub">'+tr('Siamo felici di ospitarvi','We are happy to host you','Wir freuen uns, Sie zu beherbergen','Cieszymy się, że możemy Was gościć')+'</div></div>'+whatsappBtnHtml+'</div>'+installBtnHtml+countdownHtml+meteoHtml+socialHtml+staticMapHtml+'<div class="nav-grid">'+tiles+'</div></section>';
+        const html='<section class="section active"><div class="home-welcome"><div class="home-welcome-left"><img src="'+hostImgSrc+'" alt="Foto dell\'host" class="host-photo" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\';"><div class="host-photo-placeholder" style="display:none">👋</div></div><div class="home-welcome-right"><div class="home-welcome-title">'+tr('Benvenuti!','Welcome!','Willkommen!','Witamy!')+'</div><div class="home-welcome-sub">'+tr('Siamo felici di ospitarvi','We are happy to host you','Wir freuen uns, Sie zu beherbergen','Cieszymy się, że możemy Was gościć')+'</div></div>'+whatsappBtnHtml+'</div>'+installBtnHtml+countdownHtml+meteoHtml+culturaHtml+socialHtml+staticMapHtml+'<div class="nav-grid">'+tiles+'</div></section>';
         cont.innerHTML=html;
         // FIX #5 V4.2.1 27/06/26: avvia refresh countdown se presente
         if(countdownHtml) startCountdownRefresh(); else clearInterval(_countdownInterval);

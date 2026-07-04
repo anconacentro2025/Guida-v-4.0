@@ -1,5 +1,5 @@
-// Service Worker — Affittacamere Ancona Centro · Guida Ospiti V4.2.4 01/07/26
-// Aggiornamento: flusso updatefound+skipWaiting gestito da index.html (banner)
+// Service Worker — Affittacamere Ancona Centro · Guida Ospiti V4.2.5 04/07/26
+// Aggiornamento: strategia HTML cambiata in Network-First per aggiornamenti immediati
 // FIX #10: tile fallback 404 invece di body vuoto con image/png
 
 // CACHE_NAME non è più hardcoded: viene ricevuto da index.html tramite postMessage
@@ -75,20 +75,18 @@ self.addEventListener('fetch', (event) => {
     if (url.hostname.includes('google-analytics.com') ||
         url.hostname.includes('facebook.com/tr')) return;
 
-    // HTML: Stale-While-Revalidate — serve cache subito, aggiorna in background
+    // HTML: Network-First — prova sempre la rete, fallback alla cache solo se offline.
+    // Garantisce che l'utente veda sempre la versione aggiornata quando è connesso.
     if (url.pathname.endsWith('/') || url.pathname.endsWith('.html') || url.pathname === './') {
         event.respondWith(
-            caches.match(event.request).then((cachedResponse) => {
-                const fetchPromise = fetch(event.request).then((networkResponse) => {
-                    const responseClone = networkResponse.clone();
-                    caches.open(CACHE_NAME).then((cache) => {
-                        cache.put(event.request, responseClone);
-                    });
-                    return networkResponse;
-                }).catch(() => {
-                    return cachedResponse || offlineFallback();
+            fetch(event.request).then((networkResponse) => {
+                const responseClone = networkResponse.clone();
+                caches.open(CACHE_NAME).then((cache) => {
+                    cache.put(event.request, responseClone);
                 });
-                return cachedResponse || fetchPromise;
+                return networkResponse;
+            }).catch(() => {
+                return caches.match(event.request).then(cached => cached || offlineFallback());
             })
         );
         return;

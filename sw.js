@@ -1,5 +1,5 @@
-// ===== V6.14 · 21/08/26 08:50 =====
-// Service Worker — Affittacamere Ancona Centro · Guida Ospiti V6.10 14/08/26
+// ===== V6.16 · 23/08/26 13:20 =====
+// Service Worker — Affittacamere Ancona Centro · Guida Ospiti V6.16 23/08/26
 // V6.0: aggiunta cache dedicata e persistente per data.js/engine.js (vedi APP_FILES_CACHE_NAME
 // più sotto). A differenza di CACHE_NAME, questa cache NON viene svuotata ad ogni release:
 // serve proprio a evitare che un piccolo aggiornamento di contenuto (data.js) costringa a
@@ -9,7 +9,7 @@
 // CACHE_NAME non è più hardcoded: viene ricevuto da index.html tramite postMessage
 // {type:'SET_CACHE_NAME', cacheName:'...'} subito dopo la registrazione.
 // Il valore di fallback copre il primo avvio prima che il messaggio arrivi.
-let CACHE_NAME = 'ancona-guida-v6.0-05080000';
+let CACHE_NAME = 'ancona-guida-v6.16-23081320';
 let TILES_CACHE_NAME = CACHE_NAME + '-tiles';
 const MAX_TILES = 200;
 
@@ -18,6 +18,31 @@ const MAX_TILES = 200;
 // lo scopo (persistere data.js/engine.js tra una release e l'altra).
 const APP_FILES_CACHE_NAME = 'ancona-guida-appfiles';
 const MAX_APP_FILES = 6; // ~3 versioni di data.js + engine.js prima del trim
+
+// FIX 22/08/26: nome FISSO come APP_FILES_CACHE_NAME — deve sopravvivere al cleanup
+// in 'activate'. Usata come sostituto di localStorage (NON disponibile in un Service
+// Worker: è un'API sincrona legata al DOM/window, assente in ServiceWorkerGlobalScope).
+// Prima di questo fix, checkAndClearCacheIfVersionChanged() chiamava localStorage
+// direttamente, lanciando un ReferenceError intercettato silenziosamente dal try/catch
+// esterno: l'intera funzione di sicurezza non ha mai eseguito il suo compito.
+const VERSION_META_CACHE_NAME = 'ancona-guida-version-meta';
+const VERSION_META_KEY = new Request('https://internal.local/__app_version__');
+
+async function getSavedVersion() {
+    try {
+        const cache = await caches.open(VERSION_META_CACHE_NAME);
+        const match = await cache.match(VERSION_META_KEY);
+        if (!match) return null;
+        return await match.text();
+    } catch (e) { return null; }
+}
+
+async function setSavedVersion(version) {
+    try {
+        const cache = await caches.open(VERSION_META_CACHE_NAME);
+        await cache.put(VERSION_META_KEY, new Response(version));
+    } catch (e) {}
+}
 
 const ASSETS_TO_CACHE = [
     './',
@@ -80,27 +105,36 @@ self.addEventListener('install', (event) => {
 
 async function checkAndClearCacheIfVersionChanged() {
     try {
-        // Fetch index.html senza cache per leggere il meta version
+        // {cache:'no-store'} esplicito: non basta fare fetch() e sperare che il browser
+        // vada in rete. Senza questa opzione, la cache HTTP del browser (un livello SOTTO
+        // la Cache Storage API, invisibile qui) può restituire una index.html non aggiornata
+        // se il server invia header di cache standard — vanificando il controllo "fresco"
+        // che questa funzione dovrebbe fare.
         const response = await fetch('./index.html', { cache: 'no-store' });
         const html = await response.text();
-        
+
         // Estrai version dal meta tag usando regex
         const versionMatch = html.match(/meta name="version" content="([^"]+)"/);
         const newVersion = versionMatch ? versionMatch[1] : null;
-        const savedVersion = typeof self !== 'undefined' && self.registration ? localStorage.getItem('app-version') : null;
-        
+        const savedVersion = await getSavedVersion();
+
         if (newVersion && newVersion !== savedVersion) {
-            // Versione diversa — svuota tutti i cache
+            // Versione diversa — svuota tutti i cache, INCLUSA APP_FILES_CACHE_NAME.
+            // Questo è il paracadute per il caso "ho dimenticato di alzare ?v= in
+            // index.html": anche se la query string non cambia, un meta version diverso
+            // forza comunque lo svuotamento della cache persistente di data.js/engine.js.
             const cacheNames = await caches.keys();
-            await Promise.all(cacheNames.map(name => caches.delete(name)));
-            localStorage.setItem('app-version', newVersion);
+            await Promise.all(cacheNames
+                .filter(name => name !== VERSION_META_CACHE_NAME)
+                .map(name => caches.delete(name)));
+            await setSavedVersion(newVersion);
             console.log('Cache cleared: version changed from', savedVersion, 'to', newVersion);
             // Notifica i client
             self.clients.matchAll().then(clients => {
                 clients.forEach(client => client.postMessage({ type: 'VERSION_UPDATED' }));
             });
         } else if (newVersion) {
-            localStorage.setItem('app-version', newVersion);
+            await setSavedVersion(newVersion);
         }
     } catch (error) {
         console.error('Cache version check failed:', error);
@@ -115,7 +149,9 @@ self.addEventListener('activate', (event) => {
                     cacheNames.map((cacheName) => {
                         // V6.0: APP_FILES_CACHE_NAME aggiunta alla whitelist — è l'unica cache
                         // che deve sopravvivere anche quando CACHE_NAME cambia ad ogni release.
-                        if (cacheName !== CACHE_NAME && cacheName !== TILES_CACHE_NAME && cacheName !== APP_FILES_CACHE_NAME) {
+                        // VERSION_META_CACHE_NAME idem: deve persistere per poter fare il confronto
+                        // di versione al prossimo 'activate'.
+                        if (cacheName !== CACHE_NAME && cacheName !== TILES_CACHE_NAME && cacheName !== APP_FILES_CACHE_NAME && cacheName !== VERSION_META_CACHE_NAME) {
                             return caches.delete(cacheName);
                         }
                     })
@@ -135,9 +171,14 @@ self.addEventListener('fetch', (event) => {
 
     // HTML: Network-First — prova sempre la rete, fallback alla cache solo se offline.
     // Garantisce che l'utente veda sempre la versione aggiornata quando è connesso.
+    // FIX 22/08/26: {cache:'no-store'} esplicito. Senza questa opzione, fetch() da solo
+    // NON garantisce di raggiungere davvero la rete: la cache HTTP del browser (livello
+    // sotto la Cache Storage API, invisibile qui) può intercettare la richiesta e restituire
+    // una index.html non aggiornata se il server invia header di cache standard — la
+    // strategia "network-first" resterebbe network-first solo sulla carta.
     if (url.pathname.endsWith('/') || url.pathname.endsWith('.html') || url.pathname === './') {
         event.respondWith(
-            fetch(event.request).then((networkResponse) => {
+            fetch(event.request, { cache: 'no-store' }).then((networkResponse) => {
                 const responseClone = networkResponse.clone();
                 caches.open(CACHE_NAME).then((cache) => {
                     cache.put(event.request, responseClone);

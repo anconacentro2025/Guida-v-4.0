@@ -1,4 +1,4 @@
-// ===== V6.18 · 23/08/26 18:40 =====
+// ===== V6.19 · 24/08/26 12:20 =====
 // engine.js — Ancona Centro Guida Ospiti
 // Contiene SOLO la logica (rendering, mappa, GPS, meteo, ecc). Richiede che data.js sia
 // caricato PRIMA di questo file nello stesso documento (le const/let di data.js sono
@@ -12,7 +12,7 @@
     // Unica fonte di verità per la versione cache.
     // Aggiornare solo questo valore ad ogni release — il SW lo riceve via postMessage,
     // non serve più modificare sw.js ad ogni versione.
-    const APP_CACHE_NAME = 'ancona-guida-v6.18-23081840';
+    const APP_CACHE_NAME = 'ancona-guida-v6.19-24081220';
     const HOME_COORDS = { lat: 43.6181895, lng: 13.5129489 };
     const headerSubTr = { it: 'Guida Ospiti · Piazza Roma 3', en: 'Guest Guide · Piazza Roma 3', de: 'Gästeführer · Piazza Roma 3', pl: 'Przewodnik dla gości · Piazza Roma 3' };
     const ANCONA_LAT = 43.6181895, ANCONA_LNG = 13.5129489;
@@ -1260,6 +1260,39 @@
         L.marker([HOME_COORDS.lat,HOME_COORDS.lng],{icon:starIcon,zIndexOffset:1000}).addTo(leafletMap).bindPopup('<b style="font-size:.78rem">★ Ancona Centro</b><br><span style="font-size:.68rem;color:#888">📍 Piazza Roma 3</span>');
     }
 
+    // FIX 23/08/26: interruttore promosso a scope condiviso (prima era locale al blocco
+    // service worker) — serve anche al nuovo controllo BUILD_NUMBER qui sotto, per evitare
+    // che i due meccanismi (aggiornamento SW e controllo build) possano ricaricare la
+    // pagina due volte in sequenza.
+    let _reloading=false;
+
+    // FIX 23/08/26: controllo build a 3 cifre, più semplice e più frequente del controllo
+    // meta-version legato al ciclo di vita del service worker (quello scatta solo quando
+    // il SW si attiva). Questo gira ad ogni apertura dell'app E ogni volta che torna in
+    // primo piano da sfondo — il caso reale di "tocco l'icona di un'app già aperta".
+    const BUILD_NUMBER = 619;
+    let _lastBuildCheck = 0;
+    async function checkBuildNumber(){
+        if(_reloading)return;
+        const now=Date.now();
+        if(now-_lastBuildCheck<30000)return; // throttle: non più di 1 controllo ogni 30s
+        _lastBuildCheck=now;
+        try{
+            const res=await fetch('./build.txt',{cache:'no-store'});
+            if(!res.ok)return;
+            const remoteBuild=(await res.text()).trim();
+            if(remoteBuild && remoteBuild!==String(BUILD_NUMBER)){
+                _reloading=true;
+                if('caches' in window){
+                    try{const names=await caches.keys();await Promise.all(names.map(n=>caches.delete(n)));}catch(e){}
+                }
+                window.location.reload();
+            }
+        }catch(e){ /* offline o rete assente: nessuna azione forzata */ }
+    }
+    window.addEventListener('load', checkBuildNumber);
+    document.addEventListener('visibilitychange', ()=>{ if(document.visibilityState==='visible') checkBuildNumber(); });
+
     if('serviceWorker' in navigator)window.addEventListener('load',()=>{
         navigator.serviceWorker.register('./sw.js',{scope:'./'}).then(reg=>{
             // Invia APP_CACHE_NAME al SW (attivo, in waiting o in installazione)
@@ -1284,7 +1317,6 @@
             });
         }).catch(()=>{});
 
-        let _reloading=false;
         navigator.serviceWorker.addEventListener('message',(event)=>{
             if(event.data&&event.data.type==='VERSION_UPDATED'){
                 if(!_reloading){
@@ -1299,6 +1331,7 @@
             window.location.reload();
         });
     });
+
 
     function showUpdateBanner(swWaiting){
         const banner=document.getElementById('sw-update-banner');

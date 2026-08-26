@@ -1,4 +1,4 @@
-// ===== V6.19 · 24/08/26 12:20 =====
+// ===== V6.22 · 26/08/26 20:20 =====
 // engine.js — Ancona Centro Guida Ospiti
 // Contiene SOLO la logica (rendering, mappa, GPS, meteo, ecc). Richiede che data.js sia
 // caricato PRIMA di questo file nello stesso documento (le const/let di data.js sono
@@ -12,7 +12,7 @@
     // Unica fonte di verità per la versione cache.
     // Aggiornare solo questo valore ad ogni release — il SW lo riceve via postMessage,
     // non serve più modificare sw.js ad ogni versione.
-    const APP_CACHE_NAME = 'ancona-guida-v6.19-24081220';
+    const APP_CACHE_NAME = 'ancona-guida-v6.22-26082020';
     const HOME_COORDS = { lat: 43.6181895, lng: 13.5129489 };
     const headerSubTr = { it: 'Guida Ospiti · Piazza Roma 3', en: 'Guest Guide · Piazza Roma 3', de: 'Gästeführer · Piazza Roma 3', pl: 'Przewodnik dla gości · Piazza Roma 3' };
     const ANCONA_LAT = 43.6181895, ANCONA_LNG = 13.5129489;
@@ -143,17 +143,45 @@
     // dalla scheda di un luogo) per mostrare 1-4 foto scorrevoli senza uscire dall'app.
     // Il parametro photosCsv è una stringa con i nomi file separati da virgola (più semplice
     // da incorporare in un attributo onclick rispetto a un array letterale con virgolette).
-    function openLightbox(photosCsv){
+    // FIX 24/08/26: prima ogni foto andava elencata a mano (limite noto, vedi handoff.md:
+    // "Link inline: linkare manualmente per adesso"). Ora, come già succede per le foto
+    // principali dei luoghi (expandPhotosAsync), si tenta l'auto-detect delle varianti
+    // -2/-3/-4 per ciascun file passato, fino al limite di 4 foto totali. Resa async per
+    // via delle richieste HEAD di verifica — gli onclick esistenti non attendono il
+    // risultato, quindi restano invariati e continuano a funzionare senza modifiche.
+    // FIX 26/08/26: aggiunto secondo parametro opzionale 'caption' — prima era cablato a
+    // vuoto ('') senza modo di valorizzarlo. Le chiamate esistenti (senza secondo parametro)
+    // continuano a funzionare identiche a prima: nessuna didascalia, nessuna rottura.
+    async function openLightbox(photosCsv, caption){
         closeLightbox();
-        const photos = photosCsv.split(',').map(f => f.trim());
+        const baseFiles = photosCsv.split(',').map(f => f.trim()).filter(Boolean);
+        let photos = [];
+        for (const baseFile of baseFiles) {
+            if (photos.length >= 4) break;
+            if (!photos.includes(baseFile)) photos.push(baseFile);
+            // Se il file è già una variante (es. anelli-2.webp), non provare ad espanderlo
+            // ulteriormente: eviterebbe richieste inutili per pattern tipo anelli-2-2.webp.
+            if (/-[234]\.webp$/.test(baseFile)) continue;
+            const baseName = baseFile.replace(/\.webp$/, '');
+            for (let i = 2; i <= 4 && photos.length < 4; i++) {
+                const filename = baseName + '-' + i + '.webp';
+                if (photos.includes(filename)) continue;
+                try {
+                    const response = await fetch(PHOTO_BASE + filename, { method: 'HEAD' });
+                    if (response.ok) photos.push(filename);
+                } catch (e) {}
+            }
+        }
         const linkGalleryIndex = 'link-' + Math.random().toString(36).substr(2,9);
-        _detailGalleryData[linkGalleryIndex] = { photos: photos.slice(0,4), caption: '' };
+        _detailGalleryData[linkGalleryIndex] = { photos: photos.slice(0,4), caption: caption || '' };
         openDetailGalleryFullscreen(linkGalleryIndex);
     }
+    // FIX 24/08/26: puntava a '.lightbox-overlay', una classe CSS non più creata da nessuna
+    // parte (residuo di un'implementazione precedente, sostituita da .fullscreen-gallery-
+    // overlay in V6.13). Di fatto non chiudeva mai nulla: aprendo due link in sequenza
+    // rapida, il primo restava aperto sotto il secondo invece di chiudersi.
     function closeLightbox(){
-        const overlay = document.querySelector('.lightbox-overlay');
-        if (overlay) overlay.remove();
-        document.body.style.overflow = '';
+        closeDetailGalleryFullscreen();
     }
     function calcDistance(lat1, lon1, lat2, lon2) { const R=6371; const dLat=(lat2-lat1)*Math.PI/180; const dLon=(lon2-lon1)*Math.PI/180; const a=Math.sin(dLat/2)*Math.sin(dLat/2)+Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)*Math.sin(dLon/2); return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a)); }
 
@@ -1213,7 +1241,7 @@
 
     function renderContact(){
         const fp=HOST_PHONE.replace(/(\d{3})(\d{3})(\d{4})/,'$1 $2 $3');
-        return'<div class="contact-card"><div class="contact-label">📞 '+tr('Host disponibile su WhatsApp','Host available on WhatsApp','Gastgeber auf WhatsApp erreichbar','Gospodarz dostępny na WhatsAppie')+'</div><div class="contact-number">'+fp+'</div><div class="contact-btns"><a href="https://wa.me/39'+HOST_PHONE+'" target="_blank" rel="noopener noreferrer" class="btn-wa" aria-label="Contatta su WhatsApp">💬 WhatsApp</a><a href="tel:+39'+HOST_PHONE+'" class="btn-call" aria-label="Chiama">📞 '+tr('Chiama','Call','Anrufen','Zadzwoń')+'</a></div><div class="contact-email">✉️ <a href="mailto:'+HOST_EMAIL+'">'+HOST_EMAIL+'</a></div><div style="margin-top:14px;display:flex;flex-wrap:wrap;justify-content:center;gap:16px"><a href="'+appData.social.instagram+'" target="_blank" rel="noopener noreferrer" class="social-link">📷 Instagram</a><a href="'+appData.social.facebook+'" target="_blank" rel="noopener noreferrer" class="social-link">📘 Facebook</a><a href="'+appData.social.signal+'" target="_blank" rel="noopener noreferrer" class="social-link">🔒 Signal</a><a href="'+appData.social.telegram+'" target="_blank" rel="noopener noreferrer" class="social-link">✈️ Telegram</a></div></div><div class="emerg-card"><div class="card-header"><span class="card-header-icon" aria-hidden="true">🚨</span><span class="card-title">'+tr('Numeri di emergenza','Emergency numbers','Notrufnummern','Numery alarmowe')+'</span></div><div class="emerg-row"><span class="emerg-num">🚨 112</span><span class="emerg-desc">'+tr('Emergenza generale','General emergency','Allgemeiner Notruf','Ogólne zagrożenie')+'</span></div><div class="emerg-row"><span class="emerg-num">🚓 113</span><span class="emerg-desc">'+tr('Polizia','Police','Polizei','Policja')+'</span></div><div class="emerg-row"><span class="emerg-num">🚑 118</span><span class="emerg-desc">'+tr('Emergenza sanitaria','Medical emergency','Medizinischer Notfall','Nagły wypadek medyczny')+'</span></div><div class="emerg-row"><span class="emerg-num">🏥 071 5961</span><span class="emerg-desc">'+tr('Ospedale Riuniti – Pronto Soccorso','Ospedale Riuniti – A&amp;E','Ospedale Riuniti – Notaufnahme','Szpital Riuniti – Izba przyjęć')+'</span></div><div class="emerg-row"><span class="emerg-num">💊</span><span class="emerg-desc"><a href="https://www.farmaciediturno.org/comune.asp?cod=42002" target="_blank" rel="noopener noreferrer" style="color:inherit;text-decoration:underline">'+tr('Farmacia di turno','Duty pharmacy','Diensthabende Apotheke','Apteka dyżurna')+'</a></span></div><div class="emerg-row"><span class="emerg-num">🚕 071 43321</span><span class="emerg-desc">Radiotaxi Ancona (24h)</span></div></div><div class="card" style="margin-top:10px"><div class="card-header"><span class="card-header-icon" aria-hidden="true">🔗</span><span class="card-title">'+tr('Link utili','Useful links','Nützliche Links','Przydatne linki')+'</span></div><div class="card-body" style="padding:0"><div class="link-row"><span class="link-icon" aria-hidden="true">📰</span><div class="link-info"><div class="link-name">Ufficio turistico – Edicola Piazza Roma</div><div class="link-desc">'+tr('Proprio davanti al portone','Right in front of the entrance','Direkt vor dem Eingang','Tuż przed wejściem')+'</div></div><a href="'+getMapLink('Edicola Piazza Roma Ancona',true)+'" target="_blank" rel="noopener noreferrer" class="link-action" aria-label="Mappa Edicola">🗺️ '+tr('Mappa','Map','Karte','Mapa')+'</a></div><div class="link-row"><span class="link-icon" aria-hidden="true">🌐</span><div class="link-info"><div class="link-name">anconatourism.it</div><div class="link-desc">'+tr('Portale turistico ufficiale di Ancona','Official Ancona tourism portal','Offizielles Tourismusportal von Ancona','Oficjalny portal turystyczny Ankony')+'</div></div><a href="https://anconatourism.it" target="_blank" rel="noopener noreferrer" class="link-action" aria-label="Apri portale turistico">↗</a></div></div></div>';
+        return'<div class="contact-card"><div class="contact-label">📞 '+tr('Host disponibile su WhatsApp','Host available on WhatsApp','Gastgeber auf WhatsApp erreichbar','Gospodarz dostępny na WhatsAppie')+'</div><div class="contact-number">'+fp+'</div><div class="contact-btns"><a href="https://wa.me/39'+HOST_PHONE+'" target="_blank" rel="noopener noreferrer" class="btn-wa" aria-label="Contatta su WhatsApp">💬 WhatsApp</a><a href="tel:+39'+HOST_PHONE+'" class="btn-call" aria-label="Chiama">📞 '+tr('Chiama','Call','Anrufen','Zadzwoń')+'</a></div><div class="contact-email">✉️ <a href="mailto:'+HOST_EMAIL+'">'+HOST_EMAIL+'</a></div><div style="margin-top:14px;display:flex;flex-wrap:wrap;justify-content:center;gap:16px"><a href="'+appData.social.instagram+'" target="_blank" rel="noopener noreferrer" class="social-link">📷 Instagram</a><a href="'+appData.social.facebook+'" target="_blank" rel="noopener noreferrer" class="social-link">📘 Facebook</a><a href="'+appData.social.signal+'" target="_blank" rel="noopener noreferrer" class="social-link">🔒 Signal</a><a href="'+appData.social.telegram+'" target="_blank" rel="noopener noreferrer" class="social-link">✈️ Telegram</a></div></div><div class="emerg-card"><div class="card-header"><span class="card-header-icon" aria-hidden="true">🚨</span><span class="card-title">'+tr('Numeri di emergenza','Emergency numbers','Notrufnummern','Numery alarmowe')+'</span></div><div class="emerg-row"><span class="emerg-num">🚨 112</span><span class="emerg-desc">'+tr('Emergenza generale','General emergency','Allgemeiner Notruf','Ogólne zagrożenie')+'</span></div><div class="emerg-row"><span class="emerg-num">🚓 113</span><span class="emerg-desc">'+tr('Polizia','Police','Polizei','Policja')+'</span></div><div class="emerg-row"><span class="emerg-num">🚑 118</span><span class="emerg-desc">'+tr('Emergenza sanitaria','Medical emergency','Medizinischer Notfall','Nagły wypadek medyczny')+'</span></div><div class="emerg-row"><span class="emerg-num">🏥 071 5961</span><span class="emerg-desc">'+tr('Ospedale Riuniti – Pronto Soccorso','Ospedale Riuniti – A&amp;E','Ospedale Riuniti – Notaufnahme','Szpital Riuniti – Izba przyjęć')+'</span></div><div class="emerg-row"><span class="emerg-num">💊</span><span class="emerg-desc"><a href="https://www.farmaciediturno.org/comune.asp?cod=42002" target="_blank" rel="noopener noreferrer" style="color:inherit;text-decoration:underline">'+tr('Farmacia di turno','Duty pharmacy','Diensthabende Apotheke','Apteka dyżurna')+'</a></span></div><div class="emerg-row"><span class="emerg-num">🚕 071 43321</span><span class="emerg-desc">Radiotaxi Ancona (24h)</span></div></div><div class="card" style="margin-top:10px"><div class="card-header"><span class="card-header-icon" aria-hidden="true">🔗</span><span class="card-title">'+tr('Link utili','Useful links','Nützliche Links','Przydatne linki')+'</span></div><div class="card-body" style="padding:0"><div class="link-row"><span class="link-icon" aria-hidden="true">📰</span><div class="link-info"><div class="link-name">Ufficio turistico – Edicola Piazza Roma</div><div class="link-desc">'+tr('Proprio davanti al portone','Right in front of the entrance','Direkt vor dem Eingang','Tuż przed wejściem')+'</div></div><a href="'+getMapLink('JG97+66 Ancona, Provincia di Ancona',true)+'" target="_blank" rel="noopener noreferrer" class="link-action" aria-label="Mappa Edicola">🗺️ '+tr('Mappa','Map','Karte','Mapa')+'</a></div><div class="link-row"><span class="link-icon" aria-hidden="true">🌐</span><div class="link-info"><div class="link-name">anconatourism.it</div><div class="link-desc">'+tr('Portale turistico ufficiale di Ancona','Official Ancona tourism portal','Offizielles Tourismusportal von Ancona','Oficjalny portal turystyczny Ankony')+'</div></div><a href="https://anconatourism.it" target="_blank" rel="noopener noreferrer" class="link-action" aria-label="Apri portale turistico">↗</a></div></div></div>';
     }
 
     function initSectionMap(){
@@ -1270,7 +1298,7 @@
     // meta-version legato al ciclo di vita del service worker (quello scatta solo quando
     // il SW si attiva). Questo gira ad ogni apertura dell'app E ogni volta che torna in
     // primo piano da sfondo — il caso reale di "tocco l'icona di un'app già aperta".
-    const BUILD_NUMBER = 619;
+    const BUILD_NUMBER = 622;
     let _lastBuildCheck = 0;
     async function checkBuildNumber(){
         if(_reloading)return;

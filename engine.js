@@ -1,4 +1,4 @@
-// ===== V6.22 · 26/08/26 20:20 =====
+// ===== V6.26 · 31/08/26 08:07 =====
 // engine.js — Ancona Centro Guida Ospiti
 // Contiene SOLO la logica (rendering, mappa, GPS, meteo, ecc). Richiede che data.js sia
 // caricato PRIMA di questo file nello stesso documento (le const/let di data.js sono
@@ -12,7 +12,7 @@
     // Unica fonte di verità per la versione cache.
     // Aggiornare solo questo valore ad ogni release — il SW lo riceve via postMessage,
     // non serve più modificare sw.js ad ogni versione.
-    const APP_CACHE_NAME = 'ancona-guida-v6.22-26082020';
+    const APP_CACHE_NAME = 'ancona-guida-v6.26-29082630';
     const HOME_COORDS = { lat: 43.6181895, lng: 13.5129489 };
     const headerSubTr = { it: 'Guida Ospiti · Piazza Roma 3', en: 'Guest Guide · Piazza Roma 3', de: 'Gästeführer · Piazza Roma 3', pl: 'Przewodnik dla gości · Piazza Roma 3' };
     const ANCONA_LAT = 43.6181895, ANCONA_LNG = 13.5129489;
@@ -30,6 +30,15 @@
     let fsSubItineraryId = null;
     let fsListenersInitialized = false;
     let _fsCloseHandler = null; // FIX #4 V5.0 27/06/26: handler persistente per evitare accumulo listener
+
+    // V6.23: Auto-generate sectionHashMap da sections[] per evitare desincronizzazione
+    // Questo è l'unica fonte di verità — aggiungere sezione = modificare SOLO sections in data.js
+    let sectionHashMap = {};
+    if (typeof sections !== 'undefined' && Array.isArray(sections)) {
+        sections.forEach((sec, idx) => {
+            sectionHashMap[sec.id] = idx;
+        });
+    }
 
     // Item 1 V5.0: debounce utility – previene chiamate ravvicinate (es. resize)
     function debounce(fn, delay) { let timer; return function(...args) { clearTimeout(timer); timer = setTimeout(() => fn.apply(this, args), delay); }; }
@@ -152,15 +161,16 @@
     // FIX 26/08/26: aggiunto secondo parametro opzionale 'caption' — prima era cablato a
     // vuoto ('') senza modo di valorizzarlo. Le chiamate esistenti (senza secondo parametro)
     // continuano a funzionare identiche a prima: nessuna didascalia, nessuna rottura.
-    async function openLightbox(photosCsv, caption){
+    async function openLightbox(photosCsv, caption, noexpand){
         closeLightbox();
         const baseFiles = photosCsv.split(',').map(f => f.trim()).filter(Boolean);
         let photos = [];
         for (const baseFile of baseFiles) {
             if (photos.length >= 4) break;
             if (!photos.includes(baseFile)) photos.push(baseFile);
-            // Se il file è già una variante (es. anelli-2.webp), non provare ad espanderlo
-            // ulteriormente: eviterebbe richieste inutili per pattern tipo anelli-2-2.webp.
+            // Se noexpand=true, NON cercare varianti automatiche
+            if (noexpand) continue;
+            // Se il file è già una variante (es. anelli-2.webp), non provare ad espanderlo ulteriormente
             if (/-[234]\.webp$/.test(baseFile)) continue;
             const baseName = baseFile.replace(/\.webp$/, '');
             for (let i = 2; i <= 4 && photos.length < 4; i++) {
@@ -173,7 +183,13 @@
             }
         }
         const linkGalleryIndex = 'link-' + Math.random().toString(36).substr(2,9);
-        _detailGalleryData[linkGalleryIndex] = { photos: photos.slice(0,4), caption: caption || '' };
+        let captions = [];
+        if (Array.isArray(caption)) {
+            captions = caption;
+        } else if (caption) {
+            captions = [caption];
+        }
+        _detailGalleryData[linkGalleryIndex] = { photos: photos.slice(0,4), captions: captions };
         openDetailGalleryFullscreen(linkGalleryIndex);
     }
     // FIX 24/08/26: puntava a '.lightbox-overlay', una classe CSS non più creata da nessuna
@@ -895,13 +911,24 @@
             slidesHtml += '<div class="gallery-slide"><img class="detail-photo loaded" src="' + PHOTO_BASE + filename + '" alt="Foto ' + (i + 1) + '" id="fs-img-' + i + '"></div>';
         });
         const dotsHtml = data.photos.length > 1 ? ('<div class="gallery-dots" id="fs-dots">' + data.photos.map((_, i) => '<span class="dot' + (i === 0 ? ' active' : '') + '"></span>').join('') + '</div>') : '';
-        const captionHtml = data.caption ? '<div class="fs-gallery-caption">' + data.caption + '</div>' : '';
+        
+        // V7.0: Caption resa draggable e resizable
+        const captions = data.captions || (data.caption ? [data.caption] : []);
+        const currentCaption = captions[0] || '';
+        const captionHtml = currentCaption ? ('<div class="fs-gallery-caption" id="fs-caption-' + index + '">' +
+            '<div class="fs-caption-header">≡ Dettagli</div>' +
+            '<div class="fs-caption-body">' + currentCaption + '</div>' +
+            '<div class="fs-caption-resize"></div>' +
+            '</div>') : '';
+        
         const overlay = document.createElement('div');
         overlay.className = 'fullscreen-gallery-overlay';
-        overlay.innerHTML = '<button class="fs-gallery-close" aria-label="' + tr('Chiudi', 'Close', 'Schließen', 'Zamknij') + '">✕</button>' + captionHtml + '<div class="fs-detail-gallery" id="fs-gallery-' + index + '">' + slidesHtml + '</div>' + dotsHtml;
+        overlay.innerHTML = '<button class="fs-gallery-close" aria-label="' + tr('Chiudi', 'Close', 'Schließen', 'Zamknij') + '">✕</button>' + '<div class="fs-detail-gallery" id="fs-gallery-' + index + '">' + slidesHtml + '</div>' + dotsHtml + captionHtml;
         document.body.appendChild(overlay);
+        
         overlay.querySelector('.fs-gallery-close').addEventListener('click', closeDetailGalleryFullscreen);
         overlay.addEventListener('click', function (e) { if (e.target === overlay) closeDetailGalleryFullscreen(); });
+        
         if (data.photos.length > 1) {
             const galleryEl = overlay.querySelector('#fs-gallery-' + index), dotsEl = overlay.querySelector('#fs-dots');
             if (galleryEl && dotsEl) {
@@ -912,6 +939,113 @@
                 }, 80));
             }
         }
+        
+        // V7.0: Rendi caption draggable e resizable
+        if (currentCaption) {
+            const captionEl = overlay.querySelector('#fs-caption-' + index);
+            const headerEl = captionEl.querySelector('.fs-caption-header');
+            const resizeEl = captionEl.querySelector('.fs-caption-resize');
+            const storageKey = 'fs-caption-pos-' + index;
+            
+            // Carica posizione salvata
+            const savedPos = sessionStorage.getItem(storageKey);
+            if (savedPos) {
+                try {
+                    const pos = JSON.parse(savedPos);
+                    captionEl.style.left = pos.left + 'px';
+                    captionEl.style.bottom = pos.bottom + 'px';
+                    captionEl.style.width = pos.width + 'px';
+                    captionEl.style.height = pos.height + 'px';
+                    captionEl.style.right = 'auto'; // Usa left invece di right
+                } catch (e) {}
+            }
+            
+            // Drag
+            let isDragging = false, dragOffsetX = 0, dragOffsetY = 0;
+            headerEl.addEventListener('mousedown', startDrag);
+            headerEl.addEventListener('touchstart', startDrag);
+            
+            function startDrag(e) {
+                isDragging = true;
+                const rect = captionEl.getBoundingClientRect();
+                dragOffsetX = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
+                dragOffsetY = (e.touches ? e.touches[0].clientY : e.clientY) - rect.top;
+                document.addEventListener('mousemove', doDrag);
+                document.addEventListener('touchmove', doDrag);
+                document.addEventListener('mouseup', stopDrag);
+                document.addEventListener('touchend', stopDrag);
+                e.preventDefault();
+            }
+            
+            function doDrag(e) {
+                if (!isDragging) return;
+                const x = (e.touches ? e.touches[0].clientX : e.clientX) - dragOffsetX;
+                const y = (e.touches ? e.touches[0].clientY : e.clientY) - dragOffsetY;
+                captionEl.style.left = Math.max(0, Math.min(x, window.innerWidth - captionEl.offsetWidth)) + 'px';
+                captionEl.style.bottom = 'auto';
+                captionEl.style.top = Math.max(0, Math.min(y, window.innerHeight - captionEl.offsetHeight)) + 'px';
+            }
+            
+            function stopDrag() {
+                isDragging = false;
+                document.removeEventListener('mousemove', doDrag);
+                document.removeEventListener('touchmove', doDrag);
+                document.removeEventListener('mouseup', stopDrag);
+                document.removeEventListener('touchend', stopDrag);
+                // Salva posizione
+                const rect = captionEl.getBoundingClientRect();
+                sessionStorage.setItem(storageKey, JSON.stringify({
+                    left: parseInt(captionEl.style.left) || rect.left,
+                    bottom: parseInt(captionEl.style.bottom) || 0,
+                    width: captionEl.offsetWidth,
+                    height: captionEl.offsetHeight
+                }));
+            }
+            
+            // Resize
+            let isResizing = false, resizeStartX = 0, resizeStartY = 0, resizeStartW = 0, resizeStartH = 0;
+            resizeEl.addEventListener('mousedown', startResize);
+            resizeEl.addEventListener('touchstart', startResize);
+            
+            function startResize(e) {
+                isResizing = true;
+                resizeStartX = e.touches ? e.touches[0].clientX : e.clientX;
+                resizeStartY = e.touches ? e.touches[0].clientY : e.clientY;
+                resizeStartW = captionEl.offsetWidth;
+                resizeStartH = captionEl.offsetHeight;
+                document.addEventListener('mousemove', doResize);
+                document.addEventListener('touchmove', doResize);
+                document.addEventListener('mouseup', stopResize);
+                document.addEventListener('touchend', stopResize);
+                e.preventDefault();
+            }
+            
+            function doResize(e) {
+                if (!isResizing) return;
+                const currentX = e.touches ? e.touches[0].clientX : e.clientX;
+                const currentY = e.touches ? e.touches[0].clientY : e.clientY;
+                const newW = Math.max(200, resizeStartW + (currentX - resizeStartX));
+                const newH = Math.max(150, resizeStartH + (currentY - resizeStartY));
+                captionEl.style.width = newW + 'px';
+                captionEl.style.height = newH + 'px';
+            }
+            
+            function stopResize() {
+                isResizing = false;
+                document.removeEventListener('mousemove', doResize);
+                document.removeEventListener('touchmove', doResize);
+                document.removeEventListener('mouseup', stopResize);
+                document.removeEventListener('touchend', stopResize);
+                // Salva posizione
+                sessionStorage.setItem(storageKey, JSON.stringify({
+                    left: parseInt(captionEl.style.left) || 0,
+                    bottom: parseInt(captionEl.style.bottom) || 0,
+                    width: captionEl.offsetWidth,
+                    height: captionEl.offsetHeight
+                }));
+            }
+        }
+        
         document.body.style.overflow = 'hidden';
     }
     function closeDetailGalleryFullscreen() {
@@ -1298,7 +1432,7 @@
     // meta-version legato al ciclo di vita del service worker (quello scatta solo quando
     // il SW si attiva). Questo gira ad ogni apertura dell'app E ogni volta che torna in
     // primo piano da sfondo — il caso reale di "tocco l'icona di un'app già aperta".
-    const BUILD_NUMBER = 622;
+    const BUILD_NUMBER = 626;
     let _lastBuildCheck = 0;
     async function checkBuildNumber(){
         if(_reloading)return;
@@ -1325,7 +1459,7 @@
         navigator.serviceWorker.register('./sw.js',{scope:'./'}).then(reg=>{
             // Invia APP_CACHE_NAME al SW (attivo, in waiting o in installazione)
             // così sw.js non ha più bisogno del CACHE_NAME hardcoded
-            const sendVersion=sw=>{if(sw)sw.postMessage({type:'SET_CACHE_NAME',cacheName:APP_CACHE_NAME});};
+            const sendVersion=sw=>{if(sw)sw.postMessage({type:'SET_CACHE_NAME',cacheName:APP_CACHE_NAME,buildNumber:BUILD_NUMBER});};
             sendVersion(reg.active);
             sendVersion(reg.waiting);
             sendVersion(reg.installing);

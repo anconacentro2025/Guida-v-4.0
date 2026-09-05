@@ -1,4 +1,4 @@
-// ===== V6.26 · 31/08/26 08:07 =====
+// ===== V7.1 · 05/09/26 08:30 =====
 // engine.js — Ancona Centro Guida Ospiti
 // Contiene SOLO la logica (rendering, mappa, GPS, meteo, ecc). Richiede che data.js sia
 // caricato PRIMA di questo file nello stesso documento (le const/let di data.js sono
@@ -12,7 +12,7 @@
     // Unica fonte di verità per la versione cache.
     // Aggiornare solo questo valore ad ogni release — il SW lo riceve via postMessage,
     // non serve più modificare sw.js ad ogni versione.
-    const APP_CACHE_NAME = 'ancona-guida-v6.26-29082630';
+    const APP_CACHE_NAME = 'ancona-guida-v7.1-05090830';
     const HOME_COORDS = { lat: 43.6181895, lng: 13.5129489 };
     const headerSubTr = { it: 'Guida Ospiti · Piazza Roma 3', en: 'Guest Guide · Piazza Roma 3', de: 'Gästeführer · Piazza Roma 3', pl: 'Przewodnik dla gości · Piazza Roma 3' };
     const ANCONA_LAT = 43.6181895, ANCONA_LNG = 13.5129489;
@@ -51,12 +51,12 @@
     // questi 6 id; le 8 sezioni-itinerario (mustsee...borghi) confluiscono nel picker
     // "Itinerari" invece di comparire come tile/pill separate. I link diretti tipo #mustsee
     // continuano a funzionare: sectionHashMap non viene toccato per quegli id.
-    const HOME_NAV_IDS = ['apartment','contact','services','restaurants','usefulinfo','itinerari'];
+    const HOME_NAV_IDS = ['apartment','contact','services','restaurants','usefulinfo','parcheggi','itinerari'];
     const ITINERARY_IDS = ['mustsee','passetto','cardeto','porto','beaches','portonovo','conero','borghi'];
 
     ;
 
-    let currentLang = 'it', currentSection = -1, currentPlaceDetail = -1, currentSectionPlaces = [], leafletMap = null, currentSubItinerary = null;
+    let currentLang = 'it', currentSection = -1, currentPlaceDetail = -1, currentSectionPlaces = [], leafletMap = null, currentSubItinerary = null, currentSearchQuery = null;
     let placeDataMap = {}, _mapRetryCount = 0;
     let gpsConsentGiven = null, deferredPrompt = null;
     // V5.11: gpsState/fsGpsState (definiti sopra, vicino alle funzioni GPS) sostituiscono
@@ -247,7 +247,7 @@
         renderAll();window.scrollTo({top:0,behavior:'smooth'});
     }
 
-    function backToMap(){currentPlaceDetail=-1;renderAll();window.scrollTo({top:0,behavior:'smooth'});}
+    function backToMap(){currentPlaceDetail=-1;currentSearchQuery=null;renderAll();window.scrollTo({top:0,behavior:'smooth'});}
     function panToHome(){if(leafletMap)leafletMap.setView([HOME_COORDS.lat,HOME_COORDS.lng],15);}
 
     function getDisplayNumber(p,index){
@@ -794,6 +794,8 @@
             // sola su un nuovo rigo invece di lasciarla affianco a Informazioni utili.
             return '<button class="nav-tile" data-index="'+idx+'" aria-label="'+tr(s.it,s.en,s.de,s.pl)+'"><div class="nav-tile-icon" aria-hidden="true">'+s.icon+'</div><div class="nav-tile-label">'+tr(s.it,s.en,s.de,s.pl)+'</div></button>';
         }).join('');
+        const searchTile='<button class="nav-tile" onclick="document.getElementById(\'search-modal\').style.display=\'flex\';document.getElementById(\'search-input\').focus()" aria-label="'+tr('Cerca','Search','Suchen','Szukaj')+'"><div class="nav-tile-icon" aria-hidden="true">🔍</div><div class="nav-tile-label">'+tr('Cerca','Search','Suchen','Szukaj')+'</div></button>';
+        const tilesWithSearch=searchTile+tiles;
         const installBtnHtml='<button id="install-btn" class="install-btn" style="display:none">📲 '+tr('Aggiungi alla schermata Home','Add to Home Screen','Zum Startbildschirm hinzufügen','Dodaj do ekranu głównego')+'</button>';
         const whatsappBtnHtml='<a href="https://wa.me/39'+HOST_PHONE+'" target="_blank" rel="noopener noreferrer" class="home-whatsapp-btn" aria-label="Contatta l\'host su WhatsApp">💬 '+tr('Live Chat','Live Chat','Live-Chat','Czat na żywo')+'</a>';
         const countdownHtml=getCountdownHtml();
@@ -802,7 +804,7 @@
         const socialInfoHtml='<div style="padding:6px 16px 0;font-size:.75rem;color:var(--muted);text-align:center">'+tr('Informazioni e aggiornamenti continui sui profili social','Constant information and updates on social profiles','Ständige Informationen und Updates auf den Social-Media-Profilen','Stałe informacje i aktualizacje na profilach społecznościowych')+'</div>';
         // V5.5: banner Ancona Capitale Italiana della Cultura 2028 (dossier "Ancona. Questo adesso", ancona2028.it)
         const cultura2028Html='<a href="https://ancona2028.it/" target="_blank" rel="noopener noreferrer" class="cultura2028-banner"><span class="cultura2028-emoji" aria-hidden="true">🎭</span><div><div class="cultura2028-title">Ancona 2028</div><div class="cultura2028-sub">'+tr('Capitale Italiana della Cultura','Italian Capital of Culture','Italienische Kulturhauptstadt','Włoska Stolica Kultury')+'</div></div><span class="cultura2028-arrow" aria-hidden="true">→</span></a>';
-        const html='<section class="section active"><div class="home-welcome"><div class="home-welcome-left"><img src="'+hostImgSrc+'" alt="Foto dell\'host" class="host-photo" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\';"><div class="host-photo-placeholder" style="display:none">👋</div></div><div class="home-welcome-right"><div class="home-welcome-title">'+tr('Benvenuti!','Welcome!','Willkommen!','Witamy!')+'</div><div class="home-welcome-sub">'+tr('Siete in Piazza Roma, nel cuore pedonale di Ancona, a pochi passi dal porto e dai principali monumenti della città. Questa guida vi accompagnerà durante tutto il soggiorno, con itinerari, luoghi da scoprire, indirizzi selezionati e informazioni utili, raccolti e consigliati personalmente dall\'host.','You are in Piazza Roma, in the heart of Ancona\'s pedestrian centre, just steps from the port and the city\'s main monuments. This guide will accompany you throughout your stay, with itineraries, places to discover, selected addresses and useful information, personally collected and recommended by your host.','Sie sind auf der Piazza Roma, im Herzen von Anconas Fußgängerzone, nur wenige Schritte vom Hafen und den wichtigsten Denkmälern der Stadt entfernt. Dieser Leitfaden begleitet Sie während Ihres gesamten Aufenthalts mit Routen, Orten zum Entdecken, ausgewählten Adressen und nützlichen Informationen, die persönlich von Ihrem Gastgeber zusammengestellt und empfohlen wurden.','Jesteście na Piazza Roma, w sercu pieszej strefy Ankony, zaledwie kilka kroków od portu i głównych zabytków miasta. Ten przewodnik będzie Wam towarzyszyć przez cały pobyt, z trasami, miejscami do odkrycia, wybranymi adresami i przydatnymi informacjami, osobiście zebranymi i rekomendowanymi przez gospodarza.')+'</div></div>'+whatsappBtnHtml+'</div>'+socialInfoHtml+installBtnHtml+countdownHtml+'<div class="widgets-row">'+meteoHtml+pcAlertHtml+'</div>'+cultura2028Html+'<div class="nav-grid">'+tiles+'</div>'+'</section>';
+        const html='<section class="section active"><div class="home-welcome"><div class="home-welcome-left"><img src="'+hostImgSrc+'" alt="Foto dell\'host" class="host-photo" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\';"><div class="host-photo-placeholder" style="display:none">👋</div></div><div class="home-welcome-right"><div class="home-welcome-title">'+tr('Benvenuti!','Welcome!','Willkommen!','Witamy!')+'</div><div class="home-welcome-sub">'+tr('Siete in Piazza Roma, nel cuore pedonale di Ancona, a pochi passi dal porto e dai principali monumenti della città. Questa guida vi accompagnerà durante tutto il soggiorno, con itinerari, luoghi da scoprire, indirizzi selezionati e informazioni utili, raccolti e consigliati personalmente dall\'host.','You are in Piazza Roma, in the heart of Ancona\'s pedestrian centre, just steps from the port and the city\'s main monuments. This guide will accompany you throughout your stay, with itineraries, places to discover, selected addresses and useful information, personally collected and recommended by your host.','Sie sind auf der Piazza Roma, im Herzen von Anconas Fußgängerzone, nur wenige Schritte vom Hafen und den wichtigsten Denkmälern der Stadt entfernt. Dieser Leitfaden begleitet Sie während Ihres gesamten Aufenthalts mit Routen, Orten zum Entdecken, ausgewählten Adressen und nützlichen Informationen, die persönlich von Ihrem Gastgeber zusammengestellt und empfohlen wurden.','Jesteście na Piazza Roma, w sercu pieszej strefy Ankony, zaledwie kilka kroków od portu i głównych zabytków miasta. Ten przewodnik będzie Wam towarzyszyć przez cały pobyt, z trasami, miejscami do odkrycia, wybranymi adresami i przydatnymi informacjami, osobiście zebranymi i rekomendowanymi przez gospodarza.')+'</div></div>'+whatsappBtnHtml+'</div>'+socialInfoHtml+installBtnHtml+countdownHtml+'<div class="widgets-row">'+meteoHtml+pcAlertHtml+'</div>'+cultura2028Html+'<div class="nav-grid">'+tilesWithSearch+'</div>'+'</section>';
         cont.innerHTML=html;
         // FIX #5 V5.0 27/06/26: avvia refresh countdown se presente
         if(countdownHtml) startCountdownRefresh(); else clearInterval(_countdownInterval);
@@ -833,11 +835,419 @@
         document.querySelectorAll('.nav-tile').forEach(btn=>btn.addEventListener('click',function(){goTo(parseInt(this.dataset.index));}));
     }
 
+    function getAllPois(){
+        const all=[];
+        // Itinerari principali
+        if(appData.mustsee)all.push(...appData.mustsee.map(p=>{p.section='mustsee';return p;}));
+        if(appData.passetto)all.push(...appData.passetto.map(p=>{p.section='passetto';return p;}));
+        if(appData.cardeto)all.push(...appData.cardeto.map(p=>{p.section='cardeto';return p;}));
+        if(appData.porto)all.push(...appData.porto.map(p=>{p.section='porto';return p;}));
+        if(appData.beaches)all.push(...appData.beaches.map(p=>{p.section='beaches';return p;}));
+        if(appData.borghi)all.push(...appData.borghi.map(p=>{p.section='borghi';return p;}));
+        // Portonovo
+        if(appData.portonovo?.points)all.push(...appData.portonovo.points.map(p=>{p.section='portonovo';return p;}));
+        // Ristoranti e servizi
+        if(appData.restaurants)all.push(...appData.restaurants.map(p=>{p.section='restaurants';return p;}));
+        if(appData.parking)all.push(...appData.parking.map(p=>{p.section='parcheggi';return p;}));
+        if(appData.services?.supermarkets)all.push(...appData.services.supermarkets.map(p=>{p.section='services';return p;}));
+        if(appData.services?.other)all.push(...appData.services.other.map(p=>{p.section='services';return p;}));
+        // Usefulinfo sottosezioni
+        if(appData.usefulinfo?.gastronomy)all.push(...appData.usefulinfo.gastronomy.map(p=>{p.section='usefulinfo';return p;}));
+        if(appData.usefulinfo?.nightlife)all.push(...appData.usefulinfo.nightlife.map(p=>{p.section='usefulinfo';return p;}));
+        if(appData.usefulinfo?.shopping)all.push(...appData.usefulinfo.shopping.map(p=>{p.section='usefulinfo';return p;}));
+        return all;
+    }
+    function globalSearch(query){
+        const cleanHtml=(text)=>{
+            if(!text)return "";
+            return text.replace(/<[^>]*>/g,"").replace(/&lt;/g,"<").replace(/&gt;/g,">").replace(/&amp;/g,"&");
+        };
+        if(!query||query.trim().length===0){hideSearchModal();return;}
+        query=query.toLowerCase();
+        let results=[];
+        const seen=new Set();
+        
+        // Lingua attiva — UNICA fonte per il filtro linguistico
+        const langPrefix={it:'it',en:'en',de:'de',pl:'pl'};
+        const prefix=langPrefix[currentLang]||'it';
+        const longPrefix=prefix+'Long';
+        
+        // FUNZIONE HELPER: Cerca in un oggetto per la lingua attiva (short e long)
+        const searchInObjectByLang=(obj,section,objName)=>{
+            if(!obj)return;
+            
+            // Prova il campo short (it, en, de, pl)
+            const shortVal=obj[prefix];
+            if(shortVal&&typeof shortVal==='string'){
+                const cleanShort=cleanHtml(shortVal).toLowerCase();
+                if(cleanShort.includes(query)){
+                    const plainText=cleanHtml(shortVal);
+                    const excerpt=createSearchExcerpt(plainText,query);
+                    const poiKey=(obj.name||objName)+'_'+section+'_short';
+                    if(!seen.has(poiKey)){
+                        seen.add(poiKey);
+                        results.push({
+                            type:'match',
+                            name:obj.name||objName||'',
+                            section:section||'',
+                            text:excerpt,
+                            poi:obj,
+                            field:prefix,
+                            queryWord:query,
+                            plainText:plainText
+                        });
+                        return;
+                    }
+                }
+            }
+            
+            // Prova il campo long (itLong, enLong, deLong, plLong)
+            const longVal=obj[longPrefix];
+            if(longVal&&typeof longVal==='string'){
+                const cleanLong=cleanHtml(longVal).toLowerCase();
+                if(cleanLong.includes(query)){
+                    const plainText=cleanHtml(longVal);
+                    const excerpt=createSearchExcerpt(plainText,query);
+                    const poiKey=(obj.name||objName)+'_'+section+'_long';
+                    if(!seen.has(poiKey)){
+                        seen.add(poiKey);
+                        results.push({
+                            type:'match',
+                            name:obj.name||objName||'',
+                            section:section||'',
+                            text:excerpt,
+                            poi:obj,
+                            field:longPrefix,
+                            queryWord:query,
+                            plainText:plainText
+                        });
+                        return;
+                    }
+                }
+            }
+        };
+        
+        // RICERCA 1: In tutti i POI (mustsee, passetto, cardeto, etc.)
+        const allPois=getAllPois();
+        for(let poi of allPois){
+            searchInObjectByLang(poi, poi.section||'');
+        }
+        
+        // RICERCA 2: In apartment (ogni campo è un oggetto multilingua {it:'...', en:'...', ...})
+        if(appData.apartment){
+            for(let key in appData.apartment){
+                const fieldObj=appData.apartment[key];
+                // Controlla se è un oggetto multilingua
+                if(typeof fieldObj==='object'&&fieldObj!==null&&!Array.isArray(fieldObj)){
+                    const val=fieldObj[prefix];
+                    if(val&&typeof val==='string'){
+                        const cleanVal=cleanHtml(val).toLowerCase();
+                        if(cleanVal.includes(query)){
+                            const plainText=cleanHtml(val);
+                            const excerpt=createSearchExcerpt(plainText,query);
+                            const poiKey='apartment_'+key;
+                            if(!seen.has(poiKey)){
+                                seen.add(poiKey);
+                                results.push({
+                                    type:'match',
+                                    name:tr('Appartamento','Apartment','Wohnung','Mieszkanie'),
+                                    section:'apartment',
+                                    text:excerpt,
+                                    poi:appData.apartment,
+                                    field:key,
+                                    queryWord:query,
+                                    plainText:plainText
+                                });
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        
+        // RICERCA 3: In contact (ogni campo è un oggetto multilingua {it:'...', en:'...', ...})
+        if(appData.contact){
+            for(let key in appData.contact){
+                const fieldObj=appData.contact[key];
+                if(typeof fieldObj==='object'&&fieldObj!==null&&!Array.isArray(fieldObj)){
+                    const val=fieldObj[prefix];
+                    if(val&&typeof val==='string'){
+                        const cleanVal=cleanHtml(val).toLowerCase();
+                        if(cleanVal.includes(query)){
+                            const plainText=cleanHtml(val);
+                            const excerpt=createSearchExcerpt(plainText,query);
+                            const poiKey='contact_'+key;
+                            if(!seen.has(poiKey)){
+                                seen.add(poiKey);
+                                results.push({
+                                    type:'match',
+                                    name:tr('Contatti','Contact','Kontakt','Kontakt'),
+                                    section:'contact',
+                                    text:excerpt,
+                                    poi:appData.contact,
+                                    field:key,
+                                    queryWord:query,
+                                    plainText:plainText
+                                });
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        
+        // RICERCA 4: In gastronomy.intro
+        if(appData.gastronomy&&appData.gastronomy.intro){
+            const introObj=appData.gastronomy.intro;
+            const val=introObj[prefix];
+            if(val&&typeof val==='string'){
+                const cleanVal=cleanHtml(val).toLowerCase();
+                if(cleanVal.includes(query)){
+                    const plainText=cleanHtml(val);
+                    const excerpt=createSearchExcerpt(plainText,query);
+                    const poiKey='gastronomy_intro';
+                    if(!seen.has(poiKey)){
+                        seen.add(poiKey);
+                        results.push({
+                            type:'match',
+                            name:tr('Gastronomia','Gastronomy','Gastronomie','Gastronomia'),
+                            section:'usefulinfo',
+                            text:excerpt,
+                            poi:introObj,
+                            field:prefix,
+                            queryWord:query,
+                            plainText:plainText
+                        });
+                    }
+                }
+            }
+        }
+        
+        // RICERCA 5: In gastronomy.hostTip
+        if(appData.gastronomy&&appData.gastronomy.hostTip){
+            const tipObj=appData.gastronomy.hostTip;
+            const val=tipObj[prefix];
+            if(val&&typeof val==='string'){
+                const cleanVal=cleanHtml(val).toLowerCase();
+                if(cleanVal.includes(query)){
+                    const plainText=cleanHtml(val);
+                    const excerpt=createSearchExcerpt(plainText,query);
+                    const poiKey='gastronomy_hosttip';
+                    if(!seen.has(poiKey)){
+                        seen.add(poiKey);
+                        results.push({
+                            type:'match',
+                            name:tr('Gastronomia - Consiglio','Gastronomy - Host Tip','Gastronomie - Tipp','Gastronomia - Porada'),
+                            section:'usefulinfo',
+                            text:excerpt,
+                            poi:tipObj,
+                            field:prefix,
+                            queryWord:query,
+                            plainText:plainText
+                        });
+                    }
+                }
+            }
+        }
+        
+        // RICERCA 6: In gastronomy.dishes[] — come POI (hanno it, en, de, pl direttamente)
+        if(appData.gastronomy&&appData.gastronomy.dishes&&Array.isArray(appData.gastronomy.dishes)){
+            for(let dish of appData.gastronomy.dishes){
+                searchInObjectByLang(dish, 'usefulinfo', dish.name);
+            }
+        }
+        
+        if(results.length===0){
+            showSearchResultsEmpty(query);
+        }else{
+            showSearchResults(results,query);
+        }
+    }
+    
+    function createSearchExcerpt(text,query){
+        if(!text||!query)return text.substring(0,150)+'...';
+        const lower=text.toLowerCase();
+        const index=lower.indexOf(query);
+        if(index===-1)return text.substring(0,150)+'...';
+        
+        // Centra l'excerpt attorno alla parola trovata
+        const start=Math.max(0,index-50);
+        const end=Math.min(text.length,index+query.length+100);
+        let excerpt=text.substring(start,end);
+        
+        // Aggiungi ellissi
+        if(start>0)excerpt='...'+excerpt;
+        if(end<text.length)excerpt=excerpt+'...';
+        
+        // Highlight della parola con <strong>
+        excerpt=excerpt.replace(new RegExp('('+query.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')','gi'),'<strong style="color:#C8A45A;font-weight:600">$1</strong>');
+        
+        return excerpt;
+    }
+    
+    function showSearchResults(results,query){
+        const modal=document.getElementById('search-modal');
+        const resultsList=document.getElementById('search-results-list');
+        const counter=document.getElementById('search-counter');
+        
+        if(results.length===0){
+            resultsList.innerHTML='<div class="search-no-results">'+tr('Nessun risultato per ','No results for ','Keine Ergebnisse für ','Brak wyników dla ')+'<strong>'+query+'</strong></div>';
+            counter.textContent='0';
+            modal.style.display='flex';
+            return;
+        }
+        
+        currentSearchResults=results;
+        currentSearchIndex=0;
+        updateSearchDisplay();
+        modal.style.display='flex';
+    }
+    
+    function clearAndCloseSearch(){
+        const input=document.getElementById('search-input');
+        if(input)input.value='';
+        currentSearchQuery=null;
+        currentSearchResults=[];
+        currentSearchIndex=0;
+        hideSearchModal();
+    }
+    
+    function showSearchResultsEmpty(query){
+        const modal=document.getElementById('search-modal');
+        const resultsList=document.getElementById('search-results-list');
+        const counter=document.getElementById('search-counter');
+        resultsList.innerHTML='<div class="search-no-results" style="padding:20px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:16px">'+
+            '<p>'+tr('Nessun risultato per ','No results for ','Keine Ergebnisse für ','Brak wyników dla ')+'<strong>'+query+'</strong></p>'+
+            '<button type="button" style="padding:10px 20px;background:#1a3a52;color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:14px" onclick="clearAndCloseSearch()">'+tr('Chiudi','Close','Schließen','Zamknij')+'</button>'+
+            '</div>';
+        counter.textContent='0';
+        modal.style.display='flex';
+    }
+    
+    function highlightWordInText(text,query){
+        if(!text||!query)return text;
+        const regex=new RegExp('('+query.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')','gi');
+        return text.replace(regex,'<strong style="color:#C8A45A;font-weight:600">$1</strong>');
+    }
+    
+    function updateSearchDisplay(){
+        if(currentSearchResults.length===0)return;
+        const result=currentSearchResults[currentSearchIndex];
+        const resultsList=document.getElementById('search-results-list');
+        const counter=document.getElementById('search-counter');
+        
+        counter.textContent=(currentSearchIndex+1)+' di '+currentSearchResults.length;
+        
+        resultsList.innerHTML='<div class="search-result-item search-result-active" style="background:#e8f5e9;border-left:4px solid var(--navy-2);padding:12px;border-radius:8px;cursor:pointer" onclick="navigateToSearchResult('+currentSearchIndex+')">'+
+            '<div class="search-result-name" style="font-weight:600;color:var(--navy-2);margin-bottom:8px">'+result.name+'</div>'+
+            '<div class="search-result-text" style="font-size:.85rem;color:#333;line-height:1.4">'+result.text+'</div>'+
+            '</div>';
+    }
+    
+    function navigateToSearchResult(index){
+        if(!currentSearchResults[index])return;
+        const result=currentSearchResults[index];
+        const poi=result.poi;
+        currentSearchQuery=result.queryWord;
+        hideSearchModal();
+        
+        // Trova l'indice della sezione
+        const sectionId=poi.section||'usefulinfo';
+        const sectionIdx=sections.findIndex(s=>s.id===sectionId);
+        if(sectionIdx===-1)return;
+        
+        // Ottieni i dati della sezione
+        const sectionData=getSectionData(sectionId);
+        
+        // Trova l'indice del POI per reference (identità di oggetto)
+        let placeIdx=sectionData.findIndex(p=>p===poi);
+        
+        // Se non trovato per reference, cerca per nome (case-insensitive)
+        if(placeIdx===-1&&poi.name){
+            const poiNameLower=poi.name.toLowerCase();
+            placeIdx=sectionData.findIndex(p=>p.name&&p.name.toLowerCase()===poiNameLower);
+        }
+        
+        // Se ANCORA non trovato, cerca il primo match parziale (fallback)
+        if(placeIdx===-1&&poi.name){
+            const poiNameLower=poi.name.toLowerCase();
+            placeIdx=sectionData.findIndex(p=>p.name&&p.name.toLowerCase().includes(poiNameLower));
+        }
+        
+        // Naviga alla sezione
+        goTo(sectionIdx);
+        
+        // DOPO che goTo() ha finito, imposta il detail e renderizza
+        setTimeout(()=>{
+            if(placeIdx>=0){
+                currentPlaceDetail=placeIdx;
+                renderAll();
+                // Scrolla al testo evidenziato
+                setTimeout(()=>{
+                    let firstHighlight=document.querySelector('.place-desc strong');
+                    if(!firstHighlight){
+                        firstHighlight=document.querySelector('.place-meta strong');
+                    }
+                    if(!firstHighlight){
+                        firstHighlight=document.querySelector('.place-card strong');
+                    }
+                    if(firstHighlight){
+                        firstHighlight.scrollIntoView({behavior:'smooth',block:'center'});
+                    }
+                },300);
+            }
+        },500);
+    }
+    
+    function getSectionData(sectionId){
+        const map={
+            mustsee:()=>appData.mustsee||[],
+            passetto:()=>appData.passetto||[],
+            cardeto:()=>appData.cardeto||[],
+            porto:()=>appData.porto||[],
+            beaches:()=>appData.beaches||[],
+            portonovo:()=>(appData.portonovo&&appData.portonovo.points)?appData.portonovo.points:[],
+            borghi:()=>appData.borghi||[],
+            parcheggi:()=>appData.parking||[],
+            restaurants:()=>appData.restaurants||[],
+            services:()=>{let all=[];if(appData.services?.supermarkets)all.push(...appData.services.supermarkets);if(appData.services?.other)all.push(...appData.services.other);return all;},
+            usefulinfo:()=>{let all=[];if(appData.usefulinfo?.gastronomy)all.push(...appData.usefulinfo.gastronomy);if(appData.usefulinfo?.nightlife)all.push(...appData.usefulinfo.nightlife);if(appData.usefulinfo?.shopping)all.push(...appData.usefulinfo.shopping);return all;}
+        };
+        return map[sectionId]?map[sectionId]():[];
+    }
+    
+    function hideSearchModal(){
+        const modal=document.getElementById('search-modal');
+        const input=document.getElementById('search-input');
+        if(modal) modal.style.display='none';
+        if(input) input.value='';
+    }
+    
+    let currentSearchResults=[];
+    let currentSearchIndex=0;
+    
+    function resetSearch(){
+        currentSearchResults=[];
+        currentSearchIndex=0;
+        const modal=document.getElementById('search-modal');
+        if(modal)modal.style.display='none';
+    }
+    
+    function setLanguage(lang){
+        if(lang!==currentLang){
+            currentLang=lang;
+            resetSearch();
+            localStorage.setItem('guidaLang',lang);
+            renderContent();
+        }
+    }
+
     function renderSection(id){
         if(id==='contact')return renderContact();
         if(id==='apartment')return renderApartment();
         if(id==='restaurants')return renderRestaurants();
         if(id==='services')return renderServices();
+        if(id==='parcheggi')return renderPlaceSection(appData.parking||[],'parcheggi');
         if(id==='usefulinfo')return renderUsefulInfo();
         if(id==='itinerari')return renderItinerariPicker();
         if(id==='conero')return renderConero();
@@ -912,7 +1322,7 @@
         });
         const dotsHtml = data.photos.length > 1 ? ('<div class="gallery-dots" id="fs-dots">' + data.photos.map((_, i) => '<span class="dot' + (i === 0 ? ' active' : '') + '"></span>').join('') + '</div>') : '';
         
-        // V7.0: Caption resa draggable e resizable
+        // V6.26: Caption resa draggable e resizable
         const captions = data.captions || (data.caption ? [data.caption] : []);
         const currentCaption = captions[0] || '';
         const captionHtml = currentCaption ? ('<div class="fs-gallery-caption" id="fs-caption-' + index + '">' +
@@ -940,7 +1350,7 @@
             }
         }
         
-        // V7.0: Rendi caption draggable e resizable
+        // V6.26: Rendi caption draggable e resizable
         if (currentCaption) {
             const captionEl = overlay.querySelector('#fs-caption-' + index);
             const headerEl = captionEl.querySelector('.fs-caption-header');
@@ -1056,16 +1466,16 @@
 
     function renderAnyPlaceDetail(p,index,total,isSubMode){
         const wrapId='photowrap_'+index;placeDataMap[wrapId]=p;
-        const desc=tr(p.it,p.en,p.de,p.pl);
+        const desc=currentSearchQuery?highlightWordInText(tr(p.it,p.en,p.de,p.pl),currentSearchQuery):tr(p.it,p.en,p.de,p.pl);
         const hoursBadge=getHoursBadge(p);
         const priceBadge=p.price?'<span class="price-badge" aria-label="Fascia di prezzo">'+p.price+'</span>':'';
         // V6.3: galleria multi-foto (max 4) — p.photos è un array; p.photo (singolare) è
         // mantenuto solo come fallback di compatibilità nel caso residuasse in qualche voce.
         const photos=(p.photos&&p.photos.length?p.photos:(p.photo?[p.photo]:[])).slice(0,4);
         // V6.13: calcola photoTip prima di usarlo in photoHtml (per l'onclick del fullscreen)
-        const photoTip=tr(p.itPhoto,p.enPhoto,p.dePhoto,p.plPhoto);
-        // Memorizzo i dati per il fullscreen
-        _detailGalleryData[index] = { photos: photos, caption: photoTip };
+        const photoTip=currentSearchQuery?highlightWordInText(tr(p.itPhoto,p.enPhoto,p.dePhoto,p.plPhoto),currentSearchQuery):tr(p.itPhoto,p.enPhoto,p.dePhoto,p.plPhoto);
+        // Memorizzo i dati per il fullscreen (caption vuoto — didascalia solo se esplicita)
+        _detailGalleryData[index] = { photos: photos, caption: '' };
         let photoHtml;
         if(photos.length){
             let slidesHtml='';
@@ -1087,8 +1497,8 @@
             deepHtml='<div class="place-section-block"><button class="place-deep-toggle" onclick="(function(btn){btn.classList.toggle(\'open\');var b=document.getElementById(\''+deepId+'\');b.classList.toggle(\'open\');btn.setAttribute(\'aria-expanded\',b.classList.contains(\'open\'));this})(this)" aria-expanded="false">📖 '+tr('Approfondisci','Learn more','Mehr erfahren','Dowiedz się więcej')+'</button><div class="place-deep-body" id="'+deepId+'">'+longDesc+'</div></div>';
         }
         // V5.0: meta-sezioni (👀 Da non perdere, 📸 Foto, ⏱ Tempo, 🚶 Prossima tappa)
-        const noteStr=tr(p.itNote,p.enNote,p.deNote,p.plNote);
-        const timeStr=tr(p.itTime,p.enTime,p.deTime,p.plTime);
+        const noteStr=currentSearchQuery?highlightWordInText(tr(p.itNote,p.enNote,p.deNote,p.plNote),currentSearchQuery):tr(p.itNote,p.enNote,p.deNote,p.plNote);
+        const timeStr=currentSearchQuery?highlightWordInText(tr(p.itTime,p.enTime,p.deTime,p.plTime),currentSearchQuery):tr(p.itTime,p.enTime,p.deTime,p.plTime);
         let metaHtml='';
         if(noteStr||photoTip||timeStr){
             metaHtml='<div class="place-section-block"><div class="place-meta">';
@@ -1238,9 +1648,8 @@
 
     function renderServices(){
         const s=appData.services;
-        const allPlaces=[...s.supermarkets,...s.parking,...(s.other||[])];
+        const allPlaces=[...s.supermarkets,...(s.other||[])];
         const smLen=s.supermarkets.length;
-        const pkLen=s.parking.length;
         currentSectionPlaces=allPlaces;
         for(let i=0;i<allPlaces.length;i++){const p=allPlaces[i];p._dist=(p.lat&&p.lng)?calcDistance(HOME_COORDS.lat,HOME_COORDS.lng,p.lat,p.lng):Infinity;}
 
@@ -1257,18 +1666,12 @@
             const hours=getHoursBadge(p);
             html+='<div class="place-row" onclick="selectServiceItem('+i+')" style="cursor:pointer"><div class="place-emoji" aria-hidden="true">'+p.emoji+'</div><div class="place-info"><div class="place-row-name">'+(i+1)+'. '+p.name+'</div><div class="place-row-dist">'+p.dist+'</div>'+hours+'</div></div>';
         }
-        // Parcheggi
-        html+='<div class="section-list-header" style="margin-top:8px"><span class="section-list-title">'+tr('Parcheggi','Parking','Parkplätze','Parkingi')+'</span></div>';
-        for(let i=0;i<s.parking.length;i++){
-            const p=s.parking[i];
-            html+='<div class="place-row" onclick="selectServiceItem('+(smLen+i)+')" style="cursor:pointer"><div class="place-emoji" aria-hidden="true">'+p.emoji+'</div><div class="place-info"><div class="place-row-name">'+(smLen+i+1)+'. '+p.name+'</div><div class="place-row-dist">'+p.dist+'</div></div></div>';
-        }
         // Altri servizi (lavanderia, ecc.)
         if(s.other&&s.other.length){
             html+='<div class="section-list-header" style="margin-top:8px"><span class="section-list-title">'+tr('Altri servizi','Other services','Weitere Dienstleistungen','Inne usługi')+'</span></div>';
             for(let i=0;i<s.other.length;i++){
                 const p=s.other[i];
-                html+='<div class="place-row" onclick="selectServiceItem('+(smLen+pkLen+i)+')" style="cursor:pointer"><div class="place-emoji" aria-hidden="true">'+p.emoji+'</div><div class="place-info"><div class="place-row-name">'+(smLen+pkLen+i+1)+'. '+p.name+'</div><div class="place-row-dist">'+p.dist+'</div></div></div>';
+                html+='<div class="place-row" onclick="selectServiceItem('+(smLen+i)+')" style="cursor:pointer"><div class="place-emoji" aria-hidden="true">'+p.emoji+'</div><div class="place-info"><div class="place-row-name">'+(smLen+i+1)+'. '+p.name+'</div><div class="place-row-dist">'+p.dist+'</div></div></div>';
             }
         }
         window._servicePlaces=allPlaces;
@@ -1432,7 +1835,7 @@
     // meta-version legato al ciclo di vita del service worker (quello scatta solo quando
     // il SW si attiva). Questo gira ad ogni apertura dell'app E ogni volta che torna in
     // primo piano da sfondo — il caso reale di "tocco l'icona di un'app già aperta".
-    const BUILD_NUMBER = 626;
+    const BUILD_NUMBER = 727;
     let _lastBuildCheck = 0;
     async function checkBuildNumber(){
         if(_reloading)return;
@@ -1454,6 +1857,15 @@
     }
     window.addEventListener('load', checkBuildNumber);
     document.addEventListener('visibilitychange', ()=>{ if(document.visibilityState==='visible') checkBuildNumber(); });
+    
+    document.addEventListener('keydown',(e)=>{
+        if(e.key==='Escape'){
+            const modal=document.getElementById('search-modal');
+            if(modal&&modal.style.display==='flex'){
+                clearAndCloseSearch();
+            }
+        }
+    });
 
     if('serviceWorker' in navigator)window.addEventListener('load',()=>{
         navigator.serviceWorker.register('./sw.js',{scope:'./'}).then(reg=>{

@@ -1,18 +1,18 @@
-// ===== V7.2 · 08/09/26 14:00 =====
+// ===== V7.3.2 · 13/09/26 · Build 746 =====
 // engine.js — Ancona Centro Guida Ospiti
 // Contiene SOLO la logica (rendering, mappa, GPS, meteo, ecc). Richiede che data.js sia
 // caricato PRIMA di questo file nello stesso documento (le const/let di data.js sono
 // condivise come scope globale tra script classici caricati in sequenza).
 // Versione motore: v7 — bump solo quando si modifica la logica in questo file, indipendente
 // dalla versione generale della guida.
-    const NO_GPS_SECTIONS = ['apartment', 'contact', 'usefulinfo', 'itinerari'];
+    const NO_GPS_SECTIONS = ['apartment', 'contact', 'usefulinfo', 'vicino', 'esplora', 'info', 'feedback'];
     const HOST_PHONE = '3356750269';
     const HOST_EMAIL = 'anconacentro@yahoo.com';
     const PHOTO_BASE = 'https://raw.githubusercontent.com/anconacentro2025/Guida-v-4.0/main/img/';
     // Unica fonte di verità per la versione cache.
     // Aggiornare solo questo valore ad ogni release — il SW lo riceve via postMessage,
     // non serve più modificare sw.js ad ogni versione.
-    const APP_CACHE_NAME = 'ancona-guida-v7.2-08091400';
+    const APP_CACHE_NAME = 'ancona-guida-v7.3.2-b746';
     const HOME_COORDS = { lat: 43.6181895, lng: 13.5129489 };
     const headerSubTr = { it: 'Guida Ospiti · Piazza Roma 3', en: 'Guest Guide · Piazza Roma 3', de: 'Gästeführer · Piazza Roma 3', pl: 'Przewodnik dla gości · Piazza Roma 3' };
     const ANCONA_LAT = 43.6181895, ANCONA_LNG = 13.5129489;
@@ -46,13 +46,23 @@
     ;
 
 ;
-    // FIX 23/08/26: sostituisce NAV_DIVIDER_AFTER_INDEX (indice numerico fisso, fragile
-    // se l'array sections cambia ordine/lunghezza). Home e nav-pills ora mostrano solo
-    // questi 6 id; le 8 sezioni-itinerario (mustsee...borghi) confluiscono nel picker
-    // "Itinerari" invece di comparire come tile/pill separate. I link diretti tipo #mustsee
-    // continuano a funzionare: sectionHashMap non viene toccato per quegli id.
-    const HOME_NAV_IDS = ['apartment','contact','services','restaurants','usefulinfo','parcheggi','itinerari'];
-    const ITINERARY_IDS = ['mustsee','passetto','cardeto','porto','beaches','portonovo','conero','borghi'];
+    // V7.3 09/09/26: home riorganizzata per priorità ospite (arrivo → vicino a piedi →
+    // esplora con mezzi → ristoranti → servizi/info), sostituendo il precedente unico
+    // picker "Itinerari" con 3 picker tematici. Home e nav-pills mostrano solo questi 6 id;
+    // le sezioni di dettaglio confluiscono nel picker corrispondente (vedi PICKER_CHILDREN)
+    // invece di comparire come tile/pill separate. I link diretti tipo #mustsee continuano
+    // a funzionare: sectionHashMap non viene toccato per quegli id.
+    // V7.3.2 10/09/26: nuovo ordine home su richiesta: Appartamento/Servizi&Info,
+    // Contatti/Ristoranti, Vicino a piedi/Scopri di più, Cerca/Feedback (griglia 2 colonne,
+    // 4 righe). 'search' non è una sezione vera (apre un modale, non un id in sections[]),
+    // quindi resta fuori da HOME_NAV_IDS (che pilota anche le pillole di navigazione in
+    // alto) e viene inserito via splice() nell'array delle tile solo per la home, nella
+    // posizione 7ª (tra Scopri di più e Feedback).
+    const HOME_NAV_IDS = ['apartment','info','contact','restaurants','vicino','esplora','feedback'];
+    const NEARBY_IDS = ['mustsee','passetto','cardeto','porto'];
+    const EXPLORE_IDS = ['beaches','portonovo','conero','borghi'];
+    const INFO_IDS = ['services','parcheggi','usefulinfo'];
+    const PICKER_CHILDREN = { vicino:NEARBY_IDS, esplora:EXPLORE_IDS, info:INFO_IDS };
 
     ;
 
@@ -76,6 +86,11 @@
         const val = (currentLang === 'en') ? (en || it) : (currentLang === 'de') ? (de || en || it) : (currentLang === 'pl') ? (pl || en || it) : it;
         return val || '';
     }
+    // V7.3.2 11/09/26: nomi tradotti per POI — la stragrande maggioranza dei nomi (monumenti,
+    // vie, piazze) NON va tradotta (sono nomi propri). Solo per titoli descrittivi (es. "Ancona
+    // sotto le bombe") si aggiungono nameEn/nameDe/namePl al singolo POI in data.js; il fallback
+    // a p.name garantisce zero impatto su tutti i POI che non hanno questi campi extra.
+    function getName(p){ return tr(p.name, p.nameEn||p.name, p.nameDe||p.name, p.namePl||p.name); }
     function setLang(lang) { currentLang=lang; document.documentElement.lang=lang; try{localStorage.setItem('guida_lang',lang);}catch(e){} document.querySelectorAll('.lang-btn').forEach(btn=>{ const isActive=btn.id==='btn-'+lang; btn.classList.toggle('active',isActive); btn.setAttribute('aria-checked',isActive?'true':'false'); }); if(leafletMap){leafletMap.remove();leafletMap=null;} if(homeStaticMap){homeStaticMap.remove();homeStaticMap=null;} _rf_lang=null; renderAll(); }
     document.querySelectorAll('.lang-btn').forEach(btn => { btn.addEventListener('click', function() { setLang(this.id.replace('btn-', '')); }); });
 
@@ -117,7 +132,13 @@
             if (isNaN(target.getTime())) return '';
             const now = new Date();
             const diff = target - now;
-            if (diff <= 0 || diff > 30*24*3600*1000) return '';
+            // FIX 09/09/26: prima mostrava il countdown per qualunque diff fino a 30 giorni,
+            // cioè praticamente per tutta la durata del soggiorno fin dal check-in. Ora appare
+            // solo dal giorno prima del check-out (mezzanotte) fino all'orario di check-out.
+            const dayBefore = new Date(target);
+            dayBefore.setDate(dayBefore.getDate() - 1);
+            dayBefore.setHours(0, 0, 0, 0);
+            if (diff <= 0 || now < dayBefore) return '';
             const d = Math.floor(diff/86400000);
             const h = Math.floor((diff%86400000)/3600000);
             const m = Math.floor((diff%3600000)/60000);
@@ -516,7 +537,7 @@
             if (p.isSubItinerary) markerClass += ' has-sub';
             
             const icon = L.divIcon({
-                html: '<div class="' + markerClass + '" aria-label="' + p.name + '" role="img">' + displayNum + '</div>',
+                html: '<div class="' + markerClass + '" aria-label="' + getName(p) + '" role="img">' + displayNum + '</div>',
                 className: '',
                 iconSize: [24, 24],
                 iconAnchor: [12, 12],
@@ -524,7 +545,7 @@
             });
             
             const m = L.marker([p.lat, p.lng], { icon: icon }).addTo(fullscreenMapInstance);
-            m.bindPopup('<b style="font-size:.78rem">' + p.emoji + ' ' + p.name + '</b><br><span style="font-size:.68rem;color:#888">' + (p.dist || '') + '</span>');
+            m.bindPopup('<b style="font-size:.78rem">' + p.emoji + ' ' + getName(p) + '</b><br><span style="font-size:.68rem;color:#888">' + (p.dist || '') + '</span>');
             
             m.on('click', function() {
                 const originalIndex = p._originalIndex !== undefined ? p._originalIndex : idx;
@@ -636,14 +657,14 @@
         nav.innerHTML=HOME_NAV_IDS.map(id=>{
             const s=sections.find(sec=>sec.id===id);
             const idx=sections.indexOf(s);
-            // Il pillolo "Itinerari" resta evidenziato anche quando si è dentro una delle
-            // 8 sotto-sezioni (mustsee, passetto, ecc.) raggiunte tramite il picker o un
-            // link diretto tipo #passetto — altrimenti nessun pillolo risulterebbe attivo.
-            const isActive=(id==='itinerari')
-                ? (currentSection===idx || ITINERARY_IDS.includes(sections[currentSection]&&sections[currentSection].id))
+            // Un pillolo picker (vicino/esplora/info) resta evidenziato anche quando si è
+            // dentro una delle sue sotto-sezioni raggiunte tramite il picker o un link
+            // diretto tipo #passetto — altrimenti nessun pillolo risulterebbe attivo.
+            const children=PICKER_CHILDREN[id];
+            const isActive=children
+                ? (currentSection===idx || children.includes(sections[currentSection]&&sections[currentSection].id))
                 : (currentSection===idx);
-            const divider=(id==='itinerari')?'<span class="nav-pill-divider" aria-hidden="true"></span>':'';
-            return divider+'<button class="nav-pill'+(isActive?' active':'')+'" data-index="'+idx+'" role="tab" aria-selected="'+(isActive?'true':'false')+'">'+s.icon+' '+tr(s.it,s.en,s.de,s.pl)+'</button>';
+            return '<button class="nav-pill'+(isActive?' active':'')+'" data-index="'+idx+'" role="tab" aria-selected="'+(isActive?'true':'false')+'">'+s.icon+' '+tr(s.it,s.en,s.de,s.pl)+'</button>';
         }).join('');
         nav.querySelectorAll('.nav-pill').forEach(btn=>btn.addEventListener('click',function(){
             // U2 V5.0 01/07/26: feedback immediato al click — riduce opacità del contenuto
@@ -656,7 +677,7 @@
         cont.innerHTML='<section class="section active"><div class="section-header"><div class="section-header-inner"><div class="section-icon" aria-hidden="true">'+s.icon+'</div><div><div class="section-title">'+tr(s.it,s.en,s.de,s.pl)+'</div></div></div></div><div class="cards">'+body+'<div class="goto-home"><button class="home-btn" id="home-btn">🏠 Home</button></div></div></section>';
         document.getElementById('home-btn')?.addEventListener('click',function(){goTo(-1);});
         document.getElementById('sub-back-btn')?.addEventListener('click',closeSubItinerary);
-        attachDetailListeners();attachPlaceSectionListeners();attachReachListeners();attachNavTileListeners();
+        attachDetailListeners();attachPlaceSectionListeners();attachReachListeners();attachNavTileListeners();attachFeedbackListeners();
         if(currentPlaceDetail<0&&!NO_GPS_SECTIONS.includes(s.id)){
             const cardsEl=cont.querySelector('.cards'),gpsContainer=document.createElement('div');gpsContainer.className='gps-container';
             gpsContainer.innerHTML='<div class="gps-box"><div class="gps-row"><div class="gps-icon">🧭</div><div class="gps-text"></div><div class="gps-buttons"></div></div></div><div class="gps-icon-overlay" id="gps-overlay-icon">📍</div>';
@@ -789,13 +810,12 @@
         const tiles=HOME_NAV_IDS.map(id=>{
             const s=sections.find(sec=>sec.id===id);
             const idx=sections.indexOf(s);
-            // FIX 23/08/26: divisore rimosso qui — grid-column:1/-1 lo fa occupare l'intera
-            // riga della griglia a 2 colonne, spingendo la tile successiva (Itinerari) da
-            // sola su un nuovo rigo invece di lasciarla affianco a Informazioni utili.
             return '<button class="nav-tile" data-index="'+idx+'" aria-label="'+tr(s.it,s.en,s.de,s.pl)+'"><div class="nav-tile-icon" aria-hidden="true">'+s.icon+'</div><div class="nav-tile-label">'+tr(s.it,s.en,s.de,s.pl)+'</div></button>';
-        }).join('');
+        });
         const searchTile='<button class="nav-tile" onclick="document.getElementById(\'search-modal\').style.display=\'flex\';document.getElementById(\'search-input\').focus()" aria-label="'+tr('Cerca','Search','Suchen','Szukaj')+'"><div class="nav-tile-icon" aria-hidden="true">🔍</div><div class="nav-tile-label">'+tr('Cerca','Search','Suchen','Szukaj')+'</div></button>';
-        const tilesWithSearch=searchTile+tiles;
+        // Cerca va tra Scopri di più (indice 5) e Feedback (indice 6, ultimo) — riga 4 colonna 1
+        tiles.splice(6,0,searchTile);
+        const tilesWithSearch=tiles.join('');
         const installBtnHtml='<button id="install-btn" class="install-btn" style="display:none">📲 '+tr('Aggiungi alla schermata Home','Add to Home Screen','Zum Startbildschirm hinzufügen','Dodaj do ekranu głównego')+'</button>';
         const whatsappBtnHtml='<a href="https://wa.me/39'+HOST_PHONE+'" target="_blank" rel="noopener noreferrer" class="home-whatsapp-btn" aria-label="Contatta l\'host su WhatsApp">💬 '+tr('Live Chat','Live Chat','Live-Chat','Czat na żywo')+'</a>';
         const countdownHtml=getCountdownHtml();
@@ -817,11 +837,11 @@
         if(installBtn){installBtn.addEventListener('click',async()=>{if(deferredPrompt){deferredPrompt.prompt();const{outcome}=await deferredPrompt.userChoice;deferredPrompt=null;installBtn.style.display='none';}});if(deferredPrompt)installBtn.style.display='inline-flex';else if(window.matchMedia('(display-mode:standalone)').matches)installBtn.style.display='none';}
     }
 
-    // FIX 23/08/26: schermata "Itinerari" — griglia di tile che raccoglie le 8 sezioni
-    // di esplorazione (prima tutte separate in home/nav). Riusa .nav-grid/.nav-tile,
-    // lo stesso stile già usato in home, nessun CSS nuovo introdotto.
-    function renderItinerariPicker(){
-        const tiles=ITINERARY_IDS.map(id=>{
+    // V7.3 09/09/26: griglia di tile generica per un picker (vicino/esplora/info) — prima
+    // esisteva solo per "Itinerari" (renderItinerariPicker), ora parametrica sui 3 picker.
+    // Riusa .nav-grid/.nav-tile, lo stesso stile già usato in home, nessun CSS nuovo introdotto.
+    function renderPickerGrid(ids){
+        const tiles=ids.map(id=>{
             const s=sections.find(sec=>sec.id===id);
             if(!s)return'';
             const idx=sections.indexOf(s);
@@ -1249,7 +1269,10 @@
         if(id==='services')return renderServices();
         if(id==='parcheggi')return renderPlaceSection(appData.parking||[],'parcheggi');
         if(id==='usefulinfo')return renderUsefulInfo();
-        if(id==='itinerari')return renderItinerariPicker();
+        if(id==='vicino')return renderPickerGrid(NEARBY_IDS);
+        if(id==='esplora')return renderPickerGrid(EXPLORE_IDS);
+        if(id==='info')return renderPickerGrid(INFO_IDS);
+        if(id==='feedback')return renderFeedback();
         if(id==='conero')return renderConero();
         if(id==='portonovo')return renderPortonovo();
         if(id==='porto')return renderPorto();
@@ -1294,14 +1317,14 @@
             let parent=null;for(let k=0;k<appData.mustsee.length;k++){if(appData.mustsee[k].subId===currentSubItinerary){parent=appData.mustsee[k];break;}}
             const descHtml=parent?'<div class="card"><div class="place-body"><div class="place-emoji-sm" aria-hidden="true">'+parent.emoji+'</div><div><div class="place-name">'+parent.name+'</div><div class="place-desc" style="margin-top:5px">'+tr(parent.it,parent.en,parent.de,parent.pl)+'</div></div></div></div>':'';
             if(currentPlaceDetail>=0&&currentPlaceDetail<items.length)return renderAnyPlaceDetail(items[currentPlaceDetail],currentPlaceDetail,items.length,true)+extraInfoBox;
-            const subBtns=items.map((p,i)=>{const dn=getDisplayNumber(p,i),sel=(i===currentPlaceDetail)?' selected':'';return'<button class="place-btn-mini'+sel+'" data-index="'+i+'" aria-label="'+p.name+'">'+dn+'. '+p.name+'</button>';}).join('');
+            const subBtns=items.map((p,i)=>{const dn=getDisplayNumber(p,i),sel=(i===currentPlaceDetail)?' selected':'';return'<button class="place-btn-mini'+sel+'" data-index="'+i+'" aria-label="'+getName(p)+'">'+dn+'. '+getName(p)+'</button>';}).join('');
             return'<button class="back-btn" id="sub-back-btn">← '+tr('Torna al tour principale','Back to main tour','Zurück zur Haupttour','Powrót do głównej trasy')+'</button>'+descHtml+'<div class="map-list-wrap"><div id="sectionMap" class="section-map-el" role="application" aria-label="Mappa dei luoghi"></div><div class="place-btn-col">'+starBtnHtml()+subBtns+'</div></div>'+extraInfoBox;
         }
         if(currentPlaceDetail>=0&&currentPlaceDetail<items.length)return renderAnyPlaceDetail(items[currentPlaceDetail],currentPlaceDetail,items.length,false)+extraInfoBox;
         const sortedItems = distSortActive ? items.slice().sort((a,b)=>(a._dist||Infinity)-(b._dist||Infinity)) : items;
         const distSortLabel = distSortActive ? '📍 '+tr('Ordine distanza','By distance','Nach Entfernung','Wg odległości') : '📍 '+tr('Ordina per distanza','Sort by distance','Nach Entfernung sortieren','Sortuj wg odl.');
         const distSortBtn = '<button class="dist-sort-btn'+(distSortActive?' active':'')+'" id="dist-sort-btn">'+distSortLabel+'</button>';
-        const btns=sortedItems.map((p,i)=>{const origIdx=items.indexOf(p),dn=getDisplayNumber(p,origIdx),sel=(origIdx===currentPlaceDetail)?' selected':'',subBadge=p.isSubItinerary?' 🔀':'',subHint=p.isSubItinerary?' – '+tr('mini-percorso','mini-tour','Mini-Tour','mini-trasa'):'';return'<button class="place-btn-mini'+sel+'" data-index="'+origIdx+'" aria-label="'+p.name+subHint+'">'+dn+'. '+p.name+subBadge+'</button>';}).join('');
+        const btns=sortedItems.map((p,i)=>{const origIdx=items.indexOf(p),dn=getDisplayNumber(p,origIdx),sel=(origIdx===currentPlaceDetail)?' selected':'',subBadge=p.isSubItinerary?' 🔀':'',subHint=p.isSubItinerary?' – '+tr('mini-percorso','mini-tour','Mini-Tour','mini-trasa'):'';return'<button class="place-btn-mini'+sel+'" data-index="'+origIdx+'" aria-label="'+getName(p)+subHint+'">'+dn+'. '+getName(p)+subBadge+'</button>';}).join('');
         return'<div class="map-list-wrap"><div id="sectionMap" class="section-map-el" role="application" aria-label="Mappa dei luoghi"></div><div class="place-btn-col">'+starBtnHtml()+distSortBtn+btns+'</div></div>'+extraInfoBox;
     }
 
@@ -1481,13 +1504,13 @@
             let slidesHtml='';
             photos.forEach((filename,i)=>{
                 const src=PHOTO_BASE+filename;
-                slidesHtml+='<div class="gallery-slide"><div class="detail-photo-placeholder" id="ph_'+index+'_'+i+'" aria-hidden="true">'+p.emoji+'</div><img class="detail-photo" src="'+src+'" alt="Foto di '+p.name+' '+(i+1)+'" loading="lazy" id="img_'+index+'_'+i+'"></div>';
+                slidesHtml+='<div class="gallery-slide"><div class="detail-photo-placeholder" id="ph_'+index+'_'+i+'" aria-hidden="true">'+p.emoji+'</div><img class="detail-photo" src="'+src+'" alt="Foto di '+getName(p)+' '+(i+1)+'" loading="lazy" id="img_'+index+'_'+i+'"></div>';
             });
             const dotsHtml=photos.length>1?('<div class="gallery-dots" id="dots_'+index+'">'+photos.map((_,i)=>'<span class="dot'+(i===0?' active':'')+'" data-idx="'+i+'"></span>').join('')+'</div>'):'';
             photoHtml='<div class="detail-photo-wrap" id="'+wrapId+'"><div class="detail-gallery" id="gallery_'+index+'" onclick="openDetailGalleryFullscreen('+index+')" style="cursor:pointer">'+slidesHtml+'</div>'+dotsHtml+'</div>';
         }
         else photoHtml='<div class="detail-photo-wrap" id="'+wrapId+'"><a href="'+getImgSearchUrl(p)+'" target="_blank" rel="noopener noreferrer" class="detail-photo-link" aria-label="Cerca foto di '+p.name+' su Google Immagini"><span class="placeholder-emoji" aria-hidden="true">🖼️</span><span class="placeholder-text">'+tr('Clicca per vedere le foto','Click to see photos','Klicken, um Fotos zu sehen','Kliknij, aby zobaczyć zdjęcia')+'</span></a></div>';
-        let btns='<a href="'+getMapLink(p.mapQuery||p.name,!!p.mapQuery)+'" target="_blank" rel="noopener noreferrer" class="map-button" aria-label="Apri mappa per '+p.name+'">🗺️ '+tr('Apri mappa','Open map','Karte öffnen','Otwórz mapę')+'</a>';
+        let btns='<a href="'+getMapLink(p.mapQuery||p.name,!!p.mapQuery)+'" target="_blank" rel="noopener noreferrer" class="map-button" aria-label="Apri mappa per '+getName(p)+'">🗺️ '+tr('Apri mappa','Open map','Karte öffnen','Otwórz mapę')+'</a>';
         if(!isSubMode&&p.extraMap){const extraHref=p.extraMap.url||getMapLink(p.extraMap.query,true);btns+=' <a href="'+extraHref+'" target="_blank" rel="noopener noreferrer" class="map-button" aria-label="'+p.extraMap.label+'">'+p.extraMap.label+'</a>';}
         // V5.0: sezione 📖 Approfondisci
         const deepId='deep_'+index;
@@ -1509,7 +1532,7 @@
         const backLabel=tr('Tutti i luoghi','All places','Alle Orte','Wszystkie miejsca');
         const prev=index>0?'<button class="nav-detail-btn" data-prev="'+(index-1)+'" aria-label="Luogo precedente">◀ '+tr('Prec.','Prev','Vor.','Poprz.')+'</button>':'<span></span>';
         const next=index<total-1?'<button class="nav-detail-btn" data-next="'+(index+1)+'" aria-label="Luogo successivo">'+tr('Succ.','Next','Näch.','Nast.')+' ▶</button>':'<span></span>';
-        const html='<button class="back-btn" id="detail-back-btn" aria-label="Torna alla lista dei luoghi">← '+backLabel+'</button><div class="place-card">'+photoHtml+'<div class="place-body"><div class="place-emoji-sm" aria-hidden="true">'+p.emoji+'</div><div style="width:100%"><div class="place-name">'+p.name+'</div><div class="place-dist">'+p.dist+priceBadge+'</div>'+hoursBadge+'<div class="place-desc" style="margin-top:6px">'+desc+'</div>'+deepHtml+metaHtml+'</div></div><div class="place-actions">'+btns+'</div></div><div class="detail-nav">'+prev+'<span class="detail-counter">'+displayNum+' / '+totalDisplay+'</span>'+next+'</div>';
+        const html='<button class="back-btn" id="detail-back-btn" aria-label="Torna alla lista dei luoghi">← '+backLabel+'</button><div class="place-card">'+photoHtml+'<div class="place-body"><div class="place-emoji-sm" aria-hidden="true">'+p.emoji+'</div><div style="width:100%"><div class="place-name">'+getName(p)+'</div><div class="place-dist">'+p.dist+priceBadge+'</div>'+hoursBadge+'<div class="place-desc" style="margin-top:6px">'+desc+'</div>'+deepHtml+metaHtml+'</div></div><div class="place-actions">'+btns+'</div></div><div class="detail-nav">'+prev+'<span class="detail-counter">'+displayNum+' / '+totalDisplay+'</span>'+next+'</div>';
         // V6.3: gestione caricamento/errore per-immagine + fallback completo solo se
         // TUTTE le immagini della galleria falliscono; sincronizzazione dots via scroll.
         setTimeout(()=>{
@@ -1603,7 +1626,7 @@
         if(currentPlaceDetail>=0&&currentPlaceDetail<places.length)return renderAnyPlaceDetail(places[currentPlaceDetail],currentPlaceDetail,places.length,false);
 
         // Mappa + lista numerata, stesso pattern delle altre sezioni-luogo
-        const btns=places.map((p,i)=>{const price=p.price?' '+p.price:'';return'<button class="place-btn-mini" data-index="'+i+'" aria-label="'+p.name+'">'+(i+1)+'. '+p.emoji+' '+p.name+price+'</button>';}).join('');
+        const btns=places.map((p,i)=>{const price=p.price?' '+p.price:'';return'<button class="place-btn-mini" data-index="'+i+'" aria-label="'+getName(p)+'">'+(i+1)+'. '+p.emoji+' '+getName(p)+price+'</button>';}).join('');
         let html='<div class="map-list-wrap"><div id="sectionMap" class="section-map-el" role="application" aria-label="Mappa dei ristoranti"></div><div class="place-btn-col">'+starBtnHtml()+btns+'</div></div>';
         return html;
     }
@@ -1623,7 +1646,7 @@
         for(let i=0;i<c.links.length;i++){const l=c.links[i];const label=tr(l.it,l.en,l.de,l.pl);html+='<div class="link-row"><span class="link-icon" aria-hidden="true">'+l.icon+'</span><div class="link-info"><div class="link-name">'+label+'</div></div><a href="'+l.url+'" target="_blank" rel="noopener noreferrer" class="link-action" aria-label="'+label+'">↗</a></div>';}
         html+='</div></div>';
         // Mappa + lista dei punti (numerati, stesso pattern di Cardeto/Passetto)
-        const btns=points.map((p,i)=>{const dn=getDisplayNumber(p,i);return'<button class="place-btn-mini" data-index="'+i+'" aria-label="'+p.name+'">'+dn+'. '+p.name+'</button>';}).join('');
+        const btns=points.map((p,i)=>{const dn=getDisplayNumber(p,i);return'<button class="place-btn-mini" data-index="'+i+'" aria-label="'+getName(p)+'">'+dn+'. '+getName(p)+'</button>';}).join('');
         html+='<div class="map-list-wrap"><div id="sectionMap" class="section-map-el" role="application" aria-label="Mappa Monte Conero"></div><div class="place-btn-col">'+starBtnHtml()+btns+'</div></div>';
         return html;
     }
@@ -1675,7 +1698,7 @@
         if(currentPlaceDetail>=0&&currentPlaceDetail<allPlaces.length)return renderAnyPlaceDetail(allPlaces[currentPlaceDetail],currentPlaceDetail,allPlaces.length,false);
 
         // Mappa con tutti i servizi (stesso pattern delle altre sezioni-luogo)
-        const mapBtns=allPlaces.map((p,i)=>'<button class="place-btn-mini" data-index="'+i+'" aria-label="'+p.name+'">'+(i+1)+'. '+p.emoji+' '+p.name+'</button>').join('');
+        const mapBtns=allPlaces.map((p,i)=>'<button class="place-btn-mini" data-index="'+i+'" aria-label="'+getName(p)+'">'+(i+1)+'. '+p.emoji+' '+getName(p)+'</button>').join('');
         let html='<div class="map-list-wrap"><div id="sectionMap" class="section-map-el" role="application" aria-label="Mappa dei servizi"></div><div class="place-btn-col">'+starBtnHtml()+mapBtns+'</div></div>';
 
         // Supermercati
@@ -1683,14 +1706,14 @@
         for(let i=0;i<s.supermarkets.length;i++){
             const p=s.supermarkets[i];
             const hours=getHoursBadge(p);
-            html+='<div class="place-row" onclick="selectServiceItem('+i+')" style="cursor:pointer"><div class="place-emoji" aria-hidden="true">'+p.emoji+'</div><div class="place-info"><div class="place-row-name">'+(i+1)+'. '+p.name+'</div><div class="place-row-dist">'+p.dist+'</div>'+hours+'</div></div>';
+            html+='<div class="place-row" onclick="selectServiceItem('+i+')" style="cursor:pointer"><div class="place-emoji" aria-hidden="true">'+p.emoji+'</div><div class="place-info"><div class="place-row-name">'+(i+1)+'. '+getName(p)+'</div><div class="place-row-dist">'+p.dist+'</div>'+hours+'</div></div>';
         }
         // Altri servizi (lavanderia, ecc.)
         if(s.other&&s.other.length){
             html+='<div class="section-list-header" style="margin-top:8px"><span class="section-list-title">'+tr('Altri servizi','Other services','Weitere Dienstleistungen','Inne usługi')+'</span></div>';
             for(let i=0;i<s.other.length;i++){
                 const p=s.other[i];
-                html+='<div class="place-row" onclick="selectServiceItem('+(smLen+i)+')" style="cursor:pointer"><div class="place-emoji" aria-hidden="true">'+p.emoji+'</div><div class="place-info"><div class="place-row-name">'+(smLen+i+1)+'. '+p.name+'</div><div class="place-row-dist">'+p.dist+'</div></div></div>';
+                html+='<div class="place-row" onclick="selectServiceItem('+(smLen+i)+')" style="cursor:pointer"><div class="place-emoji" aria-hidden="true">'+p.emoji+'</div><div class="place-info"><div class="place-row-name">'+(smLen+i+1)+'. '+getName(p)+'</div><div class="place-row-dist">'+p.dist+'</div></div></div>';
             }
         }
         window._servicePlaces=allPlaces;
@@ -1800,6 +1823,45 @@
         return'<div class="contact-card"><div class="contact-label">📞 '+tr('Host disponibile su WhatsApp','Host available on WhatsApp','Gastgeber auf WhatsApp erreichbar','Gospodarz dostępny na WhatsAppie')+'</div><div class="contact-number">'+fp+'</div><div class="contact-btns"><a href="https://wa.me/39'+HOST_PHONE+'" target="_blank" rel="noopener noreferrer" class="btn-wa" aria-label="Contatta su WhatsApp">💬 WhatsApp</a><a href="tel:+39'+HOST_PHONE+'" class="btn-call" aria-label="Chiama">📞 '+tr('Chiama','Call','Anrufen','Zadzwoń')+'</a></div><div class="contact-email">✉️ <a href="mailto:'+HOST_EMAIL+'">'+HOST_EMAIL+'</a></div><div style="margin-top:14px;display:flex;flex-wrap:wrap;justify-content:center;gap:16px"><a href="'+appData.social.instagram+'" target="_blank" rel="noopener noreferrer" class="social-link">📷 Instagram</a><a href="'+appData.social.facebook+'" target="_blank" rel="noopener noreferrer" class="social-link">📘 Facebook</a><a href="'+appData.social.signal+'" target="_blank" rel="noopener noreferrer" class="social-link">🔒 Signal</a><a href="'+appData.social.telegram+'" target="_blank" rel="noopener noreferrer" class="social-link">✈️ Telegram</a></div></div><div class="emerg-card"><div class="card-header"><span class="card-header-icon" aria-hidden="true">🚨</span><span class="card-title">'+tr('Numeri di emergenza','Emergency numbers','Notrufnummern','Numery alarmowe')+'</span></div><div class="emerg-row"><span class="emerg-num">🚨 112</span><span class="emerg-desc">'+tr('Emergenza generale','General emergency','Allgemeiner Notruf','Ogólne zagrożenie')+'</span></div><div class="emerg-row"><span class="emerg-num">🚓 113</span><span class="emerg-desc">'+tr('Polizia','Police','Polizei','Policja')+'</span></div><div class="emerg-row"><span class="emerg-num">🚑 118</span><span class="emerg-desc">'+tr('Emergenza sanitaria','Medical emergency','Medizinischer Notfall','Nagły wypadek medyczny')+'</span></div><div class="emerg-row"><span class="emerg-num">🏥 071 5961</span><span class="emerg-desc">'+tr('Ospedale Riuniti – Pronto Soccorso','Ospedale Riuniti – A&amp;E','Ospedale Riuniti – Notaufnahme','Szpital Riuniti – Izba przyjęć')+'</span></div><div class="emerg-row"><span class="emerg-num">💊</span><span class="emerg-desc"><a href="https://www.farmaciediturno.org/comune.asp?cod=42002" target="_blank" rel="noopener noreferrer" style="color:inherit;text-decoration:underline">'+tr('Farmacia di turno','Duty pharmacy','Diensthabende Apotheke','Apteka dyżurna')+'</a></span></div><div class="emerg-row"><span class="emerg-num">🚕 071 43321</span><span class="emerg-desc">Radiotaxi Ancona (24h)</span></div></div><div class="card" style="margin-top:10px"><div class="card-header"><span class="card-header-icon" aria-hidden="true">🔗</span><span class="card-title">'+tr('Link utili','Useful links','Nützliche Links','Przydatne linki')+'</span></div><div class="card-body" style="padding:0"><div class="link-row"><span class="link-icon" aria-hidden="true">📰</span><div class="link-info"><div class="link-name">Ufficio turistico – Edicola Piazza Roma</div><div class="link-desc">'+tr('Proprio davanti al portone','Right in front of the entrance','Direkt vor dem Eingang','Tuż przed wejściem')+'</div></div><a href="'+getMapLink('JG97+66 Ancona, Provincia di Ancona',true)+'" target="_blank" rel="noopener noreferrer" class="link-action" aria-label="Mappa Edicola">🗺️ '+tr('Mappa','Map','Karte','Mapa')+'</a></div><div class="link-row"><span class="link-icon" aria-hidden="true">🌐</span><div class="link-info"><div class="link-name">anconatourism.it</div><div class="link-desc">'+tr('Portale turistico ufficiale di Ancona','Official Ancona tourism portal','Offizielles Tourismusportal von Ancona','Oficjalny portal turystyczny Ankony')+'</div></div><a href="https://anconatourism.it" target="_blank" rel="noopener noreferrer" class="link-action" aria-label="Apri portale turistico">↗</a></div></div></div>';
     }
 
+    // V7.3.1 10/09/26: sezione dedicata Feedback — tile propria in fondo alla home
+    // (prima era una card dentro Contatti). Il testo si compila DENTRO l'app in una
+    // textarea precompilata e modificabile; solo al tap su "Invia su WhatsApp" si apre
+    // WhatsApp con il testo definitivo. L'invio effettivo resta comunque un tap manuale
+    // dentro WhatsApp stesso: nessuna pagina web può inviare messaggi WhatsApp in modo
+    // automatico, per policy della piattaforma.
+    function renderFeedback(){
+        const introTxt=tr(
+            'Il tuo parere mi aiuta a migliorare l\'appartamento, la guida e i consigli su ristoranti e itinerari. Scrivi qui il tuo feedback — puoi modificare liberamente il testo — poi premi "Invia su WhatsApp".',
+            'Your feedback helps me improve the apartment, the guide, and the restaurant and itinerary suggestions. Write your feedback here — feel free to edit the text — then tap "Send via WhatsApp".',
+            'Dein Feedback hilft mir, die Wohnung, den Guide sowie die Restaurant- und Routenvorschläge zu verbessern. Schreib dein Feedback hier — du kannst den Text frei bearbeiten — und tippe dann auf "Über WhatsApp senden".',
+            'Twoja opinia pomaga mi ulepszać mieszkanie, przewodnik oraz sugestie dotyczące restauracji i tras. Napisz tutaj swoją opinię — możesz dowolnie edytować tekst — a następnie naciśnij „Wyślij przez WhatsApp”.'
+        );
+        const template=tr(
+            'Ciao! 👋 Ecco il mio feedback sul soggiorno:\n\n🏠 Appartamento: \n📱 Guida: \n🍽️ Consigli seguiti (ristoranti/itinerari): \n👍 Apprezzamenti: \n⚠️ Problemi: \n\n',
+            'Hi! 👋 Here\'s my feedback about the stay:\n\n🏠 Apartment: \n📱 Guide: \n🍽️ Suggestions followed (restaurants/itineraries): \n👍 What I liked: \n⚠️ Issues: \n\n',
+            'Hallo! 👋 Hier ist mein Feedback zum Aufenthalt:\n\n🏠 Wohnung: \n📱 Guide: \n🍽️ Befolgte Empfehlungen (Restaurants/Routen): \n👍 Was mir gefallen hat: \n⚠️ Probleme: \n\n',
+            'Cześć! 👋 Oto moja opinia o pobycie:\n\n🏠 Mieszkanie: \n📱 Przewodnik: \n🍽️ Zastosowane sugestie (restauracje/trasy): \n👍 Co mi się podobało: \n⚠️ Problemy: \n\n'
+        );
+        // Escape minimo per inserimento sicuro dentro <textarea>...</textarea>
+        const safeTemplate=template.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+        const sendLabel=tr('Invia su WhatsApp','Send via WhatsApp','Über WhatsApp senden','Wyślij przez WhatsApp');
+        let html='<div class="card"><div class="card-body">'+introTxt+'</div></div>';
+        html+='<div class="card" style="margin-top:10px"><div class="card-body">';
+        html+='<textarea id="feedback-textarea" class="feedback-textarea" rows="11">'+safeTemplate+'</textarea>';
+        html+='<div style="margin-top:12px;text-align:center"><button type="button" class="btn-wa" style="border:none;cursor:pointer;font:inherit" id="feedback-send-btn" aria-label="'+sendLabel+'">💬 '+sendLabel+'</button></div>';
+        html+='</div></div>';
+        return html;
+    }
+
+    function attachFeedbackListeners(){
+        document.getElementById('feedback-send-btn')?.addEventListener('click',function(){
+            const ta=document.getElementById('feedback-textarea');
+            const text=ta?ta.value:'';
+            if(!text.trim())return;
+            window.open('https://wa.me/39'+HOST_PHONE+'?text='+encodeURIComponent(text),'_blank','noopener,noreferrer');
+        });
+    }
+
     function initSectionMap(){
         // FIX B3 V5.0 30/06/26: il contatore va azzerato all'ingresso di ogni chiamata
         // "fresca" (non di retry), non solo dopo la verifica di L. La versione precedente
@@ -1813,7 +1875,7 @@
         leafletMap=L.map('sectionMap',{zoomControl:true,attributionControl:true});
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19}).addTo(leafletMap);
         const bounds=[];
-        valid.forEach((p,idx)=>{const displayNum=getDisplayNumber(p,idx);let markerClass='map-marker-num';if(currentSubItinerary==='cardeto'||currentSubItinerary==='cittadella')markerClass+=' '+currentSubItinerary;if(p.isSubItinerary)markerClass+=' has-sub';const icon=L.divIcon({html:'<div class="'+markerClass+'" aria-label="'+p.name+'" role="img">'+displayNum+'</div>',className:'',iconSize:[24,24],iconAnchor:[12,12],popupAnchor:[0,-14]});const m=L.marker([p.lat,p.lng],{icon:icon}).addTo(leafletMap);m.bindPopup('<b style="font-size:.78rem">'+p.emoji+' '+p.name+'</b><br><span style="font-size:.68rem;color:#888">'+p.dist+'</span>');
+        valid.forEach((p,idx)=>{const displayNum=getDisplayNumber(p,idx);let markerClass='map-marker-num';if(currentSubItinerary==='cardeto'||currentSubItinerary==='cittadella')markerClass+=' '+currentSubItinerary;if(p.isSubItinerary)markerClass+=' has-sub';const icon=L.divIcon({html:'<div class="'+markerClass+'" aria-label="'+getName(p)+'" role="img">'+displayNum+'</div>',className:'',iconSize:[24,24],iconAnchor:[12,12],popupAnchor:[0,-14]});const m=L.marker([p.lat,p.lng],{icon:icon}).addTo(leafletMap);m.bindPopup('<b style="font-size:.78rem">'+p.emoji+' '+getName(p)+'</b><br><span style="font-size:.68rem;color:#888">'+p.dist+'</span>');
             m.on('click',function(e){
                 // Bug fix V5.0: stopPropagation impedisce che il click sul marker
                 // risalga alla mappa e apra il fullscreen inaspettatamente
@@ -1854,7 +1916,7 @@
     // meta-version legato al ciclo di vita del service worker (quello scatta solo quando
     // il SW si attiva). Questo gira ad ogni apertura dell'app E ogni volta che torna in
     // primo piano da sfondo — il caso reale di "tocco l'icona di un'app già aperta".
-    const BUILD_NUMBER = 740;
+    const BUILD_NUMBER = 746;
     let _lastBuildCheck = 0;
     async function checkBuildNumber(){
         if(_reloading)return;
